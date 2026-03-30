@@ -408,7 +408,7 @@ const App = () => {
 
                   {/* Grid System: 2 cols on mobile/tablet, 3 on Laptop */}
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 font-urdu">
-                     <DashboardCard labelUr={`کل ادائیگی ${selectedYear}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="indigo" />
+                     <DashboardCard labelUr={`کل ادائیگی ${selectedYear}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="emerald" />
                      <DashboardCard labelUr={`بقایا وصولی ${selectedYear}`} val={`Rs. ${pendingVal.toLocaleString()}`} diff={`${pendingPercent}%`} color="orange" />
                      <DashboardCard labelUr={`کل اخراجات ${selectedYear}`} val={`Rs. ${expenseVal.toLocaleString()}`} color="rose" />
                   </div>
