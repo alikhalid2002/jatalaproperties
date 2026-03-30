@@ -719,7 +719,7 @@ const DashboardCard = ({ labelUr, val, diff, color, icon }) => {
         </div>
         
         <div className="space-y-1 lg:space-y-2">
-          <p className="text-slate-400 text-[12px] lg:text-[14px] font-black uppercase tracking-[0.2em] leading-tight font-urdu opacity-80">{labelUr}</p>
+          <p className="text-emerald-400 lg:text-slate-400 text-[12px] lg:text-[14px] font-black uppercase tracking-[0.2em] leading-tight font-urdu opacity-100 lg:opacity-80">{labelUr}</p>
           <h3 className="text-2xl lg:text-4xl font-black italic tracking-tighter text-white font-urdu">
             <span className="text-slate-500 text-[12px] lg:text-[14px] mr-2 leading-none not-italic tracking-normal opacity-50">Rs.</span>
             {val}
