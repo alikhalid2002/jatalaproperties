@@ -1,0 +1,931 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Map, Store, Receipt, BarChart3, Settings, 
+  UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
+  Plus, UserPlus, Trash2, Loader2, Save, CheckCircle,
+  ArrowUpRight, ArrowDownRight, Clock, Activity, Search as SearchIcon,
+  Shield, User, X, Lock, Calendar
+} from 'lucide-react';
+import { useFinanceData } from './useFinanceData';
+import { useFarmers } from './useFarmers';
+import { useGlobalActivity } from './useGlobalActivity';
+import AddEntryModal from './AddEntryModal';
+import LandAssets from './LandAssets';
+import ShopsPage from './ShopsPage';
+import FinancialReports from './FinancialReports';
+import SoldProperties from './SoldProperties';
+import { db } from './firebase';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+
+import { 
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+  CartesianGrid, BarChart, Bar, Cell 
+} from 'recharts';
+import Skeleton, { DashboardSkeleton, CardSkeleton } from './Skeleton';
+import { transliterateToUrdu } from './urduTransliterator';
+
+import { seedShops } from './seedShops';
+
+const App = () => {
+  const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [selectedYear, setSelectedYear] = useState('2024');
+
+  useEffect(() => {
+    seedShops();
+  }, []);
+
+  useEffect(() => {
+    if (accountType) {
+      localStorage.setItem('jatala_auth', accountType);
+    } else {
+      localStorage.removeItem('jatala_auth');
+    }
+  }, [accountType]);
+
+  const [showYearMenu, setShowYearMenu] = useState(false);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(accountType === 'ali');
+  const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [authStage, setAuthStage] = useState('selection'); // selection, password
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState(false);
+
+  const handleAdminLogin = (e) => {
+    e?.preventDefault();
+    if (passwordInput === 'ali321') {
+      setAccountType('ali');
+      setAuthStage('selection');
+    } else {
+      setLoginError(true);
+      setTimeout(() => setLoginError(false), 2000);
+    }
+  };
+
+  // Stats Data from Firebase
+  const { 
+    revenue: revenueVal = 0, 
+    pending: pendingVal = 0, 
+    expenses: expenseVal = 0, 
+    entries = [], 
+    loading: financeLoading, 
+    addEntry, 
+    updateEntry, 
+    deleteEntry 
+  } = useFinanceData(selectedYear);
+  
+  const { farmers, loading: farmersLoading } = useFarmers();
+  const { activities, loading: activityLoading } = useGlobalActivity();
+  
+  // Use a local state/hook for shops if needed, or stick to the current implementation
+  const [shops, setShops] = useState([]);
+  const [soldProperties, setSoldProperties] = useState([]);
+
+  useEffect(() => {
+    const unsubShops = onSnapshot(collection(db, 'shops'), (snapshot) => {
+      setShops(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    const unsubSold = onSnapshot(collection(db, 'sold_properties'), (snapshot) => {
+      setSoldProperties(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => { unsubShops(); unsubSold(); };
+  }, []);
+
+  const loading = financeLoading || activityLoading || farmersLoading;
+
+  const totalComparison = revenueVal + pendingVal;
+  const revenuePercent = totalComparison > 0 ? Math.round((revenueVal / totalComparison) * 100) : 0;
+  const pendingPercent = totalComparison > 0 ? Math.round((pendingVal / totalComparison) * 100) : 0;
+
+  // Prepare chart data (Monthly trend)
+  const chartData = useMemo(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months.map((month, idx) => {
+      const monthEntries = entries.filter(e => {
+        const d = e.date ? new Date(e.date) : (e.createdAt?.seconds ? new Date(e.createdAt.seconds * 1000) : null);
+        return d && d.getMonth() === idx;
+      });
+      const rev = monthEntries.filter(e => e.type === 'revenue' && e.status === 'received').reduce((s, e) => s + Number(e.amount), 0);
+      const exp = monthEntries.filter(e => ['expense', 'shop_expense'].includes(e.type)).reduce((s, e) => s + Number(e.amount), 0);
+      return { name: month, revenue: rev, expense: exp };
+    });
+  }, [entries]);
+
+  const menuItems = [
+    { id: 'Dashboard', labelUr: 'ڈیش بورڈ', icon: <LayoutDashboard size={20} /> },
+    { id: 'Land', labelUr: 'زرعی زمین', icon: <Map size={20} /> },
+    { id: 'Shops', labelUr: 'کمرشل دکانیں', icon: <Store size={20} /> },
+    { id: 'Expenses', labelUr: 'اخراجات', icon: <Receipt size={20} /> },
+    { id: 'Sold', labelUr: 'فروخت شدہ', icon: <CheckCircle size={20} /> },
+    { id: 'Reports', labelUr: 'مالیاتی رپورٹس', icon: <BarChart3 size={20} /> },
+    { id: 'Settings', labelUr: 'ترتیبات', icon: <Settings size={20} /> }
+  ];
+
+  const years = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+
+  if (!accountType) {
+    return (
+      <div className="fixed inset-0 bg-[#0f172a] flex items-center justify-center p-6 lg:p-10 z-[1000] overflow-hidden">
+        {/* Animated Background Orbs */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
+
+        <div className="w-full max-w-2xl text-center space-y-12 relative z-10">
+          <div className="space-y-6">
+            <h1 className="text-5xl lg:text-7xl font-black text-white font-urdu tracking-tight leading-normal drop-shadow-2xl">جٹالہ پراپرٹیز</h1>
+            <p className="text-[12px] lg:text-[14px] font-black text-indigo-400 uppercase tracking-[0.5em] italic">Premium Real Estate Management Suite</p>
+          </div>
+
+          {authStage === 'selection' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-xl mx-auto animate-login">
+              <button 
+                onClick={() => { setAuthStage('password'); setPasswordInput(''); setLoginError(false); }}
+                className="group p-10 bg-slate-800/40 border border-slate-700/50 rounded-[40px] hover:bg-indigo-600 transition-all duration-500 shadow-2xl hover:scale-[1.02] active:scale-95 flex flex-col items-center gap-6"
+              >
+                <div className="p-5 bg-indigo-500/10 text-indigo-400 group-hover:bg-white/20 group-hover:text-white rounded-[24px] transition-all">
+                  <Shield size={40} strokeWidth={1} />
+                </div>
+                 <div className="text-center">
+                    <span className="text-3xl font-black text-white font-urdu block group-hover:scale-110 transition-transform">علی</span>
+                 </div>
+              </button>
+
+              <button 
+                onClick={() => setAccountType('guest')}
+                className="group p-10 bg-slate-800/40 border border-slate-700/50 rounded-[40px] hover:bg-slate-800 transition-all duration-500 shadow-2xl hover:scale-[1.02] active:scale-95 flex flex-col items-center gap-6"
+              >
+                <div className="p-5 bg-slate-700/50 text-slate-400 group-hover:text-blue-400 rounded-[24px] transition-all">
+                  <User size={40} strokeWidth={1} />
+                </div>
+                 <div className="text-center">
+                    <span className="text-3xl font-black text-white font-urdu block">گیسٹ</span>
+                 </div>
+              </button>
+            </div>
+          ) : (
+            <div className="max-w-md mx-auto w-full animate-login">
+              <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-8 lg:p-12 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="p-4 bg-indigo-500/10 text-indigo-400 rounded-2xl">
+                    <Lock size={32} />
+                  </div>
+                  <h2 className="text-3xl font-black text-white font-urdu">پاس ورڈ درج کریں</h2>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Administrative Verification Required</p>
+                </div>
+
+                <form onSubmit={handleAdminLogin} className="space-y-6">
+                  <div className="relative">
+                    <input 
+                      autoFocus
+                      type="password"
+                      autoComplete="new-password"
+                      value={passwordInput}
+                      onChange={(e) => setPasswordInput(e.target.value)}
+                      placeholder="Password..."
+                      className={`w-full bg-slate-900/80 border ${loginError ? 'border-rose-500' : 'border-slate-700'} rounded-2xl py-5 px-6 text-white text-center text-lg font-black tracking-[0.5em] focus:outline-none focus:border-indigo-500 transition-all shadow-inner`}
+                    />
+                    {loginError && (
+                      <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest mt-3 animate-bounce">Incorrect Password • نامکمل یا غلط پاس ورڈ</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => { setAuthStage('selection'); setPasswordInput(''); }}
+                      className="flex-1 py-5 bg-slate-800 text-slate-400 font-black rounded-2xl hover:bg-slate-700 transition-all active:scale-95"
+                    >
+                      بیک
+                    </button>
+                    <button 
+                      type="submit"
+                      className="flex-1 py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
+                    >
+                      لاگ ان
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          
+          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] italic">Authorized Personnel Only • Secure Session</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden select-none" dir="ltr">
+      
+      {/* ── Desktop Sidebar ───────────────────────────────────── */}
+      <aside className="hidden lg:flex w-[280px] bg-slate-900 border-l border-slate-800 flex-col py-10 px-6 shrink-0 z-50">
+        <div className="flex items-center gap-4 px-4 mb-14 group">
+          <div className="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-[20px] flex items-center justify-center shadow-lg shadow-indigo-500/20 rotate-3 group-hover:rotate-12 transition-transform duration-500">
+             <Map className="text-white" size={28} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-white italic font-urdu leading-none">جٹالہ اسٹیٹ</h1>
+            <p className="text-[10px] font-black tracking-widest text-slate-500 mt-2 uppercase">Core Portfolio</p>
+          </div>
+        </div>
+
+        <nav className="flex-1 space-y-2">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group
+                ${activeTab === item.id 
+                  ? 'bg-gradient-to-l from-indigo-500/10 to-transparent text-indigo-400 border-r-4 border-indigo-500 shadow-xl shadow-indigo-500/5' 
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
+            >
+              <div className={`${activeTab === item.id ? 'scale-110' : 'group-hover:translate-x-1'} transition-transform`}>
+                {item.icon}
+              </div>
+              <span className="text-[17px] font-black font-urdu">{item.labelUr}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* ── Main Content Area ───────────────────────────────── */}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Header */}
+        <header className="h-24 lg:h-28 border-b border-slate-800 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-40 sticky top-0">
+          <div className="flex items-center gap-6 flex-1">
+             {/* Year Selector Dropdown - Moved to Far Left */}
+             <div className="relative lg:flex hidden">
+               <button 
+                 onClick={() => setShowYearMenu(!showYearMenu)}
+                 className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-[20px] transition-all group shadow-inner"
+               >
+                  <Calendar size={16} className="text-indigo-400" />
+                  <span className="text-[13px] font-black text-white font-urdu">{selectedYear}</span>
+                  <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
+               </button>
+
+               {showYearMenu && (
+                 <div className="absolute left-0 mt-20 w-44 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-y-auto no-scrollbar max-h-[300px] z-50 animate-in fade-in slide-in-from-top-3 backdrop-blur-2xl">
+                    {['2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((year) => (
+                      <button 
+                        key={year}
+                        onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                        className={`w-full px-5 py-4 text-left flex items-center justify-between transition-colors hover:bg-slate-800 ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-400'}`}
+                      >
+                         <span className="text-[13px] font-black font-urdu">{year}</span>
+                         {selectedYear === year && <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>}
+                      </button>
+                    ))}
+                 </div>
+               )}
+             </div>
+
+             <div className="relative group max-w-sm w-full lg:flex hidden">
+                <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="سرچ کریں..." 
+                  className="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-14 pr-6 text-sm text-white focus:border-indigo-500 focus:bg-slate-800/60 outline-none transition-all font-urdu"
+                  value={globalSearch}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const isEnglish = /[a-zA-Z]/.test(val);
+                    setGlobalSearch(isEnglish ? transliterateToUrdu(val) : val);
+                  }}
+                />
+             </div>
+
+             {/* Global Add Expense Button - Moved to Top */}
+             {isAdmin && (
+                <button 
+                  onClick={() => setIsAddEntryModalOpen(true)}
+                  className="hidden md:flex items-center gap-3 px-5 py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-rose-600/20 group animate-in slide-in-from-right-4"
+                >
+                  <Receipt size={18} className="group-hover:rotate-12 transition-transform" />
+                  <span className="font-urdu hidden xl:block">خرچہ درج کریں</span>
+                </button>
+             )}
+             {/* Mobile Logo */}
+             <div className="lg:hidden flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Map className="text-white" size={20} />
+                </div>
+                <h1 className="text-lg font-black text-white font-urdu">جٹالہ اسٹیٹ</h1>
+             </div>
+          </div>
+
+          {/* Right: Controls */}
+          <div className="flex items-center gap-2 lg:gap-3">
+            <button className="p-2 lg:p-3 text-slate-400 hover:text-white transition-all relative">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#0f172a]"></span>
+            </button>
+
+            <div className="relative ml-1 lg:ml-2">
+              <button 
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                className="flex items-center gap-2 lg:gap-3 p-1 pr-3 lg:pr-5 bg-slate-800/40 hover:bg-slate-800 rounded-full border border-slate-700 transition-all active:scale-95 group"
+              >
+                <div className="w-8 h-8 lg:w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20 text-white border border-indigo-400/20">
+                  <UserCircle size={20} />
+                </div>
+                <div className="text-left hidden lg:block">
+                  <p className="text-[13px] font-black text-white leading-none font-urdu">{accountType === 'ali' ? 'ali' : 'guest'}</p>
+                </div>
+                <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 group-hover:text-indigo-400 ${showAccountMenu ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showAccountMenu && (
+                <div className="absolute right-0 mt-3 w-56 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-3 backdrop-blur-xl">
+                   <button 
+                     onClick={() => { 
+                       if (accountType !== 'ali') {
+                         setAccountType(null); 
+                         setAuthStage('password'); 
+                         setPasswordInput('');
+                       }
+                       setShowAccountMenu(false); 
+                     }} 
+                     className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-700 transition-colors border-b border-slate-700/50"
+                   >
+                     <div className="text-left leading-tight text-white">
+                       <span className="text-lg font-black block font-urdu">ali</span>
+                     </div>
+                     {accountType === 'ali' && <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>}
+                   </button>
+                   <button onClick={() => { setAccountType('guest'); setShowAccountMenu(false); }} className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-700 transition-colors">
+                     <div className="text-left leading-tight text-white">
+                       <span className="text-lg font-black block font-urdu">guest</span>
+                     </div>
+                     {accountType === 'guest' && <div className="w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>}
+                   </button>
+                   <button onClick={() => { setAccountType(null); setShowAccountMenu(false); }} className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-rose-900/20 transition-colors border-t border-slate-700/50">
+                     <span className="text-sm font-black text-rose-400">Logout</span>
+                   </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto no-scrollbar lg:px-12 px-4 lg:py-12 py-6">
+          <div className="max-w-[1600px] mx-auto min-h-full flex flex-col">
+            {globalSearch ? (
+              <SearchResults query={globalSearch} data={{ farmers, shops, soldProperties }} onNavigate={(tab) => { setGlobalSearch(''); setActiveTab(tab); }} />
+            ) : activeTab === 'Dashboard' ? (
+              loading ? <DashboardSkeleton /> : (
+                <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0">
+                  {/* Grid System: 2 cols on mobile/tablet, 3 on Laptop */}
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 font-urdu">
+                     <DashboardCard labelUr={`کل ادائیگی ${selectedYear}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="indigo" />
+                     <DashboardCard labelUr={`بقایا وصولی ${selectedYear}`} val={`Rs. ${pendingVal.toLocaleString()}`} diff={`${pendingPercent}%`} color="orange" />
+                     <DashboardCard labelUr={`کل اخراجات ${selectedYear}`} val={`Rs. ${expenseVal.toLocaleString()}`} color="rose" />
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
+                    <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-6 lg:p-10 flex flex-col gap-10 shadow-2xl relative overflow-hidden group">
+                      <div className="relative z-10">
+                        <h2 className="text-3xl font-black text-white italic font-urdu leading-none">مالیاتی جائزہ</h2>
+                        <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-4 italic font-urdu">ریئل ٹائم مانیٹرنگ</p>
+                      </div>
+                      
+                      <div className="flex-1 min-h-[300px] w-full items-center justify-center flex">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={chartData}>
+                            <defs>
+                              <linearGradient id="colorRev" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                              </linearGradient>
+                              <linearGradient id="colorExp" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                            <XAxis dataKey="name" hide />
+                            <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', fontWeight: '900' }} />
+                            <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 flex flex-col gap-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-black text-white italic font-urdu">حالیہ سرگرمی</h3>
+                          <p className="text-[10px] uppercase font-black text-indigo-400 tracking-[0.2em] mt-1 italic font-urdu">تازہ ترین معلومات</p>
+                        </div>
+                        <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-xl">
+                          <Activity size={18} />
+                        </div>
+                      </div>
+
+                      <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar max-h-[400px]">
+                        {activities.length === 0 ? (
+                          <div className="h-full flex flex-col items-center justify-center opacity-30 gap-4 py-20">
+                            <Activity size={48} className="text-slate-600" />
+                            <p className="text-[12px] font-black uppercase tracking-[0.3em] font-urdu">کوئی نئی سرگرمی نہیں</p>
+                          </div>
+                        ) : (
+                          activities.map((act) => (
+                            <div key={act.id} className="group flex items-center justify-between p-4 bg-slate-900/40 border border-slate-700/30 rounded-3xl hover:border-indigo-500/50 transition-all">
+                              <div className="flex items-center gap-4">
+                                <div className={`p-3 rounded-2xl ${act.isRevenue ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                  {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
+                                </div>
+                                <div className="text-left font-urdu">
+                                  <p className="text-sm text-white leading-tight">{act.labelUr}</p>
+                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-sm font-black italic ${act.isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                  {act.isRevenue ? '+' : '-'} {act.amount.toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            ) : activeTab === 'Land' ? (
+              <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
+            ) : activeTab === 'Shops' ? (
+              <ShopsPage isAdmin={accountType === 'ali'} />
+            ) : activeTab === 'Expenses' ? (
+              <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
+                <div className="flex justify-between items-center mb-8 px-4">
+                  <div className="flex items-center gap-4 lg:gap-6">
+                    <div className="p-3 lg:p-4 bg-rose-500/20 text-rose-500 rounded-2xl">
+                       <Receipt size={24}/>
+                    </div>
+                    <div>
+                        <h2 className="text-xl lg:text-3xl font-black text-white font-urdu">اخراجات</h2>
+                        <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-[0.2em] mt-2 italic font-urdu">مکمل آڈٹ</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="px-4 lg:px-6 py-3 bg-slate-800 border border-slate-700 rounded-2xl text-[12px] font-black text-white font-urdu">
+                       کل: Rs. {expenseVal.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden flex flex-col">
+                  <div className="overflow-x-auto overflow-y-auto no-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 bg-[#0f172a] z-10 border-b border-slate-700/50">
+                        <tr>
+                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">تاریخ</th>
+                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-center">کیٹیگری</th>
+                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">رقم</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/30">
+                        {entries.filter(e => ['expense', 'shop_expense'].includes(e.type)).map((entry) => (
+                           <tr key={entry.id} className="group hover:bg-white/5 transition-all">
+                              <td className="p-6">
+                                <p className="text-white font-black italic text-xs mb-1 uppercase">{entry.date}</p>
+                                <p className="text-[9px] font-black text-slate-500 font-urdu">{entry.labelUr}</p>
+                              </td>
+                              <td className="p-6 text-center">
+                                <span className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-[9px] font-black uppercase tracking-widest">{entry.type}</span>
+                              </td>
+                              <td className="p-6 text-right">
+                                <p className="text-lg font-black italic text-rose-400">Rs. {Number(entry.amount).toLocaleString()}</p>
+                              </td>
+                           </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            ) : activeTab === 'Reports' ? (
+              <FinancialReports entries={entries} selectedYear={selectedYear} />
+            ) : activeTab === 'Sold' ? (
+              <SoldProperties isAdmin={accountType === 'ali'} />
+            ) : activeTab === 'Settings' ? (
+              accountType === 'ali' ? <SettingsPage /> : (
+                <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
+                  <Settings size={64} className="mb-6 text-slate-500"/>
+                  <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
+                </div>
+              )
+            ) : (
+                <div className="flex-1 flex flex-col items-center justify-center opacity-20">
+                  <Search size={64} className="mb-6 text-slate-500"/>
+                  <h2 className="text-xl font-black font-urdu">{activeTab}</h2>
+                </div>
+            )}
+          </div>
+        </div>
+
+        {/* Floating Action Button - Only for Admin */}
+        {accountType === 'ali' && (
+          <button 
+            onClick={() => setIsAddEntryModalOpen(true)}
+            className="fixed bottom-24 lg:bottom-10 right-6 lg:right-10 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-600/40 hover:scale-110 active:scale-95 transition-all z-[60] ring-4 ring-indigo-500/20"
+          >
+            <Plus size={32} className="text-white" />
+          </button>
+        )}
+
+        {/* Mobile Bottom Navigation Bar */}
+        <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-800 flex justify-around items-center p-3 z-50 pb-6">
+           {menuItems.map((item) => (
+             <button
+               key={item.id}
+               onClick={() => setActiveTab(item.id)}
+               className={`flex flex-col items-center gap-1 transition-all ${activeTab === item.id ? 'text-indigo-500 scale-105' : 'text-slate-500'}`}
+             >
+               <div className={`${activeTab === item.id ? 'text-indigo-400' : ''}`}>
+                 {React.cloneElement(item.icon, { size: activeTab === item.id ? 22 : 20 })}
+               </div>
+                <span className="text-[9px] font-black font-urdu mt-0.5">{item.labelUr}</span>
+             </button>
+           ))}
+        </nav>
+      </main>
+      <AddEntryModal 
+        isOpen={isAddEntryModalOpen} 
+        onClose={() => setIsAddEntryModalOpen(false)} 
+        onAdd={addEntry} 
+      />
+    </div>
+  );
+};
+
+const EditableRow = ({ entry, onUpdate, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ ...entry });
+
+  const handleUpdate = async () => {
+    await onUpdate(entry.id, entry.type, editData);
+    setIsEditing(false);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Delete this record permanently?")) {
+      await onDelete(entry.id, entry.type);
+    }
+  };
+
+  return (
+    <tr className="group hover:bg-slate-700/10 transition-colors">
+      <td className="p-6">
+        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+          entry.type === 'expense' ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'
+        }`}>
+          {entry.type}
+        </span>
+      </td>
+      <td className="p-6">
+        {isEditing ? (
+          <input 
+            value={editData.labelUr}
+            onChange={(e) => {
+              const val = e.target.value;
+              const isEnglish = /[a-zA-Z]/.test(val);
+              setEditData({...editData, labelUr: isEnglish ? transliterateToUrdu(val) : val});
+            }}
+            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none w-full"
+          />
+        ) : (
+          <p className="text-xs font-bold text-slate-300">{entry.labelUr}</p>
+        )}
+      </td>
+      <td className="p-6">
+        {isEditing && entry.type === 'revenue' ? (
+          <select 
+            value={editData.status}
+            onChange={(e) => setEditData({...editData, status: e.target.value})}
+            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none"
+          >
+            <option value="received">Received</option>
+            <option value="pending">Pending</option>
+          </select>
+        ) : (
+          <span className={`text-[10px] font-black uppercase tracking-widest ${
+            entry.status === 'received' ? 'text-emerald-500' : 'text-orange-400 italic'
+          }`}>
+            {entry.status || 'Paid'}
+          </span>
+        )}
+      </td>
+      <td className="p-6 text-right">
+        {isEditing ? (
+          <input 
+            type="number"
+            value={editData.amount}
+            onChange={(e) => setEditData({...editData, amount: e.target.value})}
+            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none w-24 text-right"
+          />
+        ) : (
+          <p className="text-sm font-black text-white italic">Rs. {Number(entry.amount).toLocaleString()}</p>
+        )}
+      </td>
+      <td className="p-6 text-center">
+        <div className="flex items-center justify-center gap-2">
+          {isEditing ? (
+            <>
+              <button onClick={handleUpdate} className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30">
+                <Save size={14} />
+              </button>
+              <button onClick={() => setIsEditing(false)} className="p-2 bg-slate-700/50 text-slate-400 rounded-lg">
+                <X size={14} />
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+              >
+                <Settings size={14} />
+              </button>
+              <button 
+                onClick={handleDelete}
+                className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+              >
+                <X size={14} />
+              </button>
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+const COLOR_MAP = {
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+  orange:  { bg: 'bg-orange-500/10',  text: 'text-orange-400',  border: 'border-orange-500/20'  },
+  rose:    { bg: 'bg-rose-500/10',    text: 'text-rose-400',    border: 'border-rose-500/20'    },
+  indigo:  { bg: 'bg-indigo-500/10',  text: 'text-indigo-400',  border: 'border-indigo-500/20'  },
+  blue:    { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/20'    },
+};
+
+const DashboardCard = ({ labelUr, val, diff, color, icon }) => {
+  const cfg = COLOR_MAP[color] || COLOR_MAP.indigo;
+  return (
+    <div className="bg-slate-800/40 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 group relative overflow-hidden flex flex-col items-center text-center">
+      <div className="relative z-10 flex flex-col items-center space-y-4 lg:space-y-6 w-full">
+        <div className="relative">
+           <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-2xl lg:rounded-[24px] ${cfg.bg} flex items-center justify-center ${cfg.text} mb-2 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform duration-500`}>
+             {icon || <Activity size={24} className="lg:size-7" />}
+           </div>
+           {diff && (
+             <span className={`absolute -top-2 -right-12 text-[10px] font-black px-2 py-1 rounded-lg shadow-xl ${diff.startsWith('+') ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-orange-500/20 text-orange-400 border border-orange-500/20'}`}>
+               {diff}
+             </span>
+           )}
+        </div>
+        
+        <div className="space-y-1 lg:space-y-2">
+          <p className="text-slate-400 text-[12px] lg:text-[14px] font-black uppercase tracking-[0.2em] leading-tight font-urdu opacity-80">{labelUr}</p>
+          <h3 className="text-2xl lg:text-4xl font-black italic tracking-tighter text-white font-urdu">
+            <span className="text-slate-500 text-[12px] lg:text-[14px] mr-2 leading-none not-italic tracking-normal opacity-50">Rs.</span>
+            {val}
+          </h3>
+        </div>
+      </div>
+      
+      {/* Subtle Background Glow */}
+      <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full ${cfg.bg} blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity duration-700`}></div>
+    </div>
+  );
+};
+
+// Removed DonutChart in favor of Recharts AreaChart
+
+const SettingsPage = () => {
+  const { farmers, addNewFarmer, deleteFarmer } = useFarmers();
+  const [isSaving, setIsSaving] = useState(false);
+  const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
+  const [shops, setShops] = useState([]);
+  const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
+  const [expandedSection, setExpandedSection] = useState(null);
+
+  useEffect(() => {
+    const unsubShops = onSnapshot(collection(db, 'shops'), (snapshot) => {
+      setShops(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubShops();
+  }, []);
+
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try { await addNewFarmer(newFarmer); setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' }); alert("New member registered!"); } catch (e) { alert("Error adding member."); }
+    setIsSaving(false);
+  };
+
+  const handleAddShop = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try { await addDoc(collection(db, 'shops'), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop added to portfolio!"); } catch (e) { alert("Error adding shop."); }
+    setIsSaving(false);
+  };
+
+  const handleDeleteShop = async (id) => { if (window.confirm('Remove this shop permanently?')) { await deleteDoc(doc(db, 'shops', id)); } };
+
+  return (
+    <div className="flex-1 flex flex-col gap-8 animate-in fade-in duration-500 pb-32 no-scrollbar overflow-y-auto">
+      
+      {/* 1. Member Management Section */}
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500">
+        <button 
+           onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')}
+           className="w-full flex justify-between items-center p-8 hover:bg-white/5 transition-all text-left"
+        >
+          <div className="flex items-center gap-4">
+             <div className={`p-3 rounded-2xl transition-all duration-500 ${expandedSection === 'members' ? 'bg-indigo-600 text-white rotate-12 scale-110 shadow-lg shadow-indigo-600/20' : 'bg-slate-900 border border-slate-700 text-slate-500'}`}>
+                <UserPlus size={24}/>
+             </div>
+             <div>
+                 <h2 className="text-2xl font-black text-white italic leading-none font-urdu">ممبر مینجمنٹ</h2>
+                 <div className="flex items-center gap-2 mt-2">
+                    <div className="w-8 h-[1px] bg-indigo-500/20"></div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none font-urdu">نظام کی نگرانی اور ممبرز</p>
+                 </div>
+              </div>
+          </div>
+          <ChevronDown className={`text-slate-500 transition-transform duration-500 ${expandedSection === 'members' ? 'rotate-180 text-white' : ''}`} size={24}/>
+        </button>
+
+        {expandedSection === 'members' && (
+          <div className="p-8 pt-0 animate-in slide-in-from-top-4 duration-500">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 border-t border-slate-700/50 pt-12">
+                <div className="space-y-8">
+                  <h3 className="font-black text-[12px] text-indigo-400 opacity-60 ml-4 font-urdu">نیا ممبر رجسٹر کریں</h3>
+                  <form onSubmit={handleAddMember} className="space-y-6">
+                    <input required value={newFarmer.nameUr} onChange={(e) => {
+                       const val = e.target.value;
+                       const isEnglish = /[a-zA-Z]/.test(val);
+                       setNewFarmer({...newFarmer, nameUr: isEnglish ? transliterateToUrdu(val) : val});
+                    }} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-urdu text-xl text-white outline-none focus:border-indigo-500 transition-all shadow-inner" placeholder="نام" />
+                    <input required value={newFarmer.nameEn} onChange={(e) => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-black text-white outline-none focus:border-indigo-500 transition-all text-[11px] uppercase tracking-widest" placeholder="NAME" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <input required type="number" value={newFarmer.landSize} onChange={(e) => setNewFarmer({...newFarmer, landSize: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-black text-white outline-none focus:border-indigo-500 font-urdu" placeholder="سائز" />
+                      <select value={newFarmer.landUnit} onChange={(e) => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 rounded-2xl p-5 text-[12px] font-black uppercase text-white outline-none font-urdu"><option>Acres</option><option>Kanals</option><option>Marlas</option></select>
+                    </div>
+                    <button type="submit" disabled={isSaving} className="w-full bg-indigo-600 py-6 rounded-3xl text-white font-black shadow-xl shadow-indigo-600/20 active:scale-95 transition-all font-urdu text-lg">{isSaving ? <Loader2 className="animate-spin m-auto" /> : "ممبر پورٹ فولیو رجسٹر کریں"}</button>
+                  </form>
+                </div>
+                <div className="flex flex-col max-h-[450px] overflow-hidden bg-slate-900/40 rounded-[24px] border border-slate-700/30">
+                  <div className="p-8 border-b border-slate-700/50 flex justify-between items-center text-[11px] font-black text-slate-500 italic font-urdu">فہرست <span>{farmers.length} ممبرز</span></div>
+                  <div className="overflow-y-auto no-scrollbar divide-y divide-slate-800/30">
+                    {farmers.map(f => (
+                      <div key={f.id} className="p-6 flex justify-between items-center group hover:bg-indigo-500/5">
+                        <div className="group-hover:translate-x-1 transition-transform">
+                           <p className="font-urdu text-white text-lg leading-tight">{f.nameUr}</p>
+                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic">{f.nameEn} • {f.landSize} {f.landUnit}</p>
+                        </div>
+                        <button onClick={() => deleteFarmer(f.id)} className="p-4 bg-rose-500/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all"><Trash2 size={16}/></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+             </div>
+          </div>
+        )}
+      </section>
+
+      {/* 2. Shop Management Section */}
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500">
+        <button 
+           onClick={() => setExpandedSection(expandedSection === 'shops' ? null : 'shops')}
+           className="w-full flex justify-between items-center p-8 hover:bg-white/5 transition-all text-left"
+        >
+          <div className="flex items-center gap-4">
+             <div className={`p-3 rounded-2xl transition-all duration-500 ${expandedSection === 'shops' ? 'bg-blue-600 text-white rotate-12 scale-110 shadow-lg shadow-blue-600/20' : 'bg-slate-900 border border-slate-700 text-slate-500'}`}>
+                <Store size={24}/>
+             </div>
+             <div>
+                 <h2 className="text-2xl font-black text-white italic leading-none font-urdu">کمرشل دکانوں کا کنٹرول</h2>
+                 <div className="flex items-center gap-2 mt-2">
+                    <div className="w-8 h-[1px] bg-blue-500/20"></div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none font-urdu">پورٹ فولیو مینجمنٹ اور یونٹس</p>
+                 </div>
+              </div>
+          </div>
+          <ChevronDown className={`text-slate-500 transition-transform duration-500 ${expandedSection === 'shops' ? 'rotate-180 text-white' : ''}`} size={24}/>
+        </button>
+
+        {expandedSection === 'shops' && (
+          <div className="p-8 pt-0 animate-in slide-in-from-top-4 duration-500">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 border-t border-slate-700/50 pt-12">
+                <div className="space-y-8">
+                  <h3 className="font-black text-[12px] text-blue-400 opacity-60 ml-4 font-urdu">کمرشل یونٹ شامل کریں</h3>
+                  <form onSubmit={handleAddShop} className="space-y-6">
+                    <input required value={newShop.tenant} onChange={(e) => {
+                       const val = e.target.value;
+                       const isEnglish = /[a-zA-Z]/.test(val);
+                       setNewShop({...newShop, tenant: isEnglish ? transliterateToUrdu(val) : val});
+                    }} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-urdu text-xl text-white outline-none focus:border-blue-500 transition-all shadow-inner" placeholder="کرایہ دار / کاروبار (نام)" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <input required value={newShop.name} onChange={(e) => setNewShop({...newShop, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 text-[12px] font-black text-white outline-none focus:border-blue-500 font-urdu" placeholder="شناخت (دکان نمبر)" />
+                      <input required value={newShop.area} onChange={(e) => setNewShop({...newShop, area: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 text-[12px] font-black text-white outline-none focus:border-blue-500 font-urdu" placeholder="رقبہ (12x15)" />
+                    </div>
+                    <input required type="number" value={newShop.rent} onChange={(e) => setNewShop({...newShop, rent: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-black text-white outline-none focus:border-blue-500 font-urdu" placeholder="ماہانہ کرایہ (روپے)" />
+                    <button type="submit" disabled={isSaving} className="w-full bg-blue-600 py-6 rounded-3xl text-white font-black shadow-xl shadow-blue-600/20 active:scale-95 transition-all font-urdu text-lg">{isSaving ? <Loader2 className="animate-spin m-auto" /> : "نیا دکان یونٹ رجسٹر کریں"}</button>
+                  </form>
+                </div>
+                <div className="flex flex-col max-h-[450px] overflow-hidden bg-slate-900/40 rounded-[24px] border border-slate-700/30">
+                  <div className="p-8 border-b border-slate-700/50 flex justify-between items-center text-[11px] font-black text-slate-500 italic font-urdu">پورٹ فولیو جائزہ <span>{shops.length} یونٹس</span></div>
+                  <div className="overflow-y-auto no-scrollbar divide-y divide-slate-800/30">
+                    {shops.map(s => (
+                      <div key={s.id} className="p-6 flex justify-between items-center group hover:bg-blue-500/5">
+                        <div className="group-hover:translate-x-1 transition-transform">
+                           <p className="font-urdu text-white text-lg leading-tight">{s.tenant}</p>
+                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 italic leading-none">{s.name} • {s.area}</p>
+                        </div>
+                        <button onClick={() => handleDeleteShop(s.id)} className="p-4 bg-rose-500/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all"><Trash2 size={16}/></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+             </div>
+          </div>
+        )}
+      </section>
+
+    </div>
+  );
+};
+
+
+const SearchResults = ({ query, data, onNavigate }) => {
+  const q = query.toLowerCase();
+  
+  const filteredFarmers = data.farmers.filter(f => 
+    f.nameUr?.includes(query) || f.nameEn?.toLowerCase().includes(q)
+  );
+  
+  const filteredShops = data.shops.filter(s => 
+    s.tenant?.includes(query) || s.name?.toLowerCase().includes(q)
+  );
+
+  const filteredSold = data.soldProperties.filter(p => 
+    p.nameUr?.includes(query) || p.buyerName?.toLowerCase().includes(q)
+  );
+
+  const total = filteredFarmers.length + filteredShops.length + filteredSold.length;
+
+  return (
+    <div className="flex-1 flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-black text-white italic font-urdu">تلاش کے نتائج: "{query}"</h2>
+        <span className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[12px] font-black text-indigo-400 font-urdu">
+          {total} نتائج ملے
+        </span>
+      </div>
+
+      {total === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center opacity-20 py-20">
+          <SearchIcon size={64} className="mb-6" />
+          <p className="text-2xl font-black font-urdu">کوئی نتیجہ نہیں ملا</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredFarmers.map(f => (
+            <SearchCard key={f.id} title={f.nameUr} sub={f.nameEn} type="Member" icon={<UserCircle />} color="indigo" onClick={() => onNavigate('Land')} />
+          ))}
+          {filteredShops.map(s => (
+            <SearchCard key={s.id} title={s.tenant} sub={s.name} type="Shop" icon={<Store />} color="blue" onClick={() => onNavigate('Shops')} />
+          ))}
+          {filteredSold.map(p => (
+            <SearchCard key={p.id} title={p.nameUr} sub={p.buyerName} type="Sold Property" icon={<CheckCircle />} color="emerald" onClick={() => onNavigate('Sold')} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SearchCard = ({ title, sub, type, icon, color, onClick }) => (
+  <button 
+    onClick={onClick}
+    className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 hover:border-indigo-500/50 transition-all text-left flex items-center gap-5 group"
+  >
+    <div className={`p-4 rounded-2xl bg-${color}-500/10 text-${color}-400 group-hover:scale-110 transition-transform`}>
+      {icon}
+    </div>
+    <div>
+      <p className={`text-[9px] font-black uppercase tracking-widest text-${color}-500 mb-1`}>{type}</p>
+      <h3 className="text-lg font-black text-white font-urdu leading-tight">{title}</h3>
+      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{sub}</p>
+    </div>
+  </button>
+);
+
+export default App;
