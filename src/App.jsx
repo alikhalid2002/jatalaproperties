@@ -307,11 +307,11 @@ const App = () => {
                 </button>
              )}
              {/* Mobile Logo */}
-             <div className="lg:hidden flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+             <div className="lg:hidden flex items-center gap-3 flex-shrink-0">
+                <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/10">
                     <Home className="text-white" size={20} />
                 </div>
-                <h1 className="text-lg font-black text-white">Jatala Properties</h1>
+                <h1 className="text-[17px] font-black text-white whitespace-nowrap">Jatala Properties</h1>
              </div>
           </div>
 
