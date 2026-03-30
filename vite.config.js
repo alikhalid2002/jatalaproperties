@@ -7,6 +7,17 @@ export default defineConfig({
     allowedHosts: true,
     host: true
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
+          'vendor-charts': ['recharts'],
+        }
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({

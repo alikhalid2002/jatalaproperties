@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { 
   Map, Store, Receipt, BarChart3, Settings, 
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
@@ -10,10 +10,10 @@ import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
 import { useGlobalActivity } from './useGlobalActivity';
 import AddEntryModal from './AddEntryModal';
-import LandAssets from './LandAssets';
-import ShopsPage from './ShopsPage';
-import FinancialReports from './FinancialReports';
-import SoldProperties from './SoldProperties';
+const LandAssets = lazy(() => import('./LandAssets'));
+const ShopsPage = lazy(() => import('./ShopsPage'));
+const FinancialReports = lazy(() => import('./FinancialReports'));
+const SoldProperties = lazy(() => import('./SoldProperties'));
 import { db } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
@@ -485,9 +485,13 @@ const App = () => {
                 </div>
               )
             ) : activeTab === 'Land' ? (
-              <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
+              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
+              </Suspense>
             ) : activeTab === 'Shops' ? (
-              <ShopsPage isAdmin={accountType === 'ali'} />
+              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                <ShopsPage isAdmin={accountType === 'ali'} />
+              </Suspense>
             ) : activeTab === 'Expenses' ? (
               <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
                 <div className="flex justify-between items-center mb-8 px-4">
@@ -538,9 +542,13 @@ const App = () => {
                 </div>
               </div>
             ) : activeTab === 'Reports' ? (
-              <FinancialReports entries={entries} selectedYear={selectedYear} />
+              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                <FinancialReports entries={entries} selectedYear={selectedYear} />
+              </Suspense>
             ) : activeTab === 'Sold' ? (
-              <SoldProperties isAdmin={accountType === 'ali'} />
+              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                <SoldProperties isAdmin={accountType === 'ali'} />
+              </Suspense>
             ) : activeTab === 'Settings' ? (
               accountType === 'ali' ? <SettingsPage /> : (
                 <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
