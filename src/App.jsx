@@ -4,7 +4,7 @@ import {
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
   Plus, UserPlus, Trash2, Loader2, Save, CheckCircle,
   ArrowUpRight, ArrowDownRight, Clock, Activity, Search as SearchIcon,
-  Shield, User, X, Lock, Calendar
+  Shield, User, X, Lock, Calendar, Home
 } from 'lucide-react';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
@@ -133,8 +133,8 @@ const App = () => {
 
         <div className="w-full max-w-2xl text-center space-y-12 relative z-10">
           <div className="space-y-6">
-            <h1 className="text-5xl lg:text-7xl font-black text-white font-urdu tracking-tight leading-normal drop-shadow-2xl">جٹالہ پراپرٹیز</h1>
-            <p className="text-[12px] lg:text-[14px] font-black text-indigo-400 uppercase tracking-[0.5em] italic">Premium Real Estate Management Suite</p>
+            <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tight leading-normal drop-shadow-2xl uppercase">Jatala Properties</h1>
+            <p className="text-[12px] lg:text-[14px] font-black text-indigo-400 uppercase tracking-[0.5em] italic">Real Estate Management Suite</p>
           </div>
 
           {authStage === 'selection' ? (
@@ -223,11 +223,10 @@ const App = () => {
       <aside className="hidden lg:flex w-[280px] bg-slate-900 border-l border-slate-800 flex-col py-10 px-6 shrink-0 z-50">
         <div className="flex items-center gap-4 px-4 mb-14 group">
           <div className="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-[20px] flex items-center justify-center shadow-lg shadow-indigo-500/20 rotate-3 group-hover:rotate-12 transition-transform duration-500">
-             <Map className="text-white" size={28} />
+             <Home className="text-white" size={28} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-white italic font-urdu leading-none">جٹالہ اسٹیٹ</h1>
-            <p className="text-[10px] font-black tracking-widest text-slate-500 mt-2 uppercase">Core Portfolio</p>
+            <h1 className="text-xl font-black text-white italic leading-none whitespace-nowrap">Jatala Properties</h1>
           </div>
         </div>
 
@@ -310,9 +309,9 @@ const App = () => {
              {/* Mobile Logo */}
              <div className="lg:hidden flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Map className="text-white" size={20} />
+                    <Home className="text-white" size={20} />
                 </div>
-                <h1 className="text-lg font-black text-white font-urdu">جٹالہ اسٹیٹ</h1>
+                <h1 className="text-lg font-black text-white">Jatala Properties</h1>
              </div>
           </div>
 
