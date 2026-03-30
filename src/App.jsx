@@ -581,7 +581,8 @@ const App = () => {
              <button
                key={item.id}
                onClick={() => setActiveTab(item.id)}
-               className={`flex flex-col items-center gap-1 transition-all ${activeTab === item.id ? 'text-indigo-400 scale-105' : 'text-white/70 hover:text-white'}`}
+               style={{ color: activeTab === item.id ? '#818cf8' : '#ffffff' }}
+               className={`flex flex-col items-center gap-1 transition-all ${activeTab === item.id ? 'scale-105' : 'opacity-80'}`}
              >
                <div>
                  {React.cloneElement(item.icon, { size: activeTab === item.id ? 22 : 20 })}
