@@ -14,6 +14,43 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+const compressImage = async (file) => {
+  if (!file || !file.type.startsWith('image/')) return file;
+  
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800;
+            // Only scale down if the image is wider than MAX_WIDTH
+            let scaleSize = 1;
+            if (img.width > MAX_WIDTH) {
+              scaleSize = MAX_WIDTH / img.width;
+            }
+            
+            canvas.width = img.width * scaleSize;
+            canvas.height = img.height * scaleSize;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            canvas.toBlob((blob) => {
+                const newFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+                // If compression made it amazingly larger (rare but possible for tiny images), return original
+                resolve(blob.size < file.size ? newFile : file);
+            }, 'image/jpeg', 0.6);
+        };
+    };
+  });
+};
+
 export const useFarmers = () => {
   // Load initial state from Cache for 'Instant UI'
   const [farmers, setFarmers] = useState(() => {
@@ -91,15 +128,12 @@ const updateFarmerFields = async (farmerId, fields) => {
 
   const uploadReceipt = async (file) => {
     if (!file) return null;
-    const storageRef = ref(storage, `receipts/${Date.now()}_${file.name}`);
-    
-    // Add a 10s timeout to avoid infinite lag if storage is slow/blocked
-    const timeout = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Upload timeout after 10s')), 10000)
-    );
+    const compressedFile = await compressImage(file);
+    const storageRef = ref(storage, `receipts/${Date.now()}_${compressedFile.name}`);
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000));
 
     try {
-      const uploadTask = uploadBytes(storageRef, file);
+      const uploadTask = uploadBytes(storageRef, compressedFile);
       const snapshot = await Promise.race([uploadTask, timeout]);
       return await getDownloadURL(snapshot.ref);
     } catch (error) {
@@ -114,8 +148,9 @@ const updateFarmerFields = async (farmerId, fields) => {
     if (!farmer) return;
 
     try {
-      const storageRef = ref(storage, `${docType}/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytes(storageRef, file);
+      const compressedFile = await compressImage(file);
+      const storageRef = ref(storage, `${docType}/${Date.now()}_${compressedFile.name}`);
+      const uploadTask = uploadBytes(storageRef, compressedFile);
       const snapshot = await uploadTask;
       const url = await getDownloadURL(snapshot.ref);
 
