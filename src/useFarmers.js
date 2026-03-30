@@ -137,15 +137,6 @@ const updateFarmerFields = async (farmerId, fields) => {
     const farmer = farmers.find(f => f.id === farmerId);
     if (!farmer) return;
 
-    let receiptUrl = null;
-    if (receiptFile) {
-      try {
-        receiptUrl = await uploadReceipt(receiptFile);
-      } catch (err) {
-        console.warn("Storage upload failed, saving payment only:", err);
-      }
-    }
-
     const amountNum = Number(amount);
     const newTotalPaid = (Number(farmer.totalPaid) || 0) + amountNum;
     const newTotalRemaining = Math.max(0, (Number(farmer.totalPayable) || 0) - newTotalPaid);
@@ -154,16 +145,47 @@ const updateFarmerFields = async (farmerId, fields) => {
       date: new Date().toISOString().split('T')[0],
       amount: amountNum,
       method: method,
-      receiptUrl: receiptUrl
+      receiptUrl: null // will be updated in background if file exists
     };
 
-    const farmerRef = doc(db, 'farmers', farmerId);
-    await updateDoc(farmerRef, {
+    // ⚡ OPTIMISTIC UPDATE: Update local state immediately so UI feels instant
+    setFarmers(prev => prev.map(f => f.id === farmerId ? {
+      ...f,
       totalPaid: newTotalPaid,
       totalRemaining: newTotalRemaining,
       status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
-      history: [newHistoryEntry, ...(farmer.history || [])]
-    });
+      history: [newHistoryEntry, ...(f.history || [])]
+    } : f));
+
+    // 🔄 BACKGROUND SYNC: Firebase write happens in background — no waiting!
+    const farmerRef = doc(db, 'farmers', farmerId);
+    
+    if (receiptFile) {
+      // Handle file upload in background
+      uploadReceipt(receiptFile).then(receiptUrl => {
+        updateDoc(farmerRef, {
+          totalPaid: newTotalPaid,
+          totalRemaining: newTotalRemaining,
+          status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
+          history: [{ ...newHistoryEntry, receiptUrl }, ...(farmer.history || [])]
+        }).catch(console.error);
+      }).catch(() => {
+        // Upload failed, save without receipt
+        updateDoc(farmerRef, {
+          totalPaid: newTotalPaid,
+          totalRemaining: newTotalRemaining,
+          status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
+          history: [newHistoryEntry, ...(farmer.history || [])]
+        }).catch(console.error);
+      });
+    } else {
+      updateDoc(farmerRef, {
+        totalPaid: newTotalPaid,
+        totalRemaining: newTotalRemaining,
+        status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
+        history: [newHistoryEntry, ...(farmer.history || [])]
+      }).catch(console.error);
+    }
   };
 
   const updateHistory = async (farmerId, historyIndex, updatedEntry) => {

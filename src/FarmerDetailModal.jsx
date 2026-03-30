@@ -44,17 +44,9 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
       return;
     }
     
-    setIsSaving(true);
-    try {
-      // Image upload already handled optionally in useFarmers hook
-      await onRecordPayment(farmer.id, amount, file, method);
-      setIsSaving(false);
-      onClose();
-    } catch (error) {
-      console.error("Critical Payment recording failed:", error);
-      setIsSaving(false);
-      alert("Something went wrong saving the payment record.");
-    }
+    // ⚡ Close instantly, save happens in background
+    onRecordPayment(farmer.id, amount, file, method);
+    onClose();
   };
 
   const handleUpdateInfo = async () => {
