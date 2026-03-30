@@ -377,6 +377,35 @@ const App = () => {
             ) : activeTab === 'Dashboard' ? (
               loading ? <DashboardSkeleton /> : (
                 <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0">
+                  {/* Mobile Year Selector */}
+                  <div className="lg:hidden flex justify-start -mb-2">
+                    <div className="relative">
+                      <button 
+                        onClick={() => setShowYearMenu(!showYearMenu)}
+                        className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-[20px] transition-all group shadow-inner"
+                      >
+                         <Calendar size={16} className="text-indigo-400" />
+                         <span className="text-[14px] font-black text-white font-urdu">{selectedYear}</span>
+                         <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {showYearMenu && (
+                        <div className="absolute left-0 mt-3 w-44 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-y-auto no-scrollbar max-h-[300px] z-[60] animate-in fade-in slide-in-from-top-3 backdrop-blur-2xl">
+                           {['2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((year) => (
+                             <button 
+                               key={year}
+                               onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                               className={`w-full px-5 py-4 text-left flex items-center justify-between transition-colors hover:bg-slate-800 ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-400'}`}
+                             >
+                                <span className="text-[13px] font-black font-urdu">{year}</span>
+                                {selectedYear === year && <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>}
+                             </button>
+                           ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Grid System: 2 cols on mobile/tablet, 3 on Laptop */}
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 font-urdu">
                      <DashboardCard labelUr={`کل ادائیگی ${selectedYear}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="indigo" />
