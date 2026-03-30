@@ -29,7 +29,7 @@ import { seedShops } from './seedShops';
 const App = () => {
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
   useEffect(() => {
     seedShops();
