@@ -48,17 +48,17 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       {/* Financial Summary Cards - Top */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-12 font-urdu">
         <FinanceCard 
-          labelUr={`زرعی زمین سے کل آمدنی ${selectedYear}`} 
+          labelUr={`زرعی زمین سے کل آمدنی ${Number(selectedYear) - 1}-${selectedYear}`} 
           value={revenueVal} 
           color="emerald" 
         />
         <FinanceCard 
-          labelUr="باقی رقم" 
+          labelUr={`باقی رقم ${Number(selectedYear) - 1}-${selectedYear}`} 
           value={pendingVal} 
           color="indigo" 
         />
         <FinanceCard 
-          labelUr="کل اخراجات" 
+          labelUr={`کل اخراجات ${Number(selectedYear) - 1}-${selectedYear}`} 
           value={expenseVal} 
           color="rose" 
         />
