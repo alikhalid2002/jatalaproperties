@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 
 const initialShops = [
@@ -10,11 +10,11 @@ const initialShops = [
 ];
 
 export const seedShops = async () => {
-  const querySnapshot = await getDocs(collection(db, 'shops'));
+  const querySnapshot = await getDocs(collection(db, getDataPath('shops')));
   if (querySnapshot.empty) {
     console.log("Seeding initial shops data...");
     for (const shop of initialShops) {
-      await addDoc(collection(db, 'shops'), shop);
+      await addDoc(collection(db, getDataPath('shops')), shop);
     }
   }
 };

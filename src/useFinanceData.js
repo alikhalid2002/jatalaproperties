@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { 
   collection, 
   onSnapshot, 
@@ -25,9 +25,9 @@ export const useFinanceData = (selectedYear) => {
         let unsubShopExpenses;
 
         try {
-            const qRevenue = query(collection(db, "revenue"), orderBy("createdAt", "desc"));
-            const qExpenses = query(collection(db, "expenses"), orderBy("createdAt", "desc"));
-            const qShopTrans = query(collection(db, "shop_transactions"), orderBy("createdAt", "desc"));
+            const qRevenue = query(collection(db, getDataPath("revenue")), orderBy("createdAt", "desc"));
+            const qExpenses = query(collection(db, getDataPath("expenses")), orderBy("createdAt", "desc"));
+            const qShopTrans = query(collection(db, getDataPath("shop_transactions")), orderBy("createdAt", "desc"));
 
             unsubRevenue = onSnapshot(qRevenue, (snapshot) => {
                 const filteredRev = snapshot.docs.filter(doc => {
@@ -109,24 +109,49 @@ export const useFinanceData = (selectedYear) => {
         };
     }, [selectedYear]);
 
+    const withTimeout = (promise, message = "Operation timed out. Please check your internet or Firebase config.") => {
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))
+        ]);
+    };
+
     const addEntry = async (type, data) => {
         const col = type === 'expense' ? 'expenses' : 'revenue';
-        await addDoc(collection(db, col), {
-            ...data,
-            createdAt: serverTimestamp(),
-            amount: Number(data.amount)
-        });
+        try {
+            await withTimeout(addDoc(collection(db, getDataPath(col)), {
+                ...data,
+                createdAt: serverTimestamp(),
+                amount: Number(data.amount)
+            }));
+        } catch (error) {
+            console.error("Add Entry Error:", error);
+            alert(`Error: ${error.message}`);
+            throw error;
+        }
     };
 
     const updateEntry = async (id, type, data) => {
         const col = type === 'expense' ? 'expenses' : 'revenue';
-        const docRef = doc(db, col, id);
-        await updateDoc(docRef, { ...data, amount: Number(data.amount) });
+        try {
+            const docRef = doc(db, getDataPath(col), id);
+            await withTimeout(updateDoc(docRef, { ...data, amount: Number(data.amount) }));
+        } catch (error) {
+            console.error("Update Entry Error:", error);
+            alert(`Error: ${error.message}`);
+            throw error;
+        }
     };
 
     const deleteEntry = async (id, type) => {
         const col = type === 'expense' ? 'expenses' : 'revenue';
-        await deleteDoc(doc(db, col, id));
+        try {
+            await withTimeout(deleteDoc(doc(db, getDataPath(col), id)));
+        } catch (error) {
+            console.error("Delete Entry Error:", error);
+            alert(`Error: ${error.message}`);
+            throw error;
+        }
     };
 
     return { revenue, pending, expenses, entries, loading, addEntry, updateEntry, deleteEntry };

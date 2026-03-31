@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 export const initialFarmers = [
@@ -39,7 +39,7 @@ export const initialFarmers = [
 ];
 
 export const seedFarmersData = async () => {
-  const farmersCol = collection(db, 'farmers');
+  const farmersCol = collection(db, getDataPath('farmers'));
   const snapshot = await getDocs(farmersCol);
   
   if (snapshot.empty) {

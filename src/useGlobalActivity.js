@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 export const useGlobalActivity = () => {
@@ -21,7 +21,7 @@ export const useGlobalActivity = () => {
     const listeners = [];
 
     // 1. Listen to Farmers for history
-    const qFarmers = query(collection(db, 'farmers'));
+    const qFarmers = query(collection(db, getDataPath('farmers')));
     const unsubF = onSnapshot(qFarmers, (snap) => {
       const allF = [];
       snap.docs.forEach(doc => {
@@ -44,7 +44,7 @@ export const useGlobalActivity = () => {
     });
 
     // 2. Listen to Shops for rent/repairs
-    const qShops = query(collection(db, 'shop_transactions'), orderBy('createdAt', 'desc'), limit(20));
+    const qShops = query(collection(db, getDataPath('shop_transactions')), orderBy('createdAt', 'desc'), limit(20));
     const unsubS = onSnapshot(qShops, (snap) => {
       const allS = snap.docs.map(doc => {
         const data = doc.data();
@@ -64,7 +64,7 @@ export const useGlobalActivity = () => {
     });
 
     // 3. Listen to Sold Properties
-    const qSold = query(collection(db, 'sold_properties'));
+    const qSold = query(collection(db, getDataPath('sold_properties')));
     const unsubP = onSnapshot(qSold, (snap) => {
       const allP = [];
       snap.docs.forEach(doc => {
@@ -87,7 +87,7 @@ export const useGlobalActivity = () => {
     });
 
     // 4. Listen to general expenses
-    const qExp = query(collection(db, 'expenses'), orderBy('createdAt', 'desc'), limit(20));
+    const qExp = query(collection(db, getDataPath('expenses')), orderBy('createdAt', 'desc'), limit(20));
     const unsubE = onSnapshot(qExp, (snap) => {
       const allE = snap.docs.map(doc => {
         const data = doc.data();

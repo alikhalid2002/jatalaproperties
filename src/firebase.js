@@ -15,3 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Data sync consistency
+export const appId = 'jatala-properties-official-v1';
+export const getDataPath = (collectionName) => `artifacts/${appId}/public/data/${collectionName}`;

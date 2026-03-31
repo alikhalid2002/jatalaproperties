@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { 
   collection, 
   onSnapshot, 
@@ -17,7 +17,7 @@ export const useSoldProperties = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const q = query(collection(db, "sold_properties"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, getDataPath("sold_properties")), orderBy("createdAt", "desc"));
         const unsub = onSnapshot(q, (snapshot) => {
             const data = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -31,7 +31,7 @@ export const useSoldProperties = () => {
             data.forEach(async (prop) => {
                 const currentStatus = prop.totalPaid >= Number(prop.totalPrice) ? 'Fully Paid' : 'Ongoing Installments';
                 if (prop.status !== currentStatus) {
-                    await updateDoc(doc(db, "sold_properties", prop.id), { status: currentStatus });
+                    await updateDoc(doc(db, getDataPath("sold_properties"), prop.id), { status: currentStatus });
                 }
             });
 
@@ -43,7 +43,7 @@ export const useSoldProperties = () => {
     }, []);
 
     const addProperty = async (data) => {
-        await addDoc(collection(db, "sold_properties"), {
+        await addDoc(collection(db, getDataPath("sold_properties")), {
             ...data,
             installments: [],
             status: 'Ongoing Installments',
@@ -52,7 +52,7 @@ export const useSoldProperties = () => {
     };
 
     const recordInstallment = async (propertyId, installment) => {
-        const propRef = doc(db, "sold_properties", propertyId);
+        const propRef = doc(db, getDataPath("sold_properties"), propertyId);
         const prop = properties.find(p => p.id === propertyId);
         const newInstallments = [...(prop.installments || []), { ...installment, id: Date.now().toString() }];
         
@@ -62,7 +62,7 @@ export const useSoldProperties = () => {
     };
 
     const deleteProperty = async (id) => {
-        await deleteDoc(doc(db, "sold_properties", id));
+        await deleteDoc(doc(db, getDataPath("sold_properties"), id));
     };
 
     return { properties, loading, addProperty, recordInstallment, deleteProperty };

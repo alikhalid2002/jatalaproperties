@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export const seedSoldProperties = async () => {
@@ -35,7 +35,7 @@ export const seedSoldProperties = async () => {
 
     try {
         for (const prop of properties) {
-            await addDoc(collection(db, "sold_properties"), {
+            await addDoc(collection(db, getDataPath("sold_properties")), {
                 ...prop,
                 createdAt: serverTimestamp()
             });

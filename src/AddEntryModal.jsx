@@ -8,12 +8,22 @@ const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
   const [status, setStatus] = useState('received');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onAdd(type, { amount, labelUr, status, date });
-    onClose();
+    setIsSaving(true);
+    try {
+      await onAdd(type, { amount, labelUr, status, date });
+      onClose();
+    } catch (error) {
+       // Error is already alerted in the hook, but we need to stop the loading state here
+       console.error("Modal Save Error:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -75,9 +85,10 @@ const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
 
           <button 
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 font-urdu text-lg"
+            disabled={isSaving}
+            className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 font-urdu text-lg ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            ریکارڈ محفوظ کریں
+            {isSaving ? 'محفوظ ہو رہا ہے...' : 'ریکارڈ محفوظ کریں'}
           </button>
         </form>
       </div>

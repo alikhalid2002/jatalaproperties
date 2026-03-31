@@ -44,9 +44,16 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
       return;
     }
     
-    // ⚡ Close instantly, save happens in background
-    onRecordPayment(farmer.id, amount, file, method);
-    onClose();
+    setIsSaving(true);
+    try {
+      await onRecordPayment(farmer.id, amount, file, method);
+      onClose();
+    } catch (error) {
+      console.error("Save Payment Error:", error);
+      // Note: alert is already handled by the recordPayment hook's timeout/try-catch
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleUpdateInfo = async () => {

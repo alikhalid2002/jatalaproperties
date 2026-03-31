@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { initialFarmers } from './seedFarmers';
-import { db, storage } from './firebase';
+import { db, storage, getDataPath } from './firebase';
 import { 
   collection, 
   onSnapshot, 
@@ -51,6 +51,13 @@ const compressImage = async (file) => {
   });
 };
 
+const withTimeout = (promise, message = "Connection Timeout. Please check your internet or Firebase config.") => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))
+  ]);
+};
+
 export const useFarmers = () => {
   // Load initial state from Cache for 'Instant UI'
   const [farmers, setFarmers] = useState(() => {
@@ -67,7 +74,7 @@ export const useFarmers = () => {
   useEffect(() => {
     let unsubscribe;
     try {
-      const q = query(collection(db, 'farmers'), orderBy('nameUr', 'asc'));
+      const q = query(collection(db, getDataPath('farmers')), orderBy('nameUr', 'asc'));
       
       unsubscribe = onSnapshot(q, (snapshot) => {
         const farmersData = snapshot.docs.map(doc => ({
@@ -99,42 +106,47 @@ const updateFarmerFields = async (farmerId, fields) => {
     const farmer = farmers.find(f => f.id === farmerId);
     if (!farmer) return;
 
-    const farmerRef = doc(db, 'farmers', farmerId);
-    
-    // Check if landSize is being updated
-    if (fields.landSize && Number(fields.landSize) !== Number(farmer.landSize)) {
-      const newSize = Number(fields.landSize);
-      const oldSize = Number(farmer.landSize) || 1;
+    try {
+      const farmerRef = doc(db, getDataPath('farmers'), farmerId);
       
-      // Calculate current total value (Paid + Remaining)
-      const currentPayable = Number(farmer.totalPayable) || (Number(farmer.totalPaid) + Number(farmer.totalRemaining));
-      
-      // Derive rate per unit and calculate new totals
-      const ratePerUnit = currentPayable / oldSize;
-      const newTotalPayable = Math.round(ratePerUnit * newSize);
-      const newTotalRemaining = Math.max(0, newTotalPayable - (Number(farmer.totalPaid) || 0));
+      // Check if landSize is being updated
+      if (fields.landSize && Number(fields.landSize) !== Number(farmer.landSize)) {
+        const newSize = Number(fields.landSize);
+        const oldSize = Number(farmer.landSize) || 1;
+        
+        // Calculate current total value (Paid + Remaining)
+        const currentPayable = Number(farmer.totalPayable) || (Number(farmer.totalPaid) + Number(farmer.totalRemaining));
+        
+        // Derive rate per unit and calculate new totals
+        const ratePerUnit = currentPayable / oldSize;
+        const newTotalPayable = Math.round(ratePerUnit * newSize);
+        const newTotalRemaining = Math.max(0, newTotalPayable - (Number(farmer.totalPaid) || 0));
 
-      await updateDoc(farmerRef, {
-        ...fields,
-        totalPayable: newTotalPayable,
-        totalRemaining: newTotalRemaining,
-        status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
-      });
-    } else {
-      // Basic update (e.g. name change)
-      await updateDoc(farmerRef, fields);
+        await withTimeout(updateDoc(farmerRef, {
+          ...fields,
+          totalPayable: newTotalPayable,
+          totalRemaining: newTotalRemaining,
+          status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
+        }));
+      } else {
+        // Basic update (e.g. name change)
+        await withTimeout(updateDoc(farmerRef, fields));
+      }
+    } catch (error) {
+      console.error("Update Farmer Error:", error);
+      alert(`Error updating member: ${error.message}`);
+      throw error;
     }
   };
 
   const uploadReceipt = async (file) => {
     if (!file) return null;
-    const compressedFile = await compressImage(file);
-    const storageRef = ref(storage, `receipts/${Date.now()}_${compressedFile.name}`);
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000));
-
     try {
+      const compressedFile = await compressImage(file);
+      const storageRef = ref(storage, `receipts/${Date.now()}_${compressedFile.name}`);
+
       const uploadTask = uploadBytes(storageRef, compressedFile);
-      const snapshot = await Promise.race([uploadTask, timeout]);
+      const snapshot = await withTimeout(uploadTask, "Upload timed out. Image might be too large or connection is slow.");
       return await getDownloadURL(snapshot.ref);
     } catch (error) {
       console.error("Storage Error:", error);
@@ -151,19 +163,19 @@ const updateFarmerFields = async (farmerId, fields) => {
       const compressedFile = await compressImage(file);
       const storageRef = ref(storage, `${docType}/${Date.now()}_${compressedFile.name}`);
       const uploadTask = uploadBytes(storageRef, compressedFile);
-      const snapshot = await uploadTask;
+      const snapshot = await withTimeout(uploadTask);
       const url = await getDownloadURL(snapshot.ref);
 
-      const farmerRef = doc(db, 'farmers', farmerId);
-      await updateDoc(farmerRef, {
+      const farmerRef = doc(db, getDataPath('farmers'), farmerId);
+      await withTimeout(updateDoc(farmerRef, {
         [docType]: url // docType will be 'idCardUrl' or 'agreementUrl'
-      });
+      }));
 
       console.log(`${docType} uploaded successfully:`, url);
       return url;
     } catch (error) {
       console.error(`Error uploading ${docType}:`, error);
-      alert(`Failed to upload ${docType}.`);
+      alert(`Failed to upload ${docType}: ${error.message}`);
       throw error;
     }
   };
@@ -180,7 +192,7 @@ const updateFarmerFields = async (farmerId, fields) => {
       date: new Date().toISOString().split('T')[0],
       amount: amountNum,
       method: method,
-      receiptUrl: null // will be updated in background if file exists
+      receiptUrl: null // will be updated if file exists
     };
 
     // ⚡ OPTIMISTIC UPDATE: Update local state immediately so UI feels instant
@@ -192,34 +204,32 @@ const updateFarmerFields = async (farmerId, fields) => {
       history: [newHistoryEntry, ...(f.history || [])]
     } : f));
 
-    // 🔄 BACKGROUND SYNC: Firebase write happens in background — no waiting!
-    const farmerRef = doc(db, 'farmers', farmerId);
+    // 🔄 SYNC IN BACKGROUND
+    const farmerRef = doc(db, getDataPath('farmers'), farmerId);
     
-    if (receiptFile) {
-      // Handle file upload in background
-      uploadReceipt(receiptFile).then(receiptUrl => {
-        updateDoc(farmerRef, {
+    try {
+      if (receiptFile) {
+        // Handle file upload
+        const receiptUrl = await uploadReceipt(receiptFile);
+        await withTimeout(updateDoc(farmerRef, {
           totalPaid: newTotalPaid,
           totalRemaining: newTotalRemaining,
           status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
           history: [{ ...newHistoryEntry, receiptUrl }, ...(farmer.history || [])]
-        }).catch(console.error);
-      }).catch(() => {
-        // Upload failed, save without receipt
-        updateDoc(farmerRef, {
+        }));
+      } else {
+        // No receipt file, skip upload
+        await withTimeout(updateDoc(farmerRef, {
           totalPaid: newTotalPaid,
           totalRemaining: newTotalRemaining,
           status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
           history: [newHistoryEntry, ...(farmer.history || [])]
-        }).catch(console.error);
-      });
-    } else {
-      updateDoc(farmerRef, {
-        totalPaid: newTotalPaid,
-        totalRemaining: newTotalRemaining,
-        status: newTotalRemaining === 0 ? 'Paid' : 'Pending',
-        history: [newHistoryEntry, ...(farmer.history || [])]
-      }).catch(console.error);
+        }));
+      }
+    } catch (error) {
+      console.error("Payment Sync Error:", error);
+      alert(`Payment recording failed: ${error.message}. Please refresh.`);
+      // Optional: rollback optimistic update here if needed
     }
   };
 
@@ -227,20 +237,25 @@ const updateFarmerFields = async (farmerId, fields) => {
     const farmer = farmers.find(f => f.id === farmerId);
     if (!farmer) return;
 
-    const newHistory = [...(farmer.history || [])];
-    newHistory[historyIndex] = { ...newHistory[historyIndex], ...updatedEntry };
+    try {
+      const newHistory = [...(farmer.history || [])];
+      newHistory[historyIndex] = { ...newHistory[historyIndex], ...updatedEntry };
 
-    // Recalculate totals
-    const newTotalPaid = newHistory.reduce((sum, entry) => sum + Number(entry.amount), 0);
-    const newTotalRemaining = Math.max(0, (Number(farmer.totalPayable) || 0) - newTotalPaid);
+      // Recalculate totals
+      const newTotalPaid = newHistory.reduce((sum, entry) => sum + Number(entry.amount), 0);
+      const newTotalRemaining = Math.max(0, (Number(farmer.totalPayable) || 0) - newTotalPaid);
 
-    const farmerRef = doc(db, 'farmers', farmerId);
-    await updateDoc(farmerRef, {
-      history: newHistory,
-      totalPaid: newTotalPaid,
-      totalRemaining: newTotalRemaining,
-      status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
-    });
+      const farmerRef = doc(db, getDataPath('farmers'), farmerId);
+      await withTimeout(updateDoc(farmerRef, {
+        history: newHistory,
+        totalPaid: newTotalPaid,
+        totalRemaining: newTotalRemaining,
+        status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
+      }));
+    } catch (error) {
+      console.error("Update History Error:", error);
+      alert(`History update failed: ${error.message}`);
+    }
   };
 
   const deleteHistory = async (farmerId, historyIndex) => {
@@ -256,13 +271,13 @@ const updateFarmerFields = async (farmerId, fields) => {
     const newTotalRemaining = Math.max(0, (Number(farmer.totalPayable) || 0) - newTotalPaid);
 
     try {
-      const farmerRef = doc(db, 'farmers', farmerId);
-      await updateDoc(farmerRef, {
+      const farmerRef = doc(db, getDataPath('farmers'), farmerId);
+      await withTimeout(updateDoc(farmerRef, {
         history: newHistory,
         totalPaid: newTotalPaid,
         totalRemaining: newTotalRemaining,
         status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
-      });
+      }));
       
       // PERMANENT FIX: Update local state immediately to avoid "phantom" records
       setFarmers(prev => {
@@ -280,24 +295,35 @@ const updateFarmerFields = async (farmerId, fields) => {
       console.log("History item deleted and totals updated successfully.");
     } catch (err) {
       console.error("Failed to delete history item:", err);
-      alert("Error: Could not delete record from database.");
+      alert(`Delete failed: ${err.message}`);
     }
   };
 
   const addNewFarmer = async (farmerData) => {
-    await addDoc(collection(db, 'farmers'), {
-      ...farmerData,
-      landSize: Number(farmerData.landSize),
-      status: 'Pending',
-      totalPaid: 0,
-      totalRemaining: 0,
-      history: []
-    });
+    try {
+      await withTimeout(addDoc(collection(db, getDataPath('farmers')), {
+        ...farmerData,
+        landSize: Number(farmerData.landSize),
+        status: 'Pending',
+        totalPaid: 0,
+        totalRemaining: 0,
+        history: []
+      }));
+    } catch (error) {
+       console.error("Add Farmer Error:", error);
+       alert(`Registration failed: ${error.message}`);
+       throw error;
+    }
   };
 
   const deleteFarmer = async (farmerId) => {
     if (!window.confirm("Delete this member and all their records?")) return;
-    await deleteDoc(doc(db, 'farmers', farmerId));
+    try {
+      await withTimeout(deleteDoc(doc(db, getDataPath('farmers'), farmerId)));
+    } catch (error) {
+      console.error("Delete Farmer Error:", error);
+      alert(`Delete failed: ${error.message}`);
+    }
   };
 
   return { 

@@ -14,7 +14,7 @@ const LandAssets = lazy(() => import('./LandAssets'));
 const ShopsPage = lazy(() => import('./ShopsPage'));
 const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
-import { db } from './firebase';
+import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 import { 
@@ -83,10 +83,10 @@ const App = () => {
   const [soldProperties, setSoldProperties] = useState([]);
 
   useEffect(() => {
-    const unsubShops = onSnapshot(collection(db, 'shops'), (snapshot) => {
+    const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
       setShops(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-    const unsubSold = onSnapshot(collection(db, 'sold_properties'), (snapshot) => {
+    const unsubSold = onSnapshot(collection(db, getDataPath('sold_properties')), (snapshot) => {
       setSoldProperties(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => { unsubShops(); unsubSold(); };
@@ -752,7 +752,7 @@ const SettingsPage = () => {
   const [expandedSection, setExpandedSection] = useState(null);
 
   useEffect(() => {
-    const unsubShops = onSnapshot(collection(db, 'shops'), (snapshot) => {
+    const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
       setShops(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubShops();
@@ -768,11 +768,11 @@ const SettingsPage = () => {
   const handleAddShop = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    try { await addDoc(collection(db, 'shops'), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop added to portfolio!"); } catch (e) { alert("Error adding shop."); }
+    try { await addDoc(collection(db, getDataPath('shops')), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop added to portfolio!"); } catch (e) { alert("Error adding shop."); }
     setIsSaving(false);
   };
 
-  const handleDeleteShop = async (id) => { if (window.confirm('Remove this shop permanently?')) { await deleteDoc(doc(db, 'shops', id)); } };
+  const handleDeleteShop = async (id) => { if (window.confirm('Remove this shop permanently?')) { await deleteDoc(doc(db, getDataPath('shops'), id)); } };
 
   return (
     <div className="flex-1 flex flex-col gap-8 animate-in fade-in duration-500 pb-32 no-scrollbar overflow-y-auto">

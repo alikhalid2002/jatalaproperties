@@ -5,7 +5,7 @@ import {
   Calendar, Wrench, X, CreditCard, Save, 
   CheckCircle, Trash2, Edit3, Clock, Shield, FileText, Upload, ImageIcon, Loader2
 } from 'lucide-react';
-import { db, storage } from './firebase';
+import { db, storage, getDataPath } from './firebase';
 import { 
   collection, doc, addDoc, updateDoc, deleteDoc,
   onSnapshot, query, serverTimestamp 
@@ -32,12 +32,12 @@ const ShopsPage = ({ isAdmin }) => {
   const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
-    const unsubShops = onSnapshot(collection(db, 'shops'), (snapshot) => {
+    const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
       const shopsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setShops(shopsData);
     });
 
-    const unsubTrans = onSnapshot(collection(db, 'shop_transactions'), (snapshot) => {
+    const unsubTrans = onSnapshot(collection(db, getDataPath('shop_transactions')), (snapshot) => {
       const transData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setTransactions(transData);
     });
@@ -47,6 +47,13 @@ const ShopsPage = ({ isAdmin }) => {
       unsubTrans();
     };
   }, []);
+
+  const withTimeout = (promise, message = "Connection Timeout. Please check your internet or Firebase config.") => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))
+    ]);
+  };
 
   const handleSaveTransaction = async (e) => {
     e.preventDefault();
@@ -70,17 +77,18 @@ const ShopsPage = ({ isAdmin }) => {
         createdAt: serverTimestamp()
       };
 
-      await addDoc(collection(db, 'shop_transactions'), newTransaction);
+      await withTimeout(addDoc(collection(db, getDataPath('shop_transactions')), newTransaction));
 
       if (showEntryForm === 'Rent') {
-        await updateDoc(doc(db, 'shops', selectedShop.id), { status: 'Paid' });
+        await withTimeout(updateDoc(doc(db, getDataPath('shops'), selectedShop.id), { status: 'Paid' }));
       }
 
       setEntryAmount('');
       setEntryNote('');
       setShowEntryForm(null);
     } catch (error) {
-      console.error("Save Error:", error);
+      console.error("Save Transaction Error:", error);
+      alert(`Save failed: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -90,14 +98,15 @@ const ShopsPage = ({ isAdmin }) => {
     if (!selectedShop) return;
     setIsSaving(true);
     try {
-      await updateDoc(doc(db, 'shops', selectedShop.id), {
+      await withTimeout(updateDoc(doc(db, getDataPath('shops'), selectedShop.id), {
         tenant: editData.tenant,
         area: editData.area,
         rent: Number(editData.rent)
-      });
+      }));
       setIsEditing(false);
     } catch (error) {
-      console.error("Update Error:", error);
+      console.error("Update Shop Error:", error);
+      alert(`Update failed: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -106,23 +115,24 @@ const ShopsPage = ({ isAdmin }) => {
   const handleDeleteTransaction = async (transId) => {
     if (!window.confirm("Delete this transaction permanently?")) return;
     try {
-      await deleteDoc(doc(db, 'shop_transactions', transId));
-      // Optionally recalc something here, but snapshots handle global state
+      await withTimeout(deleteDoc(doc(db, getDataPath('shop_transactions'), transId)));
     } catch (error) {
-      console.error("Delete Error:", error);
+      console.error("Delete Transaction Error:", error);
+      alert(`Delete failed: ${error.message}`);
     }
   };
 
   const handleUpdateTransaction = async (transId) => {
     try {
-      await updateDoc(doc(db, 'shop_transactions', transId), {
+      await withTimeout(updateDoc(doc(db, getDataPath('shop_transactions'), transId), {
         amount: Number(editTransData.amount),
         date: editTransData.date,
         type: editTransData.type
-      });
+      }));
       setEditingTransId(null);
     } catch (error) {
       console.error("Update Transaction Error:", error);
+      alert(`Update failed: ${error.message}`);
     }
   };
 
@@ -144,18 +154,18 @@ const ShopsPage = ({ isAdmin }) => {
     try {
       const storageRef = ref(storage, `shops/${selectedShop.id}/${docType}/${Date.now()}_${file.name}`);
       const uploadTask = uploadBytes(storageRef, file);
-      const snapshot = await uploadTask;
+      const snapshot = await withTimeout(uploadTask, "Document upload timed out.");
       const url = await getDownloadURL(snapshot.ref);
 
-      const shopRef = doc(db, 'shops', selectedShop.id);
-      await updateDoc(shopRef, {
-        [docType]: url
-      });
+      const shopRef = doc(db, getDataPath('shops'), selectedShop.id);
+      await withTimeout(updateDoc(shopRef, {
+          [docType]: url
+      }));
 
       alert(`${docType === 'idCardUrl' ? 'ID Card' : 'Agreement'} uploaded successfully!`);
     } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Upload failed. Please try again.");
+      console.error("Document Upload Error:", error);
+      alert(`Upload failed: ${error.message}`);
     } finally {
       setIsUploadingDoc(prev => ({ ...prev, [docType === 'idCardUrl' ? 'idCard' : 'agreement']: false }));
     }
