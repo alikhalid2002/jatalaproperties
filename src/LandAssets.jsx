@@ -11,10 +11,11 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     farmers, 
     loading: farmersLoading, 
     recordPayment, 
-    updateFarmerFields, 
-    updateHistory, 
+    updateFarmerFields,
+    updateHistory,
     deleteHistory,
-    updateFarmerDocuments
+    updateFarmerDocuments,
+    bulkRecalculateFarmers
   } = useFarmers();
   const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
@@ -65,15 +66,26 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       </div>
 
 
-      {farmers.length === 0 && isAdmin && (
-          <div className="flex justify-center mb-12">
-            <button 
-              onClick={seedFarmersData}
-              className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
-            >
-              <Database size={20} />
-              SEED INITIAL DATA
-            </button>
+        {isAdmin && (
+          <div className="flex justify-center gap-4 mb-12">
+            {farmers.length === 0 && (
+              <button 
+                onClick={seedFarmersData}
+                className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+              >
+                <Database size={20} />
+                SEED INITIAL DATA
+              </button>
+            )}
+            {farmers.length > 0 && (
+              <button 
+                onClick={bulkRecalculateFarmers}
+                className="flex items-center gap-3 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 text-sm font-urdu tracking-widest"
+              >
+                <Calculator size={20} />
+                تمام ریکارڈز اپ ڈیٹ کریں (Formula)
+              </button>
+            )}
           </div>
         )}
 

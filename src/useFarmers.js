@@ -148,6 +148,38 @@ const updateFarmerFields = async (farmerId, fields) => {
     }
   };
 
+  const bulkRecalculateFarmers = async () => {
+    try {
+      console.log("Starting bulk recalculation...");
+      const updates = farmers.map(async (farmer) => {
+        const theka = Number(farmer.theka) || 0;
+        const acres = Number(farmer.landSize) || 1;
+        const newTotalPayable = Math.round(acres * theka);
+        
+        if (newTotalPayable > 0 && newTotalPayable !== Number(farmer.totalPayable)) {
+          const totalPaid = Number(farmer.totalPaid) || 0;
+          const newTotalRemaining = Math.max(0, newTotalPayable - totalPaid);
+          const farmerRef = doc(db, getDataPath('farmers'), farmer.id);
+          
+          return updateDoc(farmerRef, {
+            totalPayable: newTotalPayable,
+            totalRemaining: newTotalRemaining,
+            status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
+          });
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(updates);
+      localStorage.removeItem('jatala_farmers_cache');
+      console.log("Bulk recalculation complete.");
+      alert("تمام ممبران کا حساب کتاب اپ ڈیٹ کر دیا گیا ہے!"); // Urdu: All members' calculations updated!
+    } catch (error) {
+      console.error("Bulk Recalculate Error:", error);
+      alert(`Bulk update failed: ${error.message}`);
+    }
+  };
+
   const uploadReceipt = async (file) => {
     if (!file) return null;
     try {
