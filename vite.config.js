@@ -27,6 +27,9 @@ export default defineConfig({
         name: 'Jatala Properties',
         short_name: 'Jatala',
         description: 'Property Management Dashboard',
+        display: 'standalone',
+        start_url: '/',
+        orientation: 'portrait',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         icons: [
