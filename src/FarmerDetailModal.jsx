@@ -157,7 +157,15 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                  <input 
                    type="number"
                    value={editData.landSize}
-                   onChange={(e) => setEditData({...editData, landSize: e.target.value})}
+                   onChange={(e) => {
+                     const newSize = e.target.value;
+                     const currentTheka = Number(editData.theka) || 0;
+                     setEditData(prev => ({
+                       ...prev,
+                       landSize: newSize,
+                       totalPayable: Math.round(Number(newSize) * currentTheka).toString()
+                     }));
+                   }}
                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-20"
                  />
                ) : farmer.landSize} {farmer.landUnit}
@@ -194,7 +202,17 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   <input 
                     type="number"
                     value={editData.totalPayable}
-                    onChange={(e) => setEditData({...editData, totalPayable: e.target.value})}
+                    onChange={(e) => {
+                      const newVal = e.target.value;
+                      setEditData(prev => {
+                        const currentSize = Number(prev.landSize) || 0;
+                        return {
+                          ...prev,
+                          totalPayable: newVal,
+                          theka: currentSize > 0 ? Math.round(Number(newVal) / currentSize).toString() : prev.theka
+                        };
+                      });
+                    }}
                     className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl"
                   />
                 ) : (
@@ -224,7 +242,17 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   <input 
                     type="number"
                     value={editData.theka}
-                    onChange={(e) => setEditData({...editData, theka: e.target.value})}
+                    onChange={(e) => {
+                      const newTheka = e.target.value;
+                      setEditData(prev => {
+                        const currentSize = Number(prev.landSize) || 0;
+                        return {
+                          ...prev,
+                          theka: newTheka,
+                          totalPayable: Math.round(currentSize * Number(newTheka)).toString()
+                        };
+                      });
+                    }}
                     className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl"
                   />
                 ) : (
