@@ -418,9 +418,9 @@ const App = () => {
 
                   {/* Grid System: 2 cols on mobile/tablet, 3 on Laptop */}
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 font-urdu">
-                     <DashboardCard labelUr={`کل ادائیگی ${Number(selectedYear) - 1}-${selectedYear}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="emerald" />
-                     <DashboardCard labelUr={`بقایا وصولی ${Number(selectedYear) - 1}-${selectedYear}`} val={`Rs. ${pendingVal.toLocaleString()}`} diff={`${pendingPercent}%`} color="orange" />
-                     <DashboardCard labelUr={`کل اخراجات ${Number(selectedYear) - 1}-${selectedYear}`} val={`Rs. ${expenseVal.toLocaleString()}`} color="rose" />
+                     <DashboardCard labelUr={`کل ادائیگی ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="emerald" />
+                     <DashboardCard labelUr={`بقایا وصولی ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${pendingVal.toLocaleString()}`} diff={`${pendingPercent}%`} color="orange" />
+                     <DashboardCard labelUr={`کل اخراجات ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${expenseVal.toLocaleString()}`} color="rose" />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">

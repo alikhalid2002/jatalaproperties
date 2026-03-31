@@ -140,7 +140,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
   const downloadExcel = () => {
     const worksheetData = [
       ["Jatala Properties — Financial Report"],
-      [`Fiscal Year: ${Number(selectedYear) - 1}-${selectedYear}`],
+      [`Fiscal Year: ${selectedYear}-${Number(selectedYear) - 1}`],
       [`Generated: ${new Date().toLocaleString()}`],
       [],
       ["FINANCIAL SUMMARY"],
@@ -175,7 +175,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Accounts");
-    XLSX.writeFile(workbook, `Jatala_Report_${Number(selectedYear) - 1}_${selectedYear}.xlsx`);
+    XLSX.writeFile(workbook, `Jatala_Report_${selectedYear}_${Number(selectedYear) - 1}.xlsx`);
   };
 
   const downloadPDFReport = () => {
@@ -192,7 +192,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Financial Performance Report • Year ${Number(selectedYear) - 1}-${selectedYear}`, 15, 28);
+    doc.text(`Financial Performance Report • Year ${selectedYear}-${Number(selectedYear) - 1}`, 15, 28);
     doc.text(`Exported: ${new Date().toLocaleString()}`, 15, 33);
 
     // Summary Section
@@ -253,7 +253,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
         doc.text("Jatala Properties Dashboard — System Generated Report", 15, 285);
     }
 
-    doc.save(`Jatala_Financial_Report_${Number(selectedYear) - 1}_${selectedYear}.pdf`);
+    doc.save(`Jatala_Financial_Report_${selectedYear}_${Number(selectedYear) - 1}.pdf`);
   };
 
   return (
@@ -272,7 +272,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
               مالیاتی رپورٹس
             </h2>
             <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-1.5 italic font-urdu">
-              تمام ریکارڈز • {Number(selectedYear) - 1}-{selectedYear}
+              تمام ریکارڈز • {selectedYear}-{Number(selectedYear) - 1}
             </p>
           </div>
 
