@@ -65,7 +65,6 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
         />
       </div>
 
-
         {isAdmin && (
           <div className="flex justify-center gap-4 mb-12">
             {farmers.length === 0 && (
@@ -78,13 +77,17 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
               </button>
             )}
             {farmers.length > 0 && (
-              <button 
-                onClick={bulkRecalculateFarmers}
-                className="flex items-center gap-3 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 text-sm font-urdu tracking-widest"
-              >
-                <Calculator size={20} />
-                تمام ریکارڈز اپ ڈیٹ کریں (Formula)
-              </button>
+              <div className="bg-emerald-500/10 border border-emerald-500/30 px-10 py-5 rounded-3xl flex items-center gap-6 shadow-lg shadow-emerald-500/5">
+                 <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl">
+                    <Map size={24} />
+                 </div>
+                 <div className="text-right">
+                    <h4 className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-1 font-urdu">کل رقبہ</h4>
+                    <p className="text-3xl font-black text-white italic tracking-tighter">
+                       {farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0).toLocaleString()} <span className="text-sm font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
+                    </p>
+                 </div>
+              </div>
             )}
           </div>
         )}
