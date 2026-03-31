@@ -758,21 +758,58 @@ const SettingsPage = () => {
     return () => unsubShops();
   }, []);
 
+  const withTimeout = (promise, message = "Operation timed out. Please check your connection.") => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))
+    ]);
+  };
+
   const handleAddMember = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    try { await addNewFarmer(newFarmer); setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' }); alert("New member registered!"); } catch (e) { alert("Error adding member."); }
-    setIsSaving(false);
+    try { 
+      await withTimeout(addNewFarmer(newFarmer)); 
+      setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' }); 
+      alert("New member registered!"); 
+    } catch (err) { 
+      console.error("Add Member Error:", err);
+      alert(`Error adding member: ${err.message}`); 
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddShop = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    try { await addDoc(collection(db, getDataPath('shops')), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop added to portfolio!"); } catch (e) { alert("Error adding shop."); }
-    setIsSaving(false);
+    try { 
+      await withTimeout(addDoc(collection(db, getDataPath('shops')), { 
+        ...newShop, 
+        rent: Number(newShop.rent), 
+        status: 'Pending', 
+        createdAt: new Date().toISOString() 
+      })); 
+      setNewShop({ tenant: '', name: '', rent: '', area: '' }); 
+      alert("Shop added to portfolio!"); 
+    } catch (err) { 
+      console.error("Add Shop Error:", err);
+      alert(`Error adding shop: ${err.message}`); 
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteShop = async (id) => { if (window.confirm('Remove this shop permanently?')) { await deleteDoc(doc(db, getDataPath('shops'), id)); } };
+  const handleDeleteShop = async (id) => { 
+    if (!window.confirm('Remove this shop permanently?')) return;
+    try {
+      await withTimeout(deleteDoc(doc(db, getDataPath('shops'), id)));
+      alert("Shop removed.");
+    } catch (err) {
+      console.error("Delete Shop Error:", err);
+      alert(`Error deleting shop: ${err.message}`);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col gap-8 animate-in fade-in duration-500 pb-32 no-scrollbar overflow-y-auto">
