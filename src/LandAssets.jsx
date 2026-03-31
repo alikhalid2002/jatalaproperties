@@ -94,7 +94,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
                     {farmer.status === 'Paid' ? 'ادا شدہ' : 'بقایا'}
                  </span>
                  <span className="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400 font-urdu">
-                    {farmer.landSize} {farmer.landUnit}
+                    {farmer.landSize} Acres
                  </span>
               </div>
             </div>

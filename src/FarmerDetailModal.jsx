@@ -168,7 +168,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    }}
                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-20"
                  />
-               ) : farmer.landSize} {farmer.landUnit}
+               ) : farmer.landSize} Acres
              </span>
           </div>
           
