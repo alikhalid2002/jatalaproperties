@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -28,7 +28,8 @@ body {
 }
 
 .font-urdu {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 1.8 !important;
 }
 
 /* Custom scrollbar to match the midnight theme */

@@ -41,18 +41,28 @@ const AMOUNT_COLORS = {
   shop_expense: 'text-rose-400',
 };
 
-function SummaryCard({ label, value, sub, color, icon }) {
-  return (
-    <div className={`bg-slate-800/30 border border-${color}-500/20 rounded-[24px] p-5 flex flex-col gap-2`}>
-      <div className="flex items-center justify-between">
-        <span className={`text-[12px] font-black text-${color}-400 font-urdu`}>{label}</span>
-        <div className={`p-1.5 rounded-xl bg-${color}-500/10 text-${color}-400`}>{icon}</div>
+const FinanceCard = ({ labelUr, year, value, color, icon, sub }) => (
+  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col items-center justify-center gap-2 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
+    
+    {icon && (
+      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
+        {React.cloneElement(icon, { size: 24 })}
       </div>
-      <p className={`text-xl font-black italic text-${color}-400`}>Rs. {Number(value).toLocaleString()}</p>
-      {sub && <p className="text-[10px] text-slate-500 font-urdu">{sub}</p>}
+    )}
+
+    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
+      <span className={`text-[10px] md:text-sm font-black text-white font-urdu leading-relaxed whitespace-nowrap truncate w-full ${color === 'emerald' ? 'text-emerald-400' : color === 'rose' ? 'text-rose-400' : color === 'amber' ? 'text-amber-400' : color === 'orange' ? 'text-orange-400' : ''}`}>{labelUr}</span>
+      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
+      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">Rs. {value?.toLocaleString()}</p>
+      {sub && <span className="text-[9px] md:text-xs text-slate-500 font-urdu whitespace-nowrap truncate w-full mt-0.5">{sub}</span>}
     </div>
-  );
-}
+  </div>
+);
+
+const SummaryCard = ({ label, year, value, sub, icon, color }) => (
+  <FinanceCard labelUr={label} year={year} value={value} sub={sub} icon={icon} color={color} />
+);
 
 function TypeBadge({ type }) {
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.expense;
@@ -267,11 +277,11 @@ export default function FinancialReports({ entries = [], selectedYear }) {
           <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 shrink-0">
             <BarChart3 size={24} />
           </div>
-          <div className="shrink-0">
-            <h2 className="text-3xl font-black text-white italic leading-none font-urdu">
+          <div className="shrink-0 text-right">
+            <h2 className="text-2xl md:text-4xl font-black text-white italic leading-relaxed font-urdu">
               مالیاتی رپورٹس
             </h2>
-            <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-1.5 italic font-urdu">
+            <p className="text-[9px] md:text-[11px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-2 italic font-urdu leading-relaxed">
               تمام ریکارڈز • {selectedYear}-{Number(selectedYear) - 1}
             </p>
           </div>
@@ -329,12 +339,48 @@ export default function FinancialReports({ entries = [], selectedYear }) {
         </div>
       </div>
 
-      {/* ── Summary cards ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard label="کل آمدنی"    value={totals.revenue}    color="emerald" icon={<ArrowUpRight size={15}/>}   sub={`${filtered.filter(r=>r._type==='revenue').length} ادائیگی`}/>
-        <SummaryCard label="بقایا وصولی"    value={totals.pending}    color="amber"   icon={<Clock size={15}/>}          sub={`${filtered.filter(r=>r._type==='pending').length} بقایا`}/>
-        <SummaryCard label="کل خرچہ"   value={totals.expense}    color="rose"    icon={<ArrowDownRight size={15}/>} sub={`${filtered.filter(r=>r._type==='expense').length} ریکارڈ`}/>
-        <SummaryCard label="مرمت دکان" value={totals.shopRepair} color="orange"  icon={<Store size={15}/>}         sub={`${filtered.filter(r=>r._type==='shop_expense').length} مرمت`}/>
+      {/* Flex System: Force Stacking on Mobile */}
+      <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-12 font-urdu px-1">
+        <div className="w-full md:flex-1">
+          <FinanceCard 
+            labelUr="کل آمدنی"    
+            year={`${selectedYear}-${Number(selectedYear)-1}`}
+            value={totals.revenue}    
+            color="emerald" 
+            icon={<ArrowUpRight size={15}/>}   
+            sub={`${filtered.filter(r=>r._type==='revenue').length} ادائیگی`}
+          />
+        </div>
+        <div className="w-full md:flex-1">
+          <SummaryCard 
+            label="بقایا وصولی"    
+            year={`${selectedYear}-${Number(selectedYear)-1}`}
+            value={totals.pending}    
+            color="amber"   
+            icon={<Clock size={15}/>}          
+            sub={`${filtered.filter(r=>r._type==='pending').length} بقایا`}
+          />
+        </div>
+        <div className="w-full md:flex-1">
+          <SummaryCard 
+            label="کل خرچہ"   
+            year={`${selectedYear}-${Number(selectedYear)-1}`}
+            value={totals.expense}    
+            color="rose"    
+            icon={<ArrowDownRight size={15}/>} 
+            sub={`${filtered.filter(r=>r._type==='expense').length} ریکارڈ`}
+          />
+        </div>
+        <div className="w-full md:flex-1">
+          <SummaryCard 
+            label="مرمت دکان" 
+            year={`${selectedYear}-${Number(selectedYear)-1}`}
+            value={totals.shopRepair} 
+            color="orange"  
+            icon={<Store size={15}/>}         
+            sub={`${filtered.filter(r=>r._type==='shop_expense').length} مرمت`}
+          />
+        </div>
       </div>
 
       {/* ── Filters panel ─────────────────────────────────────── */}

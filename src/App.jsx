@@ -416,11 +416,35 @@ const App = () => {
                     </div>
                   </div>
 
-                  {/* Grid System: 2 cols on mobile/tablet, 3 on Laptop */}
-                  <div className="grid grid-cols-3 gap-2 md:gap-8 font-urdu px-1">
-                     <DashboardCard labelUr={`کل ادائیگی ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${revenueVal.toLocaleString()}`} diff={`+${revenuePercent}%`} color="emerald" />
-                     <DashboardCard labelUr={`بقایا وصولی ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${pendingVal.toLocaleString()}`} diff={`${pendingPercent}%`} color="orange" />
-                     <DashboardCard labelUr={`کل اخراجات ${selectedYear}-${Number(selectedYear) - 1}`} val={`Rs. ${expenseVal.toLocaleString()}`} color="rose" />
+                  {/* Flex System: Force Stacking on Mobile */}
+                  <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-12 font-urdu px-1">
+                    <div className="w-full md:flex-1">
+                      <FinanceCard 
+                        labelUr="زرعی آمدنی"
+                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                        value={revenueVal} 
+                        color="emerald" 
+                        icon={<ArrowUpRight size={18}/>}
+                      />
+                    </div>
+                    <div className="w-full md:flex-1">
+                      <FinanceCard 
+                        labelUr="باقی رقم"
+                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                        value={pendingVal} 
+                        color="indigo" 
+                        icon={<Clock size={18}/>}
+                      />
+                    </div>
+                    <div className="w-full md:flex-1">
+                      <FinanceCard 
+                        labelUr="کل اخراجات"
+                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                        value={expenseVal} 
+                        color="rose" 
+                        icon={<ArrowDownRight size={18}/>}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
@@ -477,7 +501,7 @@ const App = () => {
                                   {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                                 </div>
                                 <div className="text-left font-urdu">
-                                  <p className="text-sm text-white leading-tight">{act.labelUr}</p>
+                                  <p className="text-sm text-white leading-relaxed">{act.labelUr}</p>
                                   <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
                                 </div>
                               </div>
@@ -611,147 +635,48 @@ const App = () => {
   );
 };
 
-const EditableRow = ({ entry, onUpdate, onDelete }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ ...entry });
-
-  const handleUpdate = async () => {
-    await onUpdate(entry.id, entry.type, editData);
-    setIsEditing(false);
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm("Delete this record permanently?")) {
-      await onDelete(entry.id, entry.type);
-    }
-  };
-
-  return (
-    <tr className="group hover:bg-slate-700/10 transition-colors">
-      <td className="p-6">
-        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-          entry.type === 'expense' ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'
-        }`}>
-          {entry.type}
-        </span>
-      </td>
-      <td className="p-6">
-        {isEditing ? (
-          <input 
-            value={editData.labelUr}
-            onChange={(e) => {
-              const val = e.target.value;
-              const isEnglish = /[a-zA-Z]/.test(val);
-              setEditData({...editData, labelUr: isEnglish ? transliterateToUrdu(val) : val});
-            }}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none w-full"
-          />
-        ) : (
-          <p className="text-xs font-bold text-slate-300">{entry.labelUr}</p>
-        )}
-      </td>
-      <td className="p-6">
-        {isEditing && entry.type === 'revenue' ? (
-          <select 
-            value={editData.status}
-            onChange={(e) => setEditData({...editData, status: e.target.value})}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none"
-          >
-            <option value="received">Received</option>
-            <option value="pending">Pending</option>
-          </select>
-        ) : (
-          <span className={`text-[10px] font-black uppercase tracking-widest ${
-            entry.status === 'received' ? 'text-emerald-500' : 'text-orange-400 italic'
-          }`}>
-            {entry.status || 'Paid'}
-          </span>
-        )}
-      </td>
-      <td className="p-6 text-right">
-        {isEditing ? (
-          <input 
-            type="number"
-            value={editData.amount}
-            onChange={(e) => setEditData({...editData, amount: e.target.value})}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white outline-none w-24 text-right"
-          />
-        ) : (
-          <p className="text-sm font-black text-white italic">Rs. {Number(entry.amount).toLocaleString()}</p>
-        )}
-      </td>
-      <td className="p-6 text-center">
-        <div className="flex items-center justify-center gap-2">
-          {isEditing ? (
-            <>
-              <button onClick={handleUpdate} className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30">
-                <Save size={14} />
-              </button>
-              <button onClick={() => setIsEditing(false)} className="p-2 bg-slate-700/50 text-slate-400 rounded-lg">
-                <X size={14} />
-              </button>
-            </>
-          ) : (
-            <>
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
-              >
-                <Settings size={14} />
-              </button>
-              <button 
-                onClick={handleDelete}
-                className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
-              >
-                <X size={14} />
-              </button>
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
-};
-
-const COLOR_MAP = {
-  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
-  orange:  { bg: 'bg-orange-500/10',  text: 'text-orange-400',  border: 'border-orange-500/20'  },
-  rose:    { bg: 'bg-rose-500/10',    text: 'text-rose-400',    border: 'border-rose-500/20'    },
-  indigo:  { bg: 'bg-indigo-500/10',  text: 'text-indigo-400',  border: 'border-indigo-500/20'  },
-  blue:    { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/20'    },
-};
-
-const DashboardCard = ({ labelUr, val, diff, color, icon }) => {
-  const cfg = COLOR_MAP[color] || COLOR_MAP.indigo;
-  return (
-    <div className="bg-slate-800/40 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 group relative overflow-hidden flex flex-col items-center text-center">
-      <div className="relative z-10 flex flex-col items-center space-y-4 lg:space-y-6 w-full">
-        <div className="relative">
-           <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-2xl lg:rounded-[24px] ${cfg.bg} flex items-center justify-center ${cfg.text} mb-2 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform duration-500`}>
-             {icon || <Activity size={24} className="lg:size-7" />}
-           </div>
-           {diff && (
-             <span className={`absolute -top-2 -right-12 text-[10px] font-black px-2 py-1 rounded-lg shadow-xl ${diff.startsWith('+') ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-orange-500/20 text-orange-400 border border-orange-500/20'}`}>
-               {diff}
-             </span>
-           )}
-        </div>
-        
-        <div className="space-y-1 lg:space-y-2">
-          <p className={`${cfg.text} lg:text-slate-400 text-[12px] lg:text-[14px] font-black uppercase tracking-[0.2em] leading-tight font-urdu opacity-100 lg:opacity-80`}>{labelUr}</p>
-          <h3 className="text-2xl lg:text-4xl font-black italic tracking-tighter text-white font-urdu">
-            {val}
-          </h3>
-        </div>
+const DashboardCard = ({ labelUr, year, val, diff, color, icon }) => (
+  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
+    
+    {icon && (
+      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
+        {React.cloneElement(icon, { size: 24 })}
       </div>
-      
-      {/* Subtle Background Glow */}
-      <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full ${cfg.bg} blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity duration-700`}></div>
-    </div>
-  );
-};
+    )}
 
-// Removed DonutChart in favor of Recharts AreaChart
+    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
+      <span className="text-[10px] md:text-sm font-black text-slate-400 font-urdu leading-relaxed whitespace-nowrap truncate w-full">{labelUr}</span>
+      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
+      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">{val}</p>
+      {diff && (
+        <div className={`mt-0.5 flex items-center justify-center gap-0.5 text-[9px] md:text-xs font-black w-full ${diff.startsWith('+') ? 'text-emerald-400' : 'text-orange-400'}`}>
+          {diff.startsWith('+') ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+          {diff}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+const FinanceCard = ({ labelUr, year, value, color, icon, sub }) => (
+  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
+    
+    {icon && (
+      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
+        {React.cloneElement(icon, { size: 24 })}
+      </div>
+    )}
+
+    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
+      <span className={`text-[10px] md:text-sm font-black text-white font-urdu leading-relaxed whitespace-nowrap truncate w-full ${color === 'emerald' ? 'text-emerald-400' : color === 'rose' ? 'text-rose-400' : color === 'amber' ? 'text-amber-400' : color === 'orange' ? 'text-orange-400' : ''}`}>{labelUr}</span>
+      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
+      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">Rs. {value?.toLocaleString()}</p>
+      {sub && <span className="text-[9px] md:text-xs text-slate-500 font-urdu whitespace-nowrap truncate w-full mt-0.5">{sub}</span>}
+    </div>
+  </div>
+);
 
 const SettingsPage = () => {
   const { farmers, addNewFarmer, deleteFarmer } = useFarmers();

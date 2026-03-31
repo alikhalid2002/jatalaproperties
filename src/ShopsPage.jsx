@@ -213,10 +213,10 @@ const ShopsPage = ({ isAdmin }) => {
           <div 
             key={shop.id}
             onClick={() => setSelectedShop(shop)}
-            className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
+            className="group bg-slate-800/40 p-8 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-visible"
           >
             <div className="space-y-4">
-              <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{shop.tenant}</h3>
+              <h3 className="text-xl lg:text-3xl font-black text-white font-urdu leading-relaxed">{shop.tenant}</h3>
               <div className="flex flex-wrap items-center justify-center gap-3">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
                     shop.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
@@ -304,7 +304,7 @@ const ShopsPage = ({ isAdmin }) => {
               
               {/* Shop Identity - Always Visible */}
               <div className="flex items-center gap-4 mb-6">
-                <h2 className="text-3xl lg:text-4xl font-black text-white font-urdu italic leading-none">{selectedShop.tenant}</h2>
+                <h2 className="text-2xl lg:text-4xl font-black text-white font-urdu italic leading-relaxed">{selectedShop.tenant}</h2>
                 <div className="w-2 h-2 rounded-full bg-slate-700"></div>
                 <p className="text-2xl font-black italic text-slate-300">{selectedShop.area || '12x15'}</p>
               </div>
