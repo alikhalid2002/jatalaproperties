@@ -128,6 +128,16 @@ const updateFarmerFields = async (farmerId, fields) => {
           totalRemaining: newTotalRemaining,
           status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
         }));
+      } else if (fields.totalPayable !== undefined) {
+        // If Total Payable is manually updated, recalculate remaining balance
+        const newTotalPayable = Number(fields.totalPayable);
+        const totalPaid = Number(farmer.totalPaid) || 0;
+        const newTotalRemaining = Math.max(0, newTotalPayable - totalPaid);
+        await withTimeout(updateDoc(farmerRef, {
+          ...fields,
+          totalRemaining: newTotalRemaining,
+          status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
+        }));
       } else {
         // Basic update (e.g. name change)
         await withTimeout(updateDoc(farmerRef, fields));
