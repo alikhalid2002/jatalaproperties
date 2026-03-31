@@ -74,7 +74,7 @@ export const useFarmers = () => {
   useEffect(() => {
     let unsubscribe;
     try {
-      const q = query(collection(db, getDataPath('farmers')), orderBy('nameUr', 'asc'));
+      const q = query(collection(db, getDataPath('farmers')), orderBy('landSize', 'desc'));
       
       unsubscribe = onSnapshot(q, (snapshot) => {
         const farmersData = snapshot.docs.map(doc => ({
