@@ -26,6 +26,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         totalPayable: farmer.totalPayable || (Number(farmer.totalPaid) + Number(farmer.totalRemaining)) || '',
         theka: farmer.theka || 0
       });
+    } else if (!isOpen) {
+      // Clear data when closing to prevent leakage to the next farmer opened
+      setEditData({ nameUr: '', nameEn: '', landSize: '', totalPayable: '', theka: '' });
+      setIsEditing(false);
     }
   }, [isOpen, farmer]);
 
@@ -212,8 +216,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                 <p className="text-2xl font-black text-white italic">Rs. {farmer.totalRemaining?.toLocaleString() || 0}</p>
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
-                <div className="flex items-center justify-center gap-2 mb-3 text-indigo-400">
-                   <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
+                <div className="flex items-center justify-center gap-2 mb-3 text-violet-400">
+                   <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse"></div>
                    <span className="text-[11px] font-black uppercase tracking-widest font-urdu">ٹھیکہ</span>
                 </div>
                 {isEditing ? (
@@ -221,7 +225,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                     type="number"
                     value={editData.theka}
                     onChange={(e) => setEditData({...editData, theka: e.target.value})}
-                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl"
+                    className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl"
                   />
                 ) : (
                   <p className="text-2xl font-black text-white italic">Rs. {Number(farmer.theka)?.toLocaleString() || 0}</p>
