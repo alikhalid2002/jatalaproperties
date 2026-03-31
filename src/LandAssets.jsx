@@ -47,7 +47,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
       
       {/* Financial Summary Cards - Top */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-12 font-urdu">
+      <div className="grid grid-cols-3 gap-2 md:gap-6 mb-12 font-urdu">
         <FinanceCard 
           labelUr={`زرعی زمین سے کل آمدنی ${selectedYear}-${Number(selectedYear) - 1}`} 
           value={revenueVal} 
@@ -166,9 +166,9 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
 };
 
 const FinanceCard = ({ labelUr, labelEn, value, color }) => (
-  <div className="bg-slate-800/30 p-3 lg:p-4 rounded-[18px] border border-slate-700/40 flex flex-col items-center justify-center text-center group hover:bg-slate-800/60 transition-all duration-500 shadow-md relative">
+  <div className="bg-slate-800/30 p-2 lg:p-4 rounded-[18px] border border-slate-700/40 flex flex-col items-center justify-center text-center group hover:bg-slate-800/60 transition-all duration-500 shadow-md relative">
     <div className="relative z-10 space-y-1">
-      <h4 className="text-sm lg:text-[15px] font-black text-white font-urdu leading-none">{labelUr}</h4>
+      <h4 className="text-[10px] md:text-sm lg:text-[15px] font-black text-white font-urdu leading-none">{labelUr}</h4>
       <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em]">{labelEn}</p>
       <div className="pt-0.5">
         <span className="text-lg lg:text-xl font-black text-white italic tracking-tighter">
