@@ -14,7 +14,7 @@ const LandAssets = lazy(() => import('./LandAssets'));
 const ShopsPage = lazy(() => import('./ShopsPage'));
 const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
-import { db, getDataPath } from './firebase';
+import { db, getDataPath, APP_VERSION } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 import { 
@@ -27,6 +27,16 @@ import { transliterateToUrdu } from './urduTransliterator';
 import { seedShops } from './seedShops';
 
 const App = () => {
+  // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
+  useEffect(() => {
+    const lastVer = localStorage.getItem('jatala_app_ver');
+    if (lastVer !== APP_VERSION) {
+      console.log(`Upgrading to version ${APP_VERSION}. Clearing old caches...`);
+      localStorage.removeItem('jatala_farmers_cache'); // Clear farmer list cache
+      localStorage.setItem('jatala_app_ver', APP_VERSION);
+    }
+  }, []);
+
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
