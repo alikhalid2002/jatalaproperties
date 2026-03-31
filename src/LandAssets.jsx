@@ -103,24 +103,24 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
               <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-60">
                 <div className="flex items-center gap-1.5">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                   <span>وصول: {((Number(farmer.totalPayable) || 0) - (Number(farmer.balance) || 0)).toLocaleString()}</span>
+                   <span>وصول: {(Number(farmer.totalPaid) || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                   <span>باقی: {(Number(farmer.balance) || 0).toLocaleString()}</span>
+                   <span>باقی: {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
                 </div>
               </div>
               
               <div className="h-2 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner group">
                 <div 
                   className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 group-hover:from-emerald-500 group-hover:to-emerald-300 transition-all duration-700 rounded-r-sm"
-                  style={{ width: `${Math.min(100, Math.max(0, (((Number(farmer.totalPayable) || 0) - (Number(farmer.balance) || 0)) / (Number(farmer.totalPayable) || 1)) * 100))}%` }}
+                  style={{ width: `${Math.min(100, Math.max(0, ((Number(farmer.totalPaid) || 0) / ((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0) || 1)) * 100))}%` }}
                 ></div>
               </div>
 
               <div className="flex justify-center">
                  <p className="text-[9px] font-black text-slate-500 italic opacity-30 uppercase tracking-[0.2em]">
-                   کل رقم: {(Number(farmer.totalPayable) || 0).toLocaleString()}
+                   کل رقم: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
               </div>
             </div>

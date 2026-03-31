@@ -23,79 +23,104 @@ export const useFinanceData = (selectedYear) => {
         let unsubRevenue;
         let unsubExpenses;
         let unsubShopExpenses;
+        let unsubFarmers;
 
         try {
             const qRevenue = query(collection(db, getDataPath("revenue")), orderBy("createdAt", "desc"));
             const qExpenses = query(collection(db, getDataPath("expenses")), orderBy("createdAt", "desc"));
             const qShopTrans = query(collection(db, getDataPath("shop_transactions")), orderBy("createdAt", "desc"));
+            const qFarmers = query(collection(db, getDataPath("farmers")));
 
-            unsubRevenue = onSnapshot(qRevenue, (snapshot) => {
-                const filteredRev = snapshot.docs.filter(doc => {
-                    const date = doc.data().createdAt?.toDate() || new Date();
-                    return date.getFullYear().toString() === selectedYear;
-                });
-                const revEntries = filteredRev.map(doc => ({ id: doc.id, type: 'revenue', ...doc.data() }));
-                
+            const syncFinance = (revDocs, expDocs, shopDocs, farmerDocs) => {
                 let totalRev = 0;
                 let totalPending = 0;
-                filteredRev.forEach(doc => {
-                    const data = doc.data();
-                    if (data.status === 'received') totalRev += Number(data.amount) || 0;
-                    else totalPending += Number(data.amount) || 0;
-                });
-                
-                setRevenue(totalRev);
-                setPending(totalPending);
-                setEntries(prev => [...revEntries, ...prev.filter(e => e.type !== 'revenue')].sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
-            });
-
-            // Aggregate both Operational and Shop Expenses
-            const syncExpenses = (opExpDocs, shopExpDocs) => {
-                let total = 0;
+                let totalExp = 0;
                 const allEntries = [];
 
-                opExpDocs.forEach(doc => {
+                // 1. Process Revenue Collection
+                revDocs.forEach(doc => {
                     const data = doc.data();
                     const date = data.createdAt?.toDate() || new Date();
                     if (date.getFullYear().toString() === selectedYear) {
-                        total += Number(data.amount) || 0;
+                        if (data.status === 'received') totalRev += Number(data.amount) || 0;
+                        else totalPending += Number(data.amount) || 0;
+                        allEntries.push({ id: doc.id, type: 'revenue', ...data });
+                    }
+                });
+
+                // 2. Process Expenses Collection
+                expDocs.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate() || new Date();
+                    if (date.getFullYear().toString() === selectedYear) {
+                        totalExp += Number(data.amount) || 0;
                         allEntries.push({ id: doc.id, type: 'expense', ...data });
                     }
                 });
 
-                shopExpDocs.forEach(doc => {
+                // 3. Process Shop Transactions (Rent & Expenses)
+                shopDocs.forEach(doc => {
                     const data = doc.data();
-                    // Shop expenses use .type === 'Expense'
-                    if (data.type === 'Expense') {
-                        let itemYear = null;
-                        if (data.date) itemYear = data.date.split('-')[0];
-                        else if (data.createdAt?.seconds) itemYear = new Date(data.createdAt.seconds * 1000).getFullYear().toString();
-                        
-                        if (itemYear === selectedYear) {
-                            total += Number(data.amount) || 0;
+                    let itemYear = null;
+                    if (data.date) itemYear = data.date.split('-')[0];
+                    else if (data.createdAt?.seconds) itemYear = new Date(data.createdAt.seconds * 1000).getFullYear().toString();
+                    
+                    if (itemYear === selectedYear) {
+                        if (data.type === 'Rent') {
+                            totalRev += Number(data.amount) || 0;
+                            allEntries.push({ id: doc.id, type: 'revenue', ...data, labelUr: `دکان کرایہ (${data.shopName || ''})` });
+                        } else {
+                            totalExp += Number(data.amount) || 0;
                             allEntries.push({ id: doc.id, type: 'shop_expense', ...data });
                         }
                     }
                 });
 
-                setExpenses(total);
-                setEntries(prev => [...allEntries, ...prev.filter(e => !['expense', 'shop_expense'].includes(e.type))].sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+                // 4. Process Farmers (Payments from History)
+                farmerDocs.forEach(doc => {
+                    const f = doc.data();
+                    // Process history for revenue (actual payments)
+                    if (f.history && Array.isArray(f.history)) {
+                        f.history.forEach((h, idx) => {
+                            const hYear = h.date?.split('-')[0];
+                            if (hYear === selectedYear) {
+                                totalRev += Number(h.amount) || 0;
+                                allEntries.push({ 
+                                    id: `${doc.id}_h_${idx}`, 
+                                    type: 'revenue', 
+                                    amount: h.amount, 
+                                    date: h.date, 
+                                    labelUr: `ادائیگی: ${f.nameUr}`,
+                                    status: 'received'
+                                });
+                            }
+                        });
+                    }
+                    // Process remaining balance for pending (weighted by current state)
+                    // Note: This shows current global pending, fitting the dashboard's "Outstanding" intent
+                    totalPending += Number(f.totalRemaining) || 0;
+                });
+
+                setRevenue(totalRev);
+                setExpenses(totalExp);
+                setPending(totalPending);
+                setEntries(allEntries.sort((a,b) => {
+                    const dateA = a.date || (a.createdAt?.seconds ? new Date(a.createdAt.seconds * 1000).toISOString() : '');
+                    const dateB = b.date || (b.createdAt?.seconds ? new Date(b.createdAt.seconds * 1000).toISOString() : '');
+                    return dateB.localeCompare(dateA);
+                }));
                 setLoading(false);
             };
 
-            // Double listener approach to keep global total synced
-            let lastOpDocs = [];
-            let lastShopDocs = [];
+            let lastRev = [];
+            let lastExp = [];
+            let lastShop = [];
+            let lastFarmer = [];
 
-            unsubExpenses = onSnapshot(qExpenses, (snapshot) => {
-                lastOpDocs = snapshot.docs;
-                syncExpenses(lastOpDocs, lastShopDocs);
-            });
-
-            unsubShopExpenses = onSnapshot(qShopTrans, (snapshot) => {
-                lastShopDocs = snapshot.docs;
-                syncExpenses(lastOpDocs, lastShopDocs);
-            });
+            unsubRevenue = onSnapshot(qRevenue, (s) => { lastRev = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
+            unsubExpenses = onSnapshot(qExpenses, (s) => { lastExp = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
+            unsubShopExpenses = onSnapshot(qShopTrans, (s) => { lastShop = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
+            unsubFarmers = onSnapshot(qFarmers, (s) => { lastFarmer = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
 
         } catch (error) {
             console.error("Finance Sync Error:", error);
@@ -106,6 +131,7 @@ export const useFinanceData = (selectedYear) => {
             if (unsubRevenue) unsubRevenue();
             if (unsubExpenses) unsubExpenses();
             if (unsubShopExpenses) unsubShopExpenses();
+            if (unsubFarmers) unsubFarmers();
         };
     }, [selectedYear]);
 
