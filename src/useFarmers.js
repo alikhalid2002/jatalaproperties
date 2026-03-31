@@ -317,6 +317,7 @@ const updateFarmerFields = async (farmerId, fields) => {
         status: 'Pending',
         totalPaid: 0,
         totalRemaining: 0,
+        theka: 0,
         history: []
       }));
     } catch (error) {
