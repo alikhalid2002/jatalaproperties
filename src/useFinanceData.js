@@ -16,7 +16,6 @@ export const useFinanceData = (selectedYear) => {
     const [revenue, setRevenue] = useState(0);
     const [pending, setPending] = useState(0);
     const [expenses, setExpenses] = useState(0);
-    const [totalArea, setTotalArea] = useState(0);
     const [loading, setLoading] = useState(true);
     const [entries, setEntries] = useState([]);
 
@@ -36,7 +35,6 @@ export const useFinanceData = (selectedYear) => {
                 let totalRev = 0;
                 let totalPending = 0;
                 let totalExp = 0;
-                let totalLandArea = 0;
                 const allEntries = [];
 
                 // 1. Process Revenue Collection
@@ -101,13 +99,11 @@ export const useFinanceData = (selectedYear) => {
                     // Process remaining balance for pending (weighted by current state)
                     // Note: This shows current global pending, fitting the dashboard's "Outstanding" intent
                     totalPending += Number(f.totalRemaining) || 0;
-                    totalLandArea += Number(f.landSize) || 0;
                 });
 
                 setRevenue(totalRev);
                 setExpenses(totalExp);
                 setPending(totalPending);
-                setTotalArea(totalLandArea);
                 setEntries(allEntries.sort((a,b) => {
                     const dateA = a.date || (a.createdAt?.seconds ? new Date(a.createdAt.seconds * 1000).toISOString() : '');
                     const dateB = b.date || (b.createdAt?.seconds ? new Date(b.createdAt.seconds * 1000).toISOString() : '');
@@ -184,5 +180,5 @@ export const useFinanceData = (selectedYear) => {
         }
     };
 
-    return { revenue, pending, expenses, totalArea, entries, loading, addEntry, updateEntry, deleteEntry };
+    return { revenue, pending, expenses, entries, loading, addEntry, updateEntry, deleteEntry };
 };

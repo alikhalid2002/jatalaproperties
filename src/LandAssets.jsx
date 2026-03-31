@@ -17,12 +17,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     updateFarmerDocuments,
     bulkRecalculateFarmers
   } = useFarmers();
-  const { 
-    revenue: revenueVal = 0, 
-    pending: pendingVal = 0, 
-    expenses: expenseVal = 0,
-    totalArea: areaVal = 0 
-  } = useFinanceData(selectedYear);
+  const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,43 +47,45 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
       
       {/* Financial Summary Cards - Top */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12 font-urdu">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-12 font-urdu">
         <FinanceCard 
-          labelUr={`کل رقبہ`} 
-          labelEn={`Total Land`}
-          value={`${areaVal.toLocaleString()} Acres`} 
-          color="indigo" 
-        />
-        <FinanceCard 
-          labelUr={`کل ادائیگی ${selectedYear}-${Number(selectedYear) - 1}`} 
-          labelEn={`Total Paid`}
-          value={`Rs. ${revenueVal.toLocaleString()}`} 
+          labelUr={`زرعی زمین سے کل آمدنی ${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={revenueVal} 
           color="emerald" 
         />
         <FinanceCard 
-          labelUr={`باقی رقم ${selectedYear}-${Number(selectedYear) - 1}`}
-          labelEn={`Outstanding`} 
-          value={`Rs. ${pendingVal.toLocaleString()}`} 
-          color="orange" 
+          labelUr={`باقی رقم ${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={pendingVal} 
+          color="indigo" 
         />
         <FinanceCard 
           labelUr={`کل اخراجات ${selectedYear}-${Number(selectedYear) - 1}`} 
-          labelEn={`Total Expenses`}
-          value={`Rs. ${expenseVal.toLocaleString()}`} 
+          value={expenseVal} 
           color="rose" 
         />
       </div>
 
 
-        {isAdmin && farmers.length === 0 && (
-          <div className="flex justify-center mb-12">
-            <button 
-              onClick={seedFarmersData}
-              className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
-            >
-              <Database size={20} />
-              SEED INITIAL DATA
-            </button>
+        {isAdmin && (
+          <div className="flex justify-center gap-4 mb-12">
+            {farmers.length === 0 && (
+              <button 
+                onClick={seedFarmersData}
+                className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+              >
+                <Database size={20} />
+                SEED INITIAL DATA
+              </button>
+            )}
+            {farmers.length > 0 && (
+              <button 
+                onClick={bulkRecalculateFarmers}
+                className="flex items-center gap-3 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20 text-sm font-urdu tracking-widest"
+              >
+                <Calculator size={20} />
+                تمام ریکارڈز اپ ڈیٹ کریں (Formula)
+              </button>
+            )}
           </div>
         )}
 
@@ -166,13 +163,13 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
 };
 
 const FinanceCard = ({ labelUr, labelEn, value, color }) => (
-  <div className="bg-slate-800/30 p-3 lg:p-5 rounded-[24px] border border-slate-700/40 flex flex-col items-center justify-center text-center group hover:bg-slate-800/60 transition-all duration-500 shadow-xl relative">
-    <div className="relative z-10 space-y-2">
-      <h4 className={`text-sm lg:text-[15px] font-black font-urdu leading-none text-${color}-400`}>{labelUr}</h4>
+  <div className="bg-slate-800/30 p-3 lg:p-4 rounded-[18px] border border-slate-700/40 flex flex-col items-center justify-center text-center group hover:bg-slate-800/60 transition-all duration-500 shadow-md relative">
+    <div className="relative z-10 space-y-1">
+      <h4 className="text-sm lg:text-[15px] font-black text-white font-urdu leading-none">{labelUr}</h4>
       <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em]">{labelEn}</p>
-      <div className="pt-1">
+      <div className="pt-0.5">
         <span className="text-lg lg:text-xl font-black text-white italic tracking-tighter">
-           {typeof value === 'number' ? `Rs. ${value?.toLocaleString()}` : value}
+           Rs. {value?.toLocaleString()}
         </span>
       </div>
     </div>
