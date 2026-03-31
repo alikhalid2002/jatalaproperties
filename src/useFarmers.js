@@ -103,45 +103,44 @@ export const useFarmers = () => {
   }, []);
 
 const updateFarmerFields = async (farmerId, fields) => {
-    const farmer = farmers.find(f => f.id === farmerId);
-    if (!farmer) return;
-
     try {
       const farmerRef = doc(db, getDataPath('farmers'), farmerId);
+      const farmer = farmers.find(f => f.id === farmerId);
+      if (!farmer) throw new Error("Member document not found.");
+
+      // Clone fields to break any shared object references
+      const updateData = { ...fields };
       
-      // Check if landSize is being updated
-      if (fields.landSize && Number(fields.landSize) !== Number(farmer.landSize)) {
-        const newSize = Number(fields.landSize);
+      // Update targeted document only
+      if (updateData.landSize && Number(updateData.landSize) !== Number(farmer.landSize)) {
+        const newSize = Number(updateData.landSize);
         const oldSize = Number(farmer.landSize) || 1;
-        
-        // Calculate current total value (Paid + Remaining)
         const currentPayable = Number(farmer.totalPayable) || (Number(farmer.totalPaid) + Number(farmer.totalRemaining));
-        
-        // Derive rate per unit and calculate new totals
         const ratePerUnit = currentPayable / oldSize;
         const newTotalPayable = Math.round(ratePerUnit * newSize);
         const newTotalRemaining = Math.max(0, newTotalPayable - (Number(farmer.totalPaid) || 0));
 
         await withTimeout(updateDoc(farmerRef, {
-          ...fields,
+          ...updateData,
           totalPayable: newTotalPayable,
           totalRemaining: newTotalRemaining,
           status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
         }));
-      } else if (fields.totalPayable !== undefined) {
-        // If Total Payable is manually updated, recalculate remaining balance
-        const newTotalPayable = Number(fields.totalPayable);
+      } else if (updateData.totalPayable !== undefined) {
+        const newTotalPayable = Number(updateData.totalPayable);
         const totalPaid = Number(farmer.totalPaid) || 0;
         const newTotalRemaining = Math.max(0, newTotalPayable - totalPaid);
         await withTimeout(updateDoc(farmerRef, {
-          ...fields,
+          ...updateData,
           totalRemaining: newTotalRemaining,
           status: newTotalRemaining === 0 ? 'Paid' : 'Pending'
         }));
       } else {
-        // Basic update (e.g. name change)
-        await withTimeout(updateDoc(farmerRef, fields));
+        await withTimeout(updateDoc(farmerRef, updateData));
       }
+
+      // Force immediate cache purge to prevent stale global state
+      localStorage.removeItem('jatala_farmers_cache');
     } catch (error) {
       console.error("Update Farmer Error:", error);
       alert(`Error updating member: ${error.message}`);
