@@ -4,7 +4,7 @@ import {
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
   Plus, UserPlus, Trash2, Loader2, Save, CheckCircle,
   ArrowUpRight, ArrowDownRight, Clock, Activity, Search as SearchIcon,
-  Shield, User, X, Lock, Calendar, Home
+  Shield, User, X, Lock, Calendar, Home, RefreshCw
 } from 'lucide-react';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
