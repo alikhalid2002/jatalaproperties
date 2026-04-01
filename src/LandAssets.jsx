@@ -46,14 +46,21 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
       
-      {/* Financial Summary Cards - Top */}
-      <div className="grid grid-cols-2 gap-2 md:gap-6 mb-8 font-urdu px-1 w-full">
+      {/* Financial Summary Cards - 3 Column Layout */}
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
           labelUr="زرعی آمدنی"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
           value={revenueVal} 
           color="emerald" 
           icon={<ArrowUpRight />}
+        />
+        <FinanceCard 
+          labelUr="باقی رقم"
+          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={pendingVal} 
+          color="indigo" 
+          icon={<Clock />}
         />
         <FinanceCard 
           labelUr="کل اخراجات"
