@@ -48,36 +48,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
-      {/* Search and Filters - Standard Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
-        <div className="relative group flex-1 max-w-xl">
-          <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-500 group-focus-within:text-emerald-500 transition-colors">
-            <UserCircle size={20} />
-          </div>
-          <input 
-            type="text" 
-            placeholder="کاشتکار کا نام تلاش کریں..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700/50 rounded-2xl py-5 pl-16 pr-6 font-urdu text-base text-white focus:outline-none focus:border-emerald-500/50 shadow-2xl transition-all"
-          />
-        </div>
-        
-        {/* Responsive Total Acreage Summary (Quick Glance) */}
-        {farmers.length > 0 && (
-          <div className="flex items-center gap-4 bg-slate-900/50 border border-slate-700/50 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-xl animate-in slide-in-from-right-4">
-             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                <Store size={22} />
-             </div>
-             <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">کل پیمائش</p>
-                <p className="text-xl font-black text-white italic tracking-tighter leading-none">
-                   {farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0).toLocaleString()} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
-                </p>
-             </div>
-          </div>
-        )}
-      </div>
+
 
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
