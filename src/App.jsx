@@ -682,6 +682,7 @@ const SettingsPage = () => {
   const [expandedSection, setExpandedSection] = useState(null);
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
@@ -740,6 +741,118 @@ const SettingsPage = () => {
     } catch (err) {
       console.error("Delete Shop Error:", err);
       alert(`Error deleting shop: ${err.message}`);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const { jsPDF } = await import('jspdf');
+      const { default: autoTable } = await import('jspdf-autotable');
+
+      // Helper to load Urdu font
+      const loadFont = async (url) => {
+        const res = await fetch(url);
+        const buffer = await res.arrayBuffer();
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      };
+
+      const fontBase64 = await loadFont('https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Regular.ttf');
+      const doc = new jsPDF();
+      
+      doc.addFileToVFS('Amiri-Regular.ttf', fontBase64);
+      doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+      doc.setFont('Amiri');
+
+      // Header
+      doc.setFontSize(28);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Jatala Properties Report', 105, 25, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`System Audit Report • ${new Date().toLocaleString()}`, 105, 33, { align: 'center' });
+      doc.line(20, 40, 190, 40);
+
+      // Section 1: Members/Farmers
+      doc.setFontSize(16);
+      doc.setTextColor(0);
+      doc.text('1. Member Portfolio (ممبران کی تفصیل)', 20, 50);
+      
+      const farmersData = farmers.map((f, i) => [
+        i + 1,
+        f.nameUr || '',
+        f.nameEn || '',
+        `${f.landSize} ${f.landUnit}`,
+        f.totalRemaining > 0 ? 'Pending' : 'Paid'
+      ]);
+
+      autoTable(doc, {
+        startY: 55,
+        head: [['#', 'Name (Urdu)', 'Name (English)', 'Land Area', 'Status']],
+        body: farmersData,
+        styles: { font: 'Amiri', fontSize: 10 },
+        headStyles: { fillColor: [79, 70, 229], halign: 'center' },
+        columnStyles: { 1: { halign: 'right' } }
+      });
+
+      // Section 2: Shops
+      const shopStartY = doc.lastAutoTable.cursor.y + 20;
+      doc.text('2. Commercial Units (دکانوں کی تفصیل)', 20, shopStartY);
+      
+      const shopsData = shops.map((s, i) => [
+        i + 1,
+        s.tenant || '',
+        s.name || '',
+        s.area || '',
+        `Rs. ${Number(s.rent || 0).toLocaleString()}`
+      ]);
+
+      autoTable(doc, {
+        startY: shopStartY + 5,
+        head: [['#', 'Tenant', 'Shop ID', 'Area', 'Monthly Rent']],
+        body: shopsData,
+        styles: { font: 'Amiri', fontSize: 10 },
+        headStyles: { fillColor: [59, 130, 246], halign: 'center' },
+        columnStyles: { 1: { halign: 'right' } }
+      });
+
+      // Section 3: Expenses
+      const expenseStartY = doc.lastAutoTable.cursor.y + 20;
+      if (expenseStartY > 220) doc.addPage();
+      const currentY = doc.lastAutoTable.cursor.y > 220 ? 30 : expenseStartY;
+      doc.text('3. Expense Registry (اخراجات کا ریکارڈ)', 20, currentY);
+
+      const expenseItems = entries.filter(e => ['expense', 'shop_expense'].includes(e.type));
+      const expensesData = expenseItems.map((e, i) => [
+        i + 1,
+        e.date || '',
+        e.labelUr || e.labelEn || '',
+        e.type.toUpperCase(),
+        `Rs. ${Number(e.amount || 0).toLocaleString()}`
+      ]);
+
+      autoTable(doc, {
+        startY: currentY + 5,
+        head: [['#', 'Date', 'Description', 'Category', 'Amount']],
+        body: expensesData,
+        styles: { font: 'Amiri', fontSize: 10 },
+        headStyles: { fillColor: [244, 63, 94], halign: 'center' },
+        columnStyles: { 2: { halign: 'right' } }
+      });
+
+      doc.save(`Jatala_Properties_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      alert("Professional PDF Report generated successfully!");
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      alert("Error generating PDF: " + err.message);
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -951,7 +1064,35 @@ const SettingsPage = () => {
            </div>
         </div>
         
-        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           {/* PDF Report Card */}
+           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-emerald-500/30 transition-all">
+              <div className="p-5 bg-emerald-500/10 text-emerald-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/5">
+                 <FileJson size={32} />
+              </div>
+              <div>
+                 <h3 className="text-xl font-black text-white font-urdu">پی ڈی ایف رپورٹ</h3>
+                 <p className="text-[11px] text-slate-500 mt-2 font-urdu">ممبرز، دکانوں اور اخراجات کی مکمل رپورٹ ڈاؤن لوڈ کریں</p>
+              </div>
+              <button 
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF || isBackingUp || isRestoring}
+                className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
+              >
+                 {isGeneratingPDF ? (
+                   <>
+                     <Loader2 className="animate-spin" size={20} />
+                     <span className="font-urdu">رپورٹ تیار ہو رہی ہے...</span>
+                   </>
+                 ) : (
+                   <>
+                     <BarChart3 size={20} />
+                     <span className="font-black uppercase tracking-widest text-[11px]">Download PDF Report</span>
+                   </>
+                 )}
+              </button>
+           </div>
+
            {/* Backup Card */}
            <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-indigo-500/30 transition-all">
               <div className="p-5 bg-indigo-500/10 text-indigo-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/5">
