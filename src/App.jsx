@@ -387,14 +387,13 @@ const App = () => {
             ) : activeTab === 'Dashboard' ? (
               loading ? <DashboardSkeleton /> : (
                 <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0" dir="ltr">
-                  {/* Dashboard Header - Centered */}
-                  <div className="flex flex-col items-center justify-center gap-6 mb-8 border-b border-white/5 pb-12 w-full text-center">
-                    <div className="space-y-4 flex flex-col items-center">
+                  {/* Dashboard Header - Left Aligned */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-white/5 pb-12">
+                    <div className="space-y-4">
                       <h2 className="text-4xl md:text-7xl font-black text-white font-urdu tracking-tight leading-none drop-shadow-2xl">مالیاتی جائزہ</h2>
-                      <div className="flex items-center justify-center gap-4">
-                        <div className="h-px w-8 bg-indigo-500/50"></div>
+                      <div className="flex items-center gap-4">
+                        <div className="h-px w-12 bg-indigo-500/50"></div>
                         <p className="text-xs md:text-sm font-black text-indigo-400 uppercase tracking-[0.4em] font-urdu">ریئل ٹائم مانیٹرنگ</p>
-                        <div className="h-px w-8 bg-indigo-500/50"></div>
                       </div>
                     </div>
                   </div>
