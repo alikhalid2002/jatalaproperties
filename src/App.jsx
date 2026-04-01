@@ -439,12 +439,12 @@ const App = () => {
                     <div className="flex justify-between items-center mb-3">
                        <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                          <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
+                          <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
                             وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
                           </span>
                        </div>
                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
+                          <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
                             باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
                           </span>
                           <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
