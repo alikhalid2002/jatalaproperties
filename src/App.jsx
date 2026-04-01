@@ -227,7 +227,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-300 font-sans selection:bg-indigo-500/30 overflow-x-hidden flex flex-col md:flex-row" dir="ltr">
+    <div className="h-screen bg-[#020617] text-slate-300 font-sans selection:bg-indigo-500/30 overflow-hidden flex flex-col md:flex-row" dir="ltr">
       
       {/* ── Desktop Sidebar ───────────────────────────────────── */}
       <aside className="hidden lg:flex w-[280px] bg-slate-900 border-r border-slate-800 flex-col py-10 px-6 shrink-0 z-50">
@@ -380,7 +380,7 @@ const App = () => {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto no-scrollbar lg:px-12 px-4 lg:py-12 py-6">
+        <div className="flex-1 overflow-y-auto lg:px-12 px-4 lg:py-12 py-6">
           <div className="max-w-[1600px] mx-auto min-h-full flex flex-col">
             {globalSearch ? (
               <SearchResults query={globalSearch} data={{ farmers, shops, soldProperties }} onNavigate={(tab) => { setGlobalSearch(''); setActiveTab(tab); }} />
