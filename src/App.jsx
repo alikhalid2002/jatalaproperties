@@ -974,7 +974,7 @@ const SettingsPage = () => {
                  ) : (
                    <>
                      <FileJson size={20} />
-                     <span className="font-urdu">بیک اپ ڈاؤن لوڈ کریں</span>
+                     <span className="font-black uppercase tracking-widest text-[11px]">Download System Backup (JSON)</span>
                    </>
                  )}
               </button>
@@ -1000,7 +1000,7 @@ const SettingsPage = () => {
                  ) : (
                    <>
                      <AlertTriangle size={20} />
-                     <span className="font-urdu">ڈیٹا فائل اپ لوڈ کریں</span>
+                     <span className="font-black uppercase tracking-widest text-[11px]">Restore Data</span>
                    </>
                  )}
                  <input type="file" accept=".json" onChange={handleRestore} className="hidden" disabled={isRestoring || isBackingUp} />
