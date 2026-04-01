@@ -227,10 +227,10 @@ const App = () => {
   }
 
   return (
-    <div className="h-screen bg-[#020617] text-slate-300 font-sans selection:bg-indigo-500/30 overflow-hidden flex flex-col md:flex-row" dir="ltr">
+    <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden select-none" dir="ltr">
       
       {/* ── Desktop Sidebar ───────────────────────────────────── */}
-      <aside className="hidden lg:flex w-[280px] bg-slate-900 border-r border-slate-800 flex-col py-10 px-6 shrink-0 z-50">
+      <aside className="hidden lg:flex w-[280px] bg-slate-900 border-l border-slate-800 flex-col py-10 px-6 shrink-0 z-50">
         <div className="flex items-center gap-4 px-4 mb-14 group">
           <div className="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-[20px] flex items-center justify-center shadow-lg shadow-indigo-500/20 rotate-3 group-hover:rotate-12 transition-transform duration-500">
              <Home className="text-white" size={28} />
@@ -247,13 +247,13 @@ const App = () => {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group
                 ${activeTab === item.id 
-                  ? 'bg-gradient-to-r from-indigo-500/10 to-transparent text-indigo-400 border-l-4 border-indigo-500 shadow-xl shadow-indigo-500/5' 
+                  ? 'bg-gradient-to-l from-indigo-500/10 to-transparent text-indigo-400 border-r-4 border-indigo-500 shadow-xl shadow-indigo-500/5' 
                   : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'}`}
             >
               <div className={`${activeTab === item.id ? 'scale-110' : 'group-hover:translate-x-1'} transition-transform`}>
                 {item.icon}
               </div>
-              <span className="text-[17px] font-black font-urdu" dir="rtl">{item.labelUr}</span>
+              <span className="text-[17px] font-black font-urdu">{item.labelUr}</span>
             </button>
           ))}
         </nav>
@@ -380,13 +380,13 @@ const App = () => {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto lg:px-12 px-4 lg:py-12 py-6">
+        <div className="flex-1 overflow-y-auto no-scrollbar lg:px-12 px-4 lg:py-12 py-6">
           <div className="max-w-[1600px] mx-auto min-h-full flex flex-col">
             {globalSearch ? (
               <SearchResults query={globalSearch} data={{ farmers, shops, soldProperties }} onNavigate={(tab) => { setGlobalSearch(''); setActiveTab(tab); }} />
             ) : activeTab === 'Dashboard' ? (
               loading ? <DashboardSkeleton /> : (
-                <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0">
+                <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0" dir="ltr">
                   {/* Mobile Year Selector */}
                   <div className="lg:hidden flex justify-start -mb-2">
                     <div className="relative">
@@ -416,8 +416,8 @@ const App = () => {
                     </div>
                   </div>
 
-                  {/* Aggregate Summary: 2 Column Layout (Starting from Left) */}
-                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full text-center" dir="ltr">
+                  {/* Aggregate Summary: 2 Column Layout (Removed Remaining card as requested) */}
+                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full text-center">
                     <FinanceCard 
                       labelUr="کل متوقع آمدنی"
                       year={selectedYear} 
@@ -435,7 +435,7 @@ const App = () => {
                   </div>
                   
                   {/* Progress Comparison Bar: Received vs Remaining */}
-                  <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-8 font-urdu" dir="rtl">
+                  <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-8 font-urdu">
                     <div className="flex justify-between items-center mb-3">
                        <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
@@ -464,7 +464,7 @@ const App = () => {
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
                     <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-6 lg:p-10 flex flex-col gap-10 shadow-2xl relative overflow-hidden group">
-                      <div className="relative z-10" dir="rtl">
+                      <div className="relative z-10">
                         <h2 className="text-3xl font-black text-white italic font-urdu leading-none">مالیاتی جائزہ</h2>
                         <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-4 italic font-urdu">ریئل ٹائم مانیٹرنگ</p>
                       </div>
@@ -498,7 +498,7 @@ const App = () => {
                     </div>
 
                     <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 flex flex-col gap-6">
-                      <div className="flex items-center justify-between" dir="rtl">
+                      <div className="flex items-center justify-between">
                         <div>
                           <h3 className="text-xl font-black text-white italic font-urdu">حالیہ سرگرمی</h3>
                           <p className="text-[10px] uppercase font-black text-indigo-400 tracking-[0.2em] mt-1 italic font-urdu">تازہ ترین معلومات</p>
@@ -516,17 +516,17 @@ const App = () => {
                           </div>
                         ) : (
                           activities.map((act) => (
-                            <div key={act.id} className="group flex items-center justify-between p-4 bg-slate-900/40 border border-slate-700/30 rounded-3xl hover:border-indigo-500/50 transition-all" dir="rtl">
+                            <div key={act.id} className="group flex items-center justify-between p-4 bg-slate-900/40 border border-slate-700/30 rounded-3xl hover:border-indigo-500/50 transition-all">
                               <div className="flex items-center gap-4">
                                 <div className={`p-3 rounded-2xl ${act.isRevenue ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
                                   {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                                 </div>
-                                <div className="text-right font-urdu">
+                                <div className="text-left font-urdu">
                                   <p className="text-sm text-white leading-tight">{act.labelUr}</p>
                                   <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
                                 </div>
                               </div>
-                              <div className="text-left">
+                              <div className="text-right">
                                 <p className={`text-sm font-black italic ${act.isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>
                                   {act.isRevenue ? '+' : '-'} {act.amount.toLocaleString()}
                                 </p>
@@ -549,7 +549,7 @@ const App = () => {
               </Suspense>
             ) : activeTab === 'Expenses' ? (
               <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
-                <div className="flex justify-between items-center mb-8 px-4" dir="rtl">
+                <div className="flex justify-between items-center mb-8 px-4">
                   <div className="flex items-center gap-4 lg:gap-6">
                     <div className="p-3 lg:p-4 bg-rose-500/20 text-rose-500 rounded-2xl">
                        <Receipt size={24}/>
@@ -559,7 +559,7 @@ const App = () => {
                         <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-[0.2em] mt-2 italic font-urdu">مکمل آڈٹ</p>
                     </div>
                   </div>
-                  <div className="text-left">
+                  <div className="text-right">
                     <div className="px-4 lg:px-6 py-3 bg-slate-800 border border-slate-700 rounded-2xl text-[12px] font-black text-white font-urdu">
                        کل: Rs. {expenseVal.toLocaleString()}
                     </div>
@@ -568,12 +568,12 @@ const App = () => {
 
                 <div className="flex-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden flex flex-col">
                   <div className="overflow-x-auto overflow-y-auto no-scrollbar">
-                    <table className="w-full text-right border-collapse" dir="rtl">
+                    <table className="w-full text-left border-collapse">
                       <thead className="sticky top-0 bg-[#0f172a] z-10 border-b border-slate-700/50">
                         <tr>
-                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">تاریخ</th>
+                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">تاریخ</th>
                           <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-center">کیٹیگری</th>
-                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">رقم</th>
+                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">رقم</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/30">
@@ -586,7 +586,7 @@ const App = () => {
                               <td className="p-6 text-center">
                                 <span className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-[9px] font-black uppercase tracking-widest">{entry.type}</span>
                               </td>
-                              <td className="p-6 text-left">
+                              <td className="p-6 text-right">
                                 <p className="text-lg font-black italic text-rose-400">Rs. {Number(entry.amount).toLocaleString()}</p>
                               </td>
                            </tr>
@@ -657,7 +657,7 @@ const App = () => {
 };
 
 const FinanceCard = ({ labelUr, year, value, color, icon }) => (
-  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg" dir="rtl">
+  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
     <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
     <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
@@ -741,7 +741,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
+    <div className="flex-1 flex flex-col gap-8 animate-in fade-in duration-500 pb-32 no-scrollbar overflow-y-auto">
       
       {/* 1. Member Management Section */}
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500">
@@ -749,7 +749,7 @@ const SettingsPage = () => {
            onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')}
            className="w-full flex justify-between items-center p-8 hover:bg-white/5 transition-all text-left"
         >
-          <div className="flex items-center gap-4" dir="rtl">
+          <div className="flex items-center gap-4">
              <div className={`p-3 rounded-2xl transition-all duration-500 ${expandedSection === 'members' ? 'bg-indigo-600 text-white rotate-12 scale-110 shadow-lg shadow-indigo-600/20' : 'bg-slate-900 border border-slate-700 text-slate-500'}`}>
                 <UserPlus size={24}/>
              </div>

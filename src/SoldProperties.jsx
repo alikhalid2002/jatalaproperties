@@ -31,7 +31,7 @@ const SoldProperties = ({ isAdmin }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
+    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
       {/* Search Bar & Seed Action */}
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-12">

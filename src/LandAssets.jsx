@@ -46,16 +46,47 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     );
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500 pb-32" dir="ltr">
+    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
+      {/* Search and Filters - Standard Row */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
+        <div className="relative group flex-1 max-w-xl">
+          <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-500 group-focus-within:text-emerald-500 transition-colors">
+            <UserCircle size={20} />
+          </div>
+          <input 
+            type="text" 
+            placeholder="کاشتکار کا نام تلاش کریں..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-700/50 rounded-2xl py-5 pl-16 pr-6 font-urdu text-base text-white focus:outline-none focus:border-emerald-500/50 shadow-2xl transition-all"
+          />
+        </div>
+        
+        {/* Responsive Total Acreage Summary (Quick Glance) */}
+        {farmers.length > 0 && (
+          <div className="flex items-center gap-4 bg-slate-900/50 border border-slate-700/50 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-xl animate-in slide-in-from-right-4">
+             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                <Store size={22} />
+             </div>
+             <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">کل پیمائش</p>
+                <p className="text-xl font-black text-white italic tracking-tighter leading-none">
+                   {farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0).toLocaleString()} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
+                </p>
+             </div>
+          </div>
+        )}
+      </div>
+
       {/* Financial Summary Cards - 3 Column Layout */}
-      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center" dir="ltr">
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
-          labelUr="کل اخراجات"
+          labelUr="کل متوقع آمدنی"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-          value={expenseVal} 
-          color="rose" 
-          icon={<ArrowDownRight />}
+          value={revenueVal + pendingVal} 
+          color="emerald" 
+          icon={<ArrowUpRight />}
         />
         <FinanceCard 
           labelUr="باقی رقم"
@@ -65,11 +96,11 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           icon={<Clock />}
         />
         <FinanceCard 
-          labelUr="کل متوقع آمدنی"
+          labelUr="کل اخراجات"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-          value={revenueVal + pendingVal} 
-          color="emerald" 
-          icon={<ArrowUpRight />}
+          value={expenseVal} 
+          color="rose" 
+          icon={<ArrowDownRight />}
         />
       </div>
 
@@ -77,26 +108,26 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-12 font-urdu">
         <div className="flex justify-between items-center mb-3">
            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
               <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
-                باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
               </span>
            </div>
            <div className="flex items-center gap-2">
               <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
-                وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
               </span>
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+              <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
            </div>
         </div>
         <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
            <div 
-             className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)]"
-             style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+             className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+             style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
            ></div>
            <div 
-             className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)] border-l border-[#0f172a]/30"
-             style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+             className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)] border-l border-[#0f172a]/30"
+             style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
            ></div>
         </div>
       </div>
@@ -135,7 +166,6 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
             key={farmer.id}
             onClick={() => handleFarmerClick(farmer)}
             className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
-            dir="rtl"
           >
             <div className="space-y-4">
               <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{farmer.nameUr}</h3>
@@ -203,7 +233,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
 };
 
 const FinanceCard = ({ labelUr, year, value, color, icon }) => (
-  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg" dir="rtl">
+  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
     <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
     <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>

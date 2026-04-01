@@ -206,7 +206,7 @@ const ShopsPage = ({ isAdmin }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
+    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       {/* Shops Grid - Responsive 1/2/3 cols */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-24">
         {shops.map((shop) => (
