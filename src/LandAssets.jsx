@@ -204,17 +204,17 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
 };
 
 const FinanceCard = ({ labelUr, year, value, color, icon }) => (
-  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
+  <div className="bg-slate-800/40 p-2 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[100px] md:min-h-0 relative overflow-hidden group shadow-lg">
     <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
-    <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
-      {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
+    <div className={`mb-2 p-2 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-lg md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
+      {React.cloneElement(icon, { size: 18 })}
     </div>
 
     <div className="flex flex-col items-center text-center relative z-10 w-full px-0.5">
-      <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{labelUr}</span>
-      <span className="text-[6.5px] md:text-xs font-black text-slate-500 font-urdu">{year}</span>
-      <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
+      <span className={`text-${color}-400 text-[11px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{labelUr}</span>
+      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu">{year}</span>
+      <p className="text-[14px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
 );
