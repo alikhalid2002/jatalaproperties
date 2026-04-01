@@ -76,11 +76,15 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
         <div className="flex justify-between items-center mb-3">
            <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">وصول شدہ: Rs. {revenueVal.toLocaleString()}</span>
+              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
+                وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+              </span>
            </div>
            <div className="flex items-center gap-2">
-              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">باقی: Rs. {pendingVal.toLocaleString()}</span>
-              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
+                باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+              </span>
+              <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
            </div>
         </div>
         <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
@@ -89,7 +93,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
              style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
            ></div>
            <div 
-             className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 transition-all duration-1000 shadow-[0_0_10px_rgba(99,102,241,0.3)] border-l border-[#0f172a]/30"
+             className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)] border-l border-[#0f172a]/30"
              style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
            ></div>
         </div>
