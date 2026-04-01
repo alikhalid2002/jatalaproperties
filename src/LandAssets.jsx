@@ -47,7 +47,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
       
       {/* Financial Summary Cards - Top */}
-      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-12 font-urdu px-1 w-full">
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full">
         <FinanceCard 
           labelUr="زرعی آمدنی"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
@@ -69,6 +69,30 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           color="rose" 
           icon={<ArrowDownRight />}
         />
+      </div>
+
+      {/* Progress Comparison Bar: Received vs Remaining */}
+      <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-12 font-urdu">
+        <div className="flex justify-between items-center mb-3">
+           <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">وصول شدہ: Rs. {revenueVal.toLocaleString()}</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">باقی: Rs. {pendingVal.toLocaleString()}</span>
+              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+           </div>
+        </div>
+        <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
+           <div 
+             className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+             style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+           ></div>
+           <div 
+             className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 transition-all duration-1000 shadow-[0_0_10px_rgba(99,102,241,0.3)] border-l border-[#0f172a]/30"
+             style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+           ></div>
+        </div>
       </div>
 
         {isAdmin && (
