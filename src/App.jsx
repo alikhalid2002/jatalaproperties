@@ -802,7 +802,7 @@ const SettingsPage = () => {
       });
 
       // Section 2: Shops
-      const shopStartY = doc.lastAutoTable.cursor.y + 20;
+      const shopStartY = (doc.lastAutoTable?.cursor?.y || 60) + 20;
       doc.text('2. Commercial Units (دکانوں کی تفصیل)', 20, shopStartY);
       
       const shopsData = shops.map((s, i) => [
@@ -823,9 +823,10 @@ const SettingsPage = () => {
       });
 
       // Section 3: Expenses
-      const expenseStartY = doc.lastAutoTable.cursor.y + 20;
+      const lastTableY = doc.lastAutoTable?.cursor?.y || 120;
+      const expenseStartY = lastTableY + 20;
       if (expenseStartY > 220) doc.addPage();
-      const currentY = doc.lastAutoTable.cursor.y > 220 ? 30 : expenseStartY;
+      const currentY = expenseStartY > 220 ? 30 : expenseStartY;
       doc.text('3. Expense Registry (اخراجات کا ریکارڈ)', 20, currentY);
 
       const expenseItems = entries.filter(e => ['expense', 'shop_expense'].includes(e.type));
