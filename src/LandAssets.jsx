@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFarmers } from './useFarmers';
 import { useFinanceData } from './useFinanceData';
 import { seedFarmersData } from './seedFarmers';
-import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map } from 'lucide-react';
+import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map, UserCircle, Store } from 'lucide-react';
 import FarmerDetailModal from './FarmerDetailModal';
 import AddEntryModal from './AddEntryModal';
 
