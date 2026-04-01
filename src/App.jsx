@@ -416,8 +416,8 @@ const App = () => {
                     </div>
                   </div>
 
-                  {/* Aggregate Summary: 2 Column Layout */}
-                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full">
+                  {/* Aggregate Summary: Strictly single row on mobile */}
+                  <div className="grid grid-cols-2 gap-2 md:gap-6 mb-12 font-urdu px-1 w-full">
                     <FinanceCard 
                       labelUr="زرعی آمدنی"
                       year={`${selectedYear}-${Number(selectedYear) - 1}`} 
@@ -426,11 +426,11 @@ const App = () => {
                       icon={<ArrowUpRight />}
                     />
                     <FinanceCard 
-                      labelUr="باقی رقم"
+                      labelUr="کل اخراجات"
                       year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-                      value={pendingVal} 
-                      color="indigo" 
-                      icon={<Clock />}
+                      value={expenseVal} 
+                      color="rose" 
+                      icon={<ArrowDownRight />}
                     />
                   </div>
                   
