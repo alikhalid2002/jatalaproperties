@@ -137,7 +137,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         {/* Header */}
         <div className="p-8 pb-4 flex flex-col items-center justify-center relative">
           <div className="flex items-center gap-3">
-             <h2 className="text-2xl lg:text-3xl font-black text-white font-urdu text-center leading-relaxed">
+             <h2 className="text-2xl lg:text-3xl font-black text-white font-urdu text-center leading-none">
                {isEditing ? (
                  <input 
                    value={editData.nameUr}

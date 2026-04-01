@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFarmers } from './useFarmers';
 import { useFinanceData } from './useFinanceData';
 import { seedFarmersData } from './seedFarmers';
-import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, Map, Clock } from 'lucide-react';
+import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, Map } from 'lucide-react';
 import FarmerDetailModal from './FarmerDetailModal';
 import AddEntryModal from './AddEntryModal';
 
@@ -46,35 +46,29 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
       
-      {/* Financial Summary Cards - Top. Flex layout ensures 100% width on mobile. */}
-      <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-12 font-urdu px-1">
-        <div className="w-full md:flex-1">
-          <FinanceCard 
-            labelUr="زرعی آمدنی"
-            year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-            value={revenueVal} 
-            color="emerald" 
-            icon={<ArrowUpRight size={18}/>}
-          />
-        </div>
-        <div className="w-full md:flex-1">
-          <FinanceCard 
-            labelUr="باقی رقم"
-            year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-            value={pendingVal} 
-            color="indigo" 
-            icon={<Clock size={18}/>}
-          />
-        </div>
-        <div className="w-full md:flex-1">
-          <FinanceCard 
-            labelUr="کل اخراجات"
-            year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-            value={expenseVal} 
-            color="rose" 
-            icon={<AlertCircle size={18}/>}
-          />
-        </div>
+      {/* Financial Summary Cards - Top */}
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-12 font-urdu px-1 w-full">
+        <FinanceCard 
+          labelUr="زرعی آمدنی"
+          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={revenueVal} 
+          color="emerald" 
+          icon={<ArrowUpRight />}
+        />
+        <FinanceCard 
+          labelUr="باقی رقم"
+          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={pendingVal} 
+          color="indigo" 
+          icon={<Clock />}
+        />
+        <FinanceCard 
+          labelUr="کل اخراجات"
+          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          value={expenseVal} 
+          color="rose" 
+          icon={<ArrowDownRight />}
+        />
       </div>
 
         {isAdmin && (
@@ -110,10 +104,10 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           <div 
             key={farmer.id}
             onClick={() => handleFarmerClick(farmer)}
-            className="group bg-slate-800/40 p-8 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-visible"
+            className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
           >
             <div className="space-y-4">
-              <h3 className="text-xl lg:text-3xl font-black text-white font-urdu leading-relaxed">{farmer.nameUr}</h3>
+              <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{farmer.nameUr}</h3>
               <div className="flex flex-wrap items-center justify-center gap-3">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
                     farmer.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/20 text-orange-400'
@@ -177,21 +171,18 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
   );
 };
 
-const FinanceCard = ({ labelUr, year, value, color, icon, sub }) => (
-  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col items-center justify-center gap-2 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
-    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
+const FinanceCard = ({ labelUr, year, value, color, icon }) => (
+  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
-    {icon && (
-      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
-        {React.cloneElement(icon, { size: 24 })}
-      </div>
-    )}
+    <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
+      {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
+    </div>
 
-    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
-      <span className={`text-[10px] md:text-sm font-black text-white font-urdu leading-relaxed whitespace-nowrap truncate w-full ${color === 'emerald' ? 'text-emerald-400' : color === 'rose' ? 'text-rose-400' : color === 'amber' ? 'text-amber-400' : color === 'orange' ? 'text-orange-400' : ''}`}>{labelUr}</span>
-      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
-      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">Rs. {value?.toLocaleString()}</p>
-      {sub && <span className="text-[9px] md:text-xs text-slate-500 font-urdu whitespace-nowrap truncate w-full mt-0.5">{sub}</span>}
+    <div className="flex flex-col items-center text-center relative z-10 w-full px-0.5">
+      <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{labelUr}</span>
+      <span className="text-[6.5px] md:text-xs font-black text-slate-500 font-urdu">{year}</span>
+      <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
 );

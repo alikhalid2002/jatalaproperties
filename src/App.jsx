@@ -416,35 +416,29 @@ const App = () => {
                     </div>
                   </div>
 
-                  {/* Flex System: Force Stacking on Mobile */}
-                  <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-12 font-urdu px-1">
-                    <div className="w-full md:flex-1">
-                      <FinanceCard 
-                        labelUr="زرعی آمدنی"
-                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-                        value={revenueVal} 
-                        color="emerald" 
-                        icon={<ArrowUpRight size={18}/>}
-                      />
-                    </div>
-                    <div className="w-full md:flex-1">
-                      <FinanceCard 
-                        labelUr="باقی رقم"
-                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-                        value={pendingVal} 
-                        color="indigo" 
-                        icon={<Clock size={18}/>}
-                      />
-                    </div>
-                    <div className="w-full md:flex-1">
-                      <FinanceCard 
-                        labelUr="کل اخراجات"
-                        year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-                        value={expenseVal} 
-                        color="rose" 
-                        icon={<ArrowDownRight size={18}/>}
-                      />
-                    </div>
+                  {/* Aggregate Summary: Strictly single row on mobile */}
+                  <div className="grid grid-cols-3 gap-1 md:gap-4 mb-12 font-urdu px-1 w-full">
+                    <FinanceCard 
+                      labelUr="زرعی آمدنی"
+                      year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                      value={revenueVal} 
+                      color="emerald" 
+                      icon={<ArrowUpRight />}
+                    />
+                    <FinanceCard 
+                      labelUr="باقی رقم"
+                      year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                      value={pendingVal} 
+                      color="indigo" 
+                      icon={<Clock />}
+                    />
+                    <FinanceCard 
+                      labelUr="کل اخراجات"
+                      year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+                      value={expenseVal} 
+                      color="rose" 
+                      icon={<ArrowDownRight />}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
@@ -501,7 +495,7 @@ const App = () => {
                                   {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                                 </div>
                                 <div className="text-left font-urdu">
-                                  <p className="text-sm text-white leading-relaxed">{act.labelUr}</p>
+                                  <p className="text-sm text-white leading-tight">{act.labelUr}</p>
                                   <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
                                 </div>
                               </div>
@@ -635,45 +629,18 @@ const App = () => {
   );
 };
 
-const DashboardCard = ({ labelUr, year, val, diff, color, icon }) => (
-  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
-    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
+const FinanceCard = ({ labelUr, year, value, color, icon }) => (
+  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
-    {icon && (
-      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
-        {React.cloneElement(icon, { size: 24 })}
-      </div>
-    )}
-
-    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
-      <span className="text-[10px] md:text-sm font-black text-slate-400 font-urdu leading-relaxed whitespace-nowrap truncate w-full">{labelUr}</span>
-      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
-      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">{val}</p>
-      {diff && (
-        <div className={`mt-0.5 flex items-center justify-center gap-0.5 text-[9px] md:text-xs font-black w-full ${diff.startsWith('+') ? 'text-emerald-400' : 'text-orange-400'}`}>
-          {diff.startsWith('+') ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
-          {diff}
-        </div>
-      )}
+    <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
+      {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
     </div>
-  </div>
-);
 
-const FinanceCard = ({ labelUr, year, value, color, icon, sub }) => (
-  <div className="bg-slate-800/40 p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-slate-700/50 relative overflow-visible group hover:bg-slate-800 transition-all flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 w-full min-h-[90px] md:min-h-0 z-10">
-    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10 pointer-events-none`}></div>
-    
-    {icon && (
-      <div className={`p-2.5 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl shrink-0`}>
-        {React.cloneElement(icon, { size: 24 })}
-      </div>
-    )}
-
-    <div className="flex flex-col items-center text-center relative z-20 grow overflow-hidden w-full text-center">
-      <span className={`text-[10px] md:text-sm font-black text-white font-urdu leading-relaxed whitespace-nowrap truncate w-full ${color === 'emerald' ? 'text-emerald-400' : color === 'rose' ? 'text-rose-400' : color === 'amber' ? 'text-amber-400' : color === 'orange' ? 'text-orange-400' : ''}`}>{labelUr}</span>
-      <span className="text-[9px] md:text-xs font-black text-slate-500 font-urdu whitespace-nowrap">{year}</span>
-      <p className="text-[16px] md:text-2xl font-black text-white italic tracking-tighter whitespace-nowrap mt-1">Rs. {value?.toLocaleString()}</p>
-      {sub && <span className="text-[9px] md:text-xs text-slate-500 font-urdu whitespace-nowrap truncate w-full mt-0.5">{sub}</span>}
+    <div className="flex flex-col items-center text-center relative z-10 w-full px-0.5">
+      <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{labelUr}</span>
+      <span className="text-[6.5px] md:text-xs font-black text-slate-500 font-urdu">{year}</span>
+      <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
 );
