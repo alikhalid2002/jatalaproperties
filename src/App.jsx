@@ -387,16 +387,6 @@ const App = () => {
             ) : activeTab === 'Dashboard' ? (
               loading ? <DashboardSkeleton /> : (
                 <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0" dir="ltr">
-                  {/* Dashboard Header - Left Aligned */}
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-white/5 pb-12">
-                    <div className="space-y-4">
-                      <h2 className="text-4xl md:text-7xl font-black text-white font-urdu tracking-tight leading-none drop-shadow-2xl">مالیاتی جائزہ</h2>
-                      <div className="flex items-center gap-4">
-                        <div className="h-px w-12 bg-indigo-500/50"></div>
-                        <p className="text-xs md:text-sm font-black text-indigo-400 uppercase tracking-[0.4em] font-urdu">ریئل ٹائم مانیٹرنگ</p>
-                      </div>
-                    </div>
-                  </div>
                   {/* Mobile Year Selector */}
                   <div className="lg:hidden flex justify-start -mb-2">
                     <div className="relative">
@@ -474,7 +464,7 @@ const App = () => {
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
                     <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-6 lg:p-10 flex flex-col gap-10 shadow-2xl relative overflow-hidden group">
-                      <div className="relative z-10">
+                      <div className="relative z-10 text-center">
                         <h2 className="text-3xl font-black text-white italic font-urdu leading-none">مالیاتی جائزہ</h2>
                         <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-4 italic font-urdu">ریئل ٹائم مانیٹرنگ</p>
                       </div>
@@ -508,13 +498,13 @@ const App = () => {
                     </div>
 
                     <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 flex flex-col gap-6">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col items-center text-center gap-4">
+                        <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl">
+                          <Activity size={24} />
+                        </div>
                         <div>
                           <h3 className="text-xl font-black text-white italic font-urdu">حالیہ سرگرمی</h3>
                           <p className="text-[10px] uppercase font-black text-indigo-400 tracking-[0.2em] mt-1 italic font-urdu">تازہ ترین معلومات</p>
-                        </div>
-                        <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-xl">
-                          <Activity size={18} />
                         </div>
                       </div>
 
