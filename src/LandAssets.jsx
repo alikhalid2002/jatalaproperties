@@ -49,9 +49,9 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
-          labelUr="زرعی آمدنی"
+          labelUr="کل متوقع آمدنی"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-          value={revenueVal} 
+          value={revenueVal + pendingVal} 
           color="emerald" 
           icon={<ArrowUpRight />}
         />
