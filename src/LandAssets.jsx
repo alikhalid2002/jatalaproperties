@@ -38,10 +38,12 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     );
   }
 
-  const filteredFarmers = (farmers || []).filter(f => 
-    (f?.nameUr || "").includes(searchTerm) || 
-    (f?.nameEn || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredFarmers = [...farmers]
+    .sort((a, b) => (Number(b.landSize) || 0) - (Number(a.landSize) || 0))
+    .filter(f => 
+      (f.nameUr || "").includes(searchTerm) || 
+      (f.nameEn || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
