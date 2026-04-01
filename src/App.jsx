@@ -4,7 +4,8 @@ import {
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
   Plus, UserPlus, Trash2, Loader2, Save, CheckCircle,
   ArrowUpRight, ArrowDownRight, Clock, Activity, Search as SearchIcon,
-  Shield, User, X, Lock, Calendar, Home, RefreshCw
+  Shield, User, X, Lock, Calendar, Home, RefreshCw,
+  Download, UploadCloud, AlertTriangle, FileJson
 } from 'lucide-react';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
@@ -15,7 +16,7 @@ const ShopsPage = lazy(() => import('./ShopsPage'));
 const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
 import { db, getDataPath, APP_VERSION } from './firebase';
-import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit, getDocs, writeBatch } from 'firebase/firestore';
 
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -679,6 +680,8 @@ const SettingsPage = () => {
   const [shops, setShops] = useState([]);
   const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
   const [expandedSection, setExpandedSection] = useState(null);
+  const [isBackingUp, setIsBackingUp] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
@@ -738,6 +741,79 @@ const SettingsPage = () => {
       console.error("Delete Shop Error:", err);
       alert(`Error deleting shop: ${err.message}`);
     }
+  };
+
+  const handleBackup = async () => {
+    setIsBackingUp(true);
+    try {
+      const collections = ['farmers', 'shops', 'sold_properties', 'revenue', 'expenses', 'shop_transactions'];
+      const backupData = {};
+      
+      for (const colName of collections) {
+        const snap = await getDocs(collection(db, getDataPath(colName)));
+        backupData[colName] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+      
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      alert("Backup file generated and downloaded successfully!");
+    } catch (err) {
+      console.error("Backup Error:", err);
+      alert("Backup Failed: " + err.message);
+    } finally {
+      setIsBackingUp(false);
+    }
+  };
+
+  const handleRestore = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!window.confirm("CRITICAL WARNING: This will merge/overwrite existing database records with the backup data. This action cannot be undone. Are you sure?")) return;
+    
+    setIsRestoring(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        
+        // Batch restoration in chunks of 450 to stay under Firestore's 500 limit
+        let totalCount = 0;
+        let batch = writeBatch(db);
+        
+        for (const colName in data) {
+          const items = data[colName];
+          for (const item of items) {
+            const { id, ...rest } = item;
+            if (!id) continue;
+            
+            const docRef = doc(db, getDataPath(colName), id);
+            batch.set(docRef, rest, { merge: true });
+            totalCount++;
+            
+            if (totalCount % 450 === 0) {
+              await batch.commit();
+              batch = writeBatch(db);
+            }
+          }
+        }
+        
+        await batch.commit();
+        alert("Restoration complete! Database has been synchronized with the backup file.");
+      } catch (err) {
+        console.error("Restore Error:", err);
+        alert("Restore Failed: " + err.message);
+      } finally {
+        setIsRestoring(false);
+        e.target.value = ''; // Reset input
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -860,6 +936,78 @@ const SettingsPage = () => {
           </div>
         )}
       </section>
+      
+      {/* 3. Global System Control & Backup */}
+      <div className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500 mb-20">
+        <div className="p-8 border-b border-white/5 bg-slate-900/40">
+           <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                 <RefreshCw size={24} />
+              </div>
+              <div>
+                  <h2 className="text-2xl font-black text-white italic leading-none font-urdu">سسٹم کنٹرول اور بیک اپ</h2>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2 italic font-urdu leading-none">انتظامی ڈیٹا مینجمنٹ</p>
+              </div>
+           </div>
+        </div>
+        
+        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+           {/* Backup Card */}
+           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-indigo-500/30 transition-all">
+              <div className="p-5 bg-indigo-500/10 text-indigo-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/5">
+                 <Download size={32} />
+              </div>
+              <div>
+                 <h3 className="text-xl font-black text-white font-urdu">ڈیٹا بیک اپ (Export)</h3>
+                 <p className="text-[11px] text-slate-500 mt-2 font-urdu">تمام ممبرز، دکانوں اور مالیاتی ڈیٹا کی JSON فائل ڈاؤن لوڈ کریں</p>
+              </div>
+              <button 
+                onClick={handleBackup}
+                disabled={isBackingUp || isRestoring}
+                className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
+              >
+                 {isBackingUp ? (
+                   <>
+                     <Loader2 className="animate-spin" size={20} />
+                     <span className="font-urdu">بیک اپ بن رہا ہے...</span>
+                   </>
+                 ) : (
+                   <>
+                     <FileJson size={20} />
+                     <span className="font-urdu">بیک اپ ڈاؤن لوڈ کریں</span>
+                   </>
+                 )}
+              </button>
+           </div>
+
+           {/* Restore Card */}
+           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-orange-500/30 transition-all">
+              <div className="p-5 bg-orange-500/10 text-orange-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/5">
+                 <UploadCloud size={32} />
+              </div>
+              <div>
+                 <h3 className="text-xl font-black text-white font-urdu">ڈیٹا ری اسٹور (Import)</h3>
+                 <p className="text-[11px] text-rose-500/60 mt-2 font-urdu font-black uppercase italic tracking-widest">پچھلے ڈیٹا کو اوور رائٹ کریں (احتیاط برتیں)</p>
+              </div>
+              <label 
+                className={`w-full bg-orange-600/10 hover:bg-orange-600/20 border border-orange-500/30 text-orange-500 py-5 rounded-2xl font-black cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl ${isRestoring || isBackingUp ? 'opacity-50 pointer-events-none' : ''}`}
+              >
+                 {isRestoring ? (
+                   <>
+                     <Loader2 className="animate-spin" size={20} />
+                     <span className="font-urdu">ڈیٹا ری اسٹور ہو رہا ہے...</span>
+                   </>
+                 ) : (
+                   <>
+                     <AlertTriangle size={20} />
+                     <span className="font-urdu">ڈیٹا فائل اپ لوڈ کریں</span>
+                   </>
+                 )}
+                 <input type="file" accept=".json" onChange={handleRestore} className="hidden" disabled={isRestoring || isBackingUp} />
+              </label>
+           </div>
+        </div>
+      </div>
 
     </div>
   );
