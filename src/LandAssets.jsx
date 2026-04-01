@@ -50,21 +50,21 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
           labelUr="زرعی آمدنی"
-          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          year={selectedYear} 
           value={revenueVal} 
           color="emerald" 
           icon={<ArrowUpRight />}
         />
         <FinanceCard 
           labelUr="باقی رقم"
-          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          year={selectedYear} 
           value={pendingVal} 
           color="indigo" 
           icon={<Clock />}
         />
         <FinanceCard 
           labelUr="کل اخراجات"
-          year={`${selectedYear}-${Number(selectedYear) - 1}`} 
+          year={selectedYear} 
           value={expenseVal} 
           color="rose" 
           icon={<ArrowDownRight />}
