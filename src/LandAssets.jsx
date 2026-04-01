@@ -49,11 +49,11 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
-          labelUr="کل متوقع آمدنی"
+          labelUr="کل اخراجات"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-          value={revenueVal + pendingVal} 
-          color="emerald" 
-          icon={<ArrowUpRight />}
+          value={expenseVal} 
+          color="rose" 
+          icon={<ArrowDownRight />}
         />
         <FinanceCard 
           labelUr="باقی رقم"
@@ -63,11 +63,11 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           icon={<Clock />}
         />
         <FinanceCard 
-          labelUr="کل اخراجات"
+          labelUr="کل متوقع آمدنی"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-          value={expenseVal} 
-          color="rose" 
-          icon={<ArrowDownRight />}
+          value={revenueVal + pendingVal} 
+          color="emerald" 
+          icon={<ArrowUpRight />}
         />
       </div>
 
