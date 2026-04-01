@@ -46,10 +46,10 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
     );
 
   return (
-    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="rtl">
+    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
       {/* Financial Summary Cards - 3 Column Layout */}
-      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center" dir="ltr">
         <FinanceCard 
           labelUr="کل اخراجات"
           year={`${selectedYear}-${Number(selectedYear) - 1}`} 
@@ -135,6 +135,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
             key={farmer.id}
             onClick={() => handleFarmerClick(farmer)}
             className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
+            dir="rtl"
           >
             <div className="space-y-4">
               <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{farmer.nameUr}</h3>
@@ -202,7 +203,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
 };
 
 const FinanceCard = ({ labelUr, year, value, color, icon }) => (
-  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
+  <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg" dir="rtl">
     <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
     <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
