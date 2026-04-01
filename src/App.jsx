@@ -606,7 +606,7 @@ const App = () => {
                 <SoldProperties isAdmin={accountType === 'ali'} />
               </Suspense>
             ) : activeTab === 'Settings' ? (
-              accountType === 'ali' ? <SettingsPage /> : (
+              accountType === 'ali' ? <SettingsPage entries={entries} /> : (
                 <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
                   <Settings size={64} className="mb-6 text-slate-500"/>
                   <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
@@ -673,7 +673,7 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
   </div>
 );
 
-const SettingsPage = () => {
+const SettingsPage = ({ entries = [] }) => {
   const { farmers, addNewFarmer, deleteFarmer } = useFarmers();
   const [isSaving, setIsSaving] = useState(false);
   const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
