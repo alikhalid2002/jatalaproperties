@@ -417,20 +417,13 @@ const App = () => {
                   </div>
 
                   {/* Aggregate Summary: Strictly single row on mobile */}
-                  <div className="grid grid-cols-3 gap-1 md:gap-4 mb-12 font-urdu px-1 w-full">
+                  <div className="grid grid-cols-2 gap-2 md:gap-6 mb-12 font-urdu px-1 w-full">
                     <FinanceCard 
                       labelUr="زرعی آمدنی"
                       year={`${selectedYear}-${Number(selectedYear) - 1}`} 
                       value={revenueVal} 
                       color="emerald" 
                       icon={<ArrowUpRight />}
-                    />
-                    <FinanceCard 
-                      labelUr="باقی رقم"
-                      year={`${selectedYear}-${Number(selectedYear) - 1}`} 
-                      value={pendingVal} 
-                      color="indigo" 
-                      icon={<Clock />}
                     />
                     <FinanceCard 
                       labelUr="کل اخراجات"
