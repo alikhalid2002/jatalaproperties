@@ -416,21 +416,14 @@ const App = () => {
                     </div>
                   </div>
 
-                  {/* Aggregate Summary: 3-Card Layout */}
-                  <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full">
+                  {/* Aggregate Summary: 2 Column Layout (Removed Remaining card as requested) */}
+                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full text-center">
                     <FinanceCard 
                       labelUr="کل متوقع آمدنی"
                       year={selectedYear} 
                       value={revenueVal + pendingVal} 
                       color="emerald" 
                       icon={<ArrowUpRight />}
-                    />
-                    <FinanceCard 
-                      labelUr="باقی رقم"
-                      year={selectedYear} 
-                      value={pendingVal} 
-                      color="indigo" 
-                      icon={<Clock />}
                     />
                     <FinanceCard 
                       labelUr="کل اخراجات"
