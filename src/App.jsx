@@ -483,7 +483,13 @@ const App = () => {
                               </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                            <XAxis dataKey="name" hide />
+                            <XAxis 
+                              dataKey="name" 
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                              dy={10}
+                            />
                             <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', fontWeight: '900' }} />
                             <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
                           </AreaChart>
