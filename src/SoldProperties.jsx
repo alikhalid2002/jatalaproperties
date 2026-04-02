@@ -64,9 +64,6 @@ const SoldProperties = ({ isAdmin }) => {
                     <p className="text-[12px] font-black text-white leading-none">Rs. {totalPaid.toLocaleString()}</p>
                     <p className="text-[8px] font-bold text-slate-500 mt-1 uppercase">Paid</p>
                   </div>
-                  <div className="p-3 bg-slate-900/50 text-slate-600 rounded-xl group-hover:text-indigo-400 transition-colors">
-                    <Home size={18} />
-                  </div>
               </div>
             </div>
           );
