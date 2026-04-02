@@ -54,7 +54,10 @@ const SoldProperties = ({ isAdmin }) => {
                        }`}>
                           {isPaid ? 'مکمل ادائیگی' : 'قسط جاری'}
                        </span>
-                       <span className="text-[10px] lg:text-[11px] font-black text-slate-500 font-urdu">خریدار: {prop.buyerName}</span>
+                        <div className="flex flex-col text-right">
+                           <span className="text-[8px] lg:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">خریدار</span>
+                           <span className="text-[13px] lg:text-[15px] font-black text-white font-urdu leading-tight">{prop.buyerName}</span>
+                        </div>
                     </div>
                  </div>
               </div>
