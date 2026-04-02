@@ -188,24 +188,27 @@ export default function FinancialReports({ entries = [], selectedYear }) {
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden gap-5">
 
       {/* ── Header row ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-
-        {/* Left: icon + title + inline search */}
-        <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-4 mb-4">
+        
+        {/* Row 1: Icon + Title + Year */}
+        <div className="flex items-center gap-4 min-w-0">
           <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 shrink-0">
             <BarChart3 size={24} />
           </div>
           <div className="shrink-0">
-            <h2 className="text-3xl font-black text-white italic leading-none font-urdu">
+            <h2 className="text-2xl lg:text-3xl font-black text-white italic leading-none font-urdu">
               مالیاتی رپورٹس
             </h2>
             <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-1.5 italic font-urdu">
               تمام ریکارڈز • {selectedYear}-{Number(selectedYear) - 1}
             </p>
           </div>
+        </div>
 
+        {/* Row 2: Search + Actions (Records, Excel, Filter) */}
+        <div className="flex flex-wrap items-center gap-3 lg:gap-4 w-full lg:w-auto">
           {/* Compact search */}
-          <div className="relative flex-1 max-w-[260px] ml-2">
+          <div className="relative flex-1 lg:max-w-[260px] min-w-[200px]">
             <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input
               type="text"
@@ -227,28 +230,26 @@ export default function FinancialReports({ entries = [], selectedYear }) {
               </button>
             )}
           </div>
-        </div>
 
-        {/* Right: counts + filter button */}
-        <div className="flex items-center gap-3 shrink-0">
-          <span className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[10px] font-black text-white italic uppercase tracking-widest">
-            {filtered.length} Records
-          </span>
-          <button
-            onClick={downloadExcel}
-            className="flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
-          >
-            <FileSpreadsheet size={13} /> Excel
-          </button>
-
-          <button
-            onClick={() => setShowFilters(f => !f)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[12px] font-black border transition-all font-urdu ${showFilters ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/40'}`}
-          >
-            <SlidersHorizontal size={13} />
-            فلٹر
-            {hasFilters && <span className="w-2 h-2 bg-indigo-400 rounded-full" />}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-3 lg:px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[9px] lg:text-[10px] font-black text-white italic uppercase tracking-widest">
+              {filtered.length} Records
+            </span>
+            <button
+              onClick={downloadExcel}
+              className="flex items-center gap-2 px-3 lg:px-4 py-2 rounded-2xl text-[9px] lg:text-[10px] font-black uppercase tracking-widest border transition-all bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+            >
+              <FileSpreadsheet size={13} /> Excel
+            </button>
+            <button
+              onClick={() => setShowFilters(f => !f)}
+              className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-2xl text-[11px] lg:text-[12px] font-black border transition-all font-urdu ${showFilters ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/40'}`}
+            >
+              <SlidersHorizontal size={13} />
+              فلٹر
+              {hasFilters && <span className="w-2 h-2 bg-indigo-400 rounded-full" />}
+            </button>
+          </div>
         </div>
       </div>
 
