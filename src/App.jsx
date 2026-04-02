@@ -687,7 +687,7 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
     </div>
 
     <div className="flex flex-col items-center text-center relative z-10 w-full px-0">
-      <span className="text-white text-[11px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full">{labelUr}</span>
+      <span className="text-white text-[11px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{labelUr}</span>
       <span className="text-white opacity-80 text-[8px] md:text-xs font-black font-urdu">{year}</span>
       <p className="text-[12px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
     </div>

@@ -53,7 +53,7 @@ const SummaryCard = ({ label, year, value, sub, icon, color }) => (
         </div>
         <div className="relative z-10 text-center w-full px-0">
             <p className="text-[9px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
-            <span className="text-white opacity-50 text-[9px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
+            <span className="text-slate-500 text-[9px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
         </div>
     </div>
 );
