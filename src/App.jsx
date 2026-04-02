@@ -78,7 +78,7 @@ const App = () => {
 
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(accountType === 'ali');
+  const isAdmin = accountType === 'ali';
   const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const [authStage, setAuthStage] = useState('selection'); // selection, password
@@ -579,11 +579,11 @@ const App = () => {
                 )
               ) : activeTab === 'Land' ? (
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                  <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
+                  <LandAssets selectedYear={selectedYear} isAdmin={isAdmin} />
                 </Suspense>
               ) : activeTab === 'Shops' ? (
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                  <ShopsPage isAdmin={accountType === 'ali'} />
+                  <ShopsPage isAdmin={isAdmin} />
                 </Suspense>
               ) : activeTab === 'Expenses' ? (
                 <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
@@ -640,10 +640,10 @@ const App = () => {
                 </Suspense>
               ) : activeTab === 'Sold' ? (
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                  <SoldProperties isAdmin={accountType === 'ali'} />
+                  <SoldProperties isAdmin={isAdmin} />
                 </Suspense>
               ) : activeTab === 'Settings' ? (
-                accountType === 'ali' ? <SettingsPage entries={entries} /> : (
+                isAdmin ? <SettingsPage entries={entries} /> : (
                   <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
                     <Settings size={64} className="mb-6 text-slate-500"/>
                     <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
@@ -660,7 +660,7 @@ const App = () => {
         </PullToRefresh>
 
         {/* Floating Action Button - Only for Admin */}
-        {accountType === 'ali' && (
+        {isAdmin && (
           <button 
             onClick={() => setIsAddEntryModalOpen(true)}
             className="fixed bottom-24 lg:bottom-10 right-6 lg:right-10 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-600/40 hover:scale-110 active:scale-95 transition-all z-[60] ring-4 ring-indigo-500/20"
@@ -690,7 +690,7 @@ const App = () => {
         isOpen={isAddEntryModalOpen} 
         onClose={() => setIsAddEntryModalOpen(false)} 
         onAdd={addEntry} 
-        isAdmin={accountType === 'ali'}
+        isAdmin={isAdmin}
       />
     </div>
   );
