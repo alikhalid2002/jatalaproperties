@@ -140,9 +140,9 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           <div 
             key={farmer.id}
             onClick={() => handleFarmerClick(farmer)}
-            className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
+            className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{farmer.nameUr}</h3>
               <div className="flex flex-wrap items-center justify-center gap-3">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
@@ -156,7 +156,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
               </div>
             </div>
 
-            <div className="w-full space-y-2 pt-4 border-t border-slate-700/30 font-urdu mt-2 overflow-hidden">
+            <div className="w-full space-y-1 pt-2 border-t border-slate-700/30 font-urdu mt-1 overflow-hidden">
               <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-200 opacity-90">
                 <div className="flex items-center gap-1.5">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
