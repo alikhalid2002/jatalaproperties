@@ -19,14 +19,12 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
   } = useFarmers();
   const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const yearString = `${Number(selectedYear) - 1}/${selectedYear.slice(-2)}`;
 
   const handleFarmerClick = (farmer) => {
     setSelectedFarmer(farmer);
-    setIsModalOpen(true);
   };
 
   if (farmersLoading) {

@@ -98,8 +98,8 @@ const PullToRefresh = ({ onRefresh, children }) => {
 
       {/* Main Content */}
       <div 
-        className="transition-transform duration-200"
-        style={{ transform: `translateY(${pullDistance}px)` }}
+        className={pullDistance > 0 ? "transition-none" : "transition-transform duration-200"}
+        style={pullDistance > 0 ? { transform: `translateY(${pullDistance}px)` } : {}}
       >
         {children}
       </div>
