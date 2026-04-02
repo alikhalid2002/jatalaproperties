@@ -55,7 +55,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
-          labelUr="کل متوقع آمدنی"
+          labelUr="زرعی رقبے کی کل متوقع آمدنی"
           year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`} 
           value={totalExIncome} 
           color="emerald" 
