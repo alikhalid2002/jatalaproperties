@@ -609,9 +609,9 @@ const App = () => {
                       <table className="w-full text-left border-collapse">
                         <thead className="sticky top-0 bg-[#0f172a] z-10 border-b border-slate-700/50">
                           <tr>
-                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">تاریخ</th>
-                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-center">کیٹیگری</th>
-                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">رقم</th>
+                            <th className="p-6 text-[11px] font-black text-white/90 font-urdu text-left uppercase tracking-widest">تاریخ</th>
+                            <th className="p-6 text-[11px] font-black text-white/90 font-urdu text-center uppercase tracking-widest">کیٹیگری</th>
+                            <th className="p-6 text-[11px] font-black text-white/90 font-urdu text-right uppercase tracking-widest">رقم</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/30">
@@ -619,7 +619,7 @@ const App = () => {
                              <tr key={entry.id} className="group hover:bg-white/5 transition-all">
                                 <td className="p-6">
                                   <p className="text-white font-black italic text-xs mb-1 uppercase">{entry.date}</p>
-                                  <p className="text-[9px] font-black text-slate-500 font-urdu">{entry.labelUr}</p>
+                                  <p className="text-[10px] font-black text-white/70 font-urdu">{entry.labelUr}</p>
                                 </td>
                                 <td className="p-6 text-center">
                                   <span className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-[9px] font-black uppercase tracking-widest">{entry.type}</span>
