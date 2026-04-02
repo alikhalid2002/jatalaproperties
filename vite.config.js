@@ -20,8 +20,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    /* 
-    Temporarily Disabled PWA to force fresh server fetch
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -54,6 +52,5 @@ export default defineConfig({
         ]
       }
     })
-    */
   ]
 })

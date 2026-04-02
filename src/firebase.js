@@ -16,5 +16,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-export const APP_VERSION = '1.0.8'; // Increment this to force cache refresh
+export const APP_VERSION = '1.0.9'; // Increment this to force cache refresh
 export const getDataPath = (collectionName) => collectionName; // Point to root collections
