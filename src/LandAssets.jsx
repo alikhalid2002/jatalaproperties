@@ -45,24 +45,28 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
       (f.nameEn || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+  const totalLandArea = farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0);
+  const totalExIncome = totalLandArea * 60000;
+  const totalRemainingAmount = totalExIncome - revenueVal;
+  const receivedPrv = totalExIncome > 0 ? (revenueVal / totalExIncome) * 100 : 0;
+  const remainingPrv = totalExIncome > 0 ? (totalRemainingAmount / totalExIncome) * 100 : 0;
+
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
-
-
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
         <FinanceCard 
           labelUr="کل متوقع آمدنی"
           year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`} 
-          value={revenueVal + pendingVal} 
+          value={totalExIncome} 
           color="emerald" 
           icon={<ArrowUpRight />}
         />
         <FinanceCard 
           labelUr="باقی رقم"
           year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`} 
-          value={pendingVal} 
+          value={totalRemainingAmount} 
           color="orange" 
           icon={<Clock />}
         />
@@ -81,12 +85,12 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
            <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
               <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
-                وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                وصول شدہ: Rs. {revenueVal.toLocaleString()} ({receivedPrv.toFixed(1)}%)
               </span>
            </div>
            <div className="flex items-center gap-2">
               <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
-                باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                باقی: Rs. {totalRemainingAmount.toLocaleString()} ({remainingPrv.toFixed(1)}%)
               </span>
               <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
            </div>
@@ -94,11 +98,11 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
         <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
            <div 
              className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
-             style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+             style={{ width: `${receivedPrv}%` }}
            ></div>
            <div 
              className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)] border-l border-[#0f172a]/30"
-             style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+             style={{ width: `${remainingPrv}%` }}
            ></div>
         </div>
       </div>
