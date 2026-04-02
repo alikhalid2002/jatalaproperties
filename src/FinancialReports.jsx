@@ -48,7 +48,7 @@ const SummaryCard = ({ label, year, value, sub, icon, color }) => (
             </div>
             <div className="flex flex-col items-center text-center w-full px-0.5">
               <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{label}</span>
-              <span className="text-[6.5px] md:text-xs font-black text-slate-500 font-urdu">{year}</span>
+              <span className={`text-${color}-400 opacity-80 text-[6.5px] md:text-xs font-black font-urdu`}>{year}</span>
             </div>
         </div>
         <div className="relative z-10 text-center w-full px-0.5">

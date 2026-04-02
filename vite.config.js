@@ -20,6 +20,8 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    /* 
+    Temporarily Disabled PWA to force fresh server fetch
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -29,8 +31,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Jatala Properties',
-        short_name: 'Jatala',
+        name: 'Jatala Properties Management', 
+        short_name: 'Jatala Prop',
         description: 'Property Management Dashboard',
         display: 'standalone',
         start_url: '/',
@@ -52,5 +54,6 @@ export default defineConfig({
         ]
       }
     })
+    */
   ]
 })
