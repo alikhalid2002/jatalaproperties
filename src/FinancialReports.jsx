@@ -47,13 +47,13 @@ const SummaryCard = ({ label, year, value, sub, icon, color }) => (
                 {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
             </div>
             <div className="flex flex-col items-center text-center w-full px-0">
-              <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{label}</span>
-              <span className={`text-${color}-400 opacity-80 text-[7px] md:text-xs font-black font-urdu`}>{year}</span>
+              <span className="text-white text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full">{label}</span>
+              <span className="text-white opacity-80 text-[7px] md:text-xs font-black font-urdu">{year}</span>
             </div>
         </div>
         <div className="relative z-10 text-center w-full px-0">
             <p className="text-[9px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
-            <span className="text-slate-500 text-[9px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
+            <span className="text-white opacity-50 text-[9px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
         </div>
     </div>
 );
