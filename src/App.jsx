@@ -31,9 +31,30 @@ const App = () => {
   // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
   useEffect(() => {
     const lastVer = localStorage.getItem('jatala_app_ver');
-    if (lastVer !== APP_VERSION) {
-      console.log(`Upgrading to version ${APP_VERSION}. Clearing old caches...`);
-      localStorage.removeItem('jatala_farmers_cache'); // Clear farmer list cache
+    if (lastVer && lastVer !== APP_VERSION) {
+      console.log(`Upgrading to version ${APP_VERSION}. Purging all caches and reloading...`);
+      
+      // 1. Clear Local Storage Cache
+      localStorage.removeItem('jatala_farmers_cache');
+      localStorage.setItem('jatala_app_ver', APP_VERSION);
+
+      // 2. Clear SW Caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+
+      // 3. Unregister SW and Force Reload
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(reg => reg.unregister());
+          window.location.reload(true);
+        });
+      } else {
+        window.location.reload(true);
+      }
+    } else {
       localStorage.setItem('jatala_app_ver', APP_VERSION);
     }
   }, []);
@@ -683,6 +704,7 @@ const SettingsPage = ({ entries = [] }) => {
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
@@ -995,106 +1017,117 @@ const SettingsPage = ({ entries = [] }) => {
         )}
       </section>
       
-      <div className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500 mb-20">
-        <div className="p-8 border-b border-white/5 bg-slate-900/40">
-           <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                 <RefreshCw size={24} />
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500 mb-20">
+        <button 
+           onClick={() => setIsBackupOpen(!isBackupOpen)}
+           className="w-full flex justify-between items-center p-8 hover:bg-white/5 transition-all text-left"
+        >
+          <div className="flex items-center gap-4">
+             <div className={`p-3 rounded-2xl transition-all duration-500 ${isBackupOpen ? 'bg-orange-600 text-white rotate-12 scale-110 shadow-lg shadow-orange-600/20' : 'bg-slate-900 border border-slate-700 text-slate-500'}`}>
+                <RefreshCw size={24}/>
+             </div>
+             <div>
+                 <h2 className="text-2xl font-black text-white italic leading-none font-urdu">سسٹم کنٹرول اور بیک اپ</h2>
+                 <div className="flex items-center gap-2 mt-2">
+                    <div className="w-8 h-[1px] bg-orange-500/20"></div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none font-urdu">انتظامی ڈیٹا مینجمنٹ</p>
+                 </div>
               </div>
-              <div>
-                  <h2 className="text-2xl font-black text-white italic leading-none font-urdu">سسٹم کنٹرول اور بیک اپ</h2>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2 italic font-urdu leading-none">انتظامی ڈیٹا مینجمنٹ</p>
-              </div>
-           </div>
-        </div>
+          </div>
+          <ChevronDown className={`text-slate-500 transition-transform duration-500 ${isBackupOpen ? 'rotate-180 text-white' : ''}`} size={24}/>
+        </button>
         
-        {/* DUMMY CONSTANT TO FORCE SERVICE WORKER UPDATE - v1.0.7 */}
-        <div className="hidden" aria-hidden="true" data-cache-bust="v1.0.7"></div>
-        
-        <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-emerald-500/30 transition-all">
-              <div className="p-5 bg-emerald-500/10 text-emerald-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/5">
-                 <FileJson size={32} />
-              </div>
-              <div>
-                 <h3 className="text-xl font-black text-white font-urdu">ایکسل رپورٹ</h3>
-                 <p className="text-[11px] text-slate-500 mt-2 font-urdu">تمام ممبرز، دکانوں اور اخراجات کی Excel رپورٹ ڈاؤن لوڈ کریں</p>
-              </div>
-              <button 
-                onClick={handleDownloadExcel}
-                disabled={isExporting || isBackingUp || isRestoring}
-                className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
-              >
-                 {isExporting ? (
-                   <>
-                     <Loader2 className="animate-spin" size={20} />
-                     <span className="font-urdu">رپورٹ تیار ہو رہی ہے...</span>
-                   </>
-                 ) : (
-                   <>
-                      <Download size={20} />
-                      <span className="font-black uppercase tracking-widest text-[11px]">Download Excel Report</span>
-                   </>
-                 )}
-              </button>
-           </div>
+        {isBackupOpen && (
+          <div className="p-8 pt-0 animate-in slide-in-from-top-4 duration-500 border-t border-slate-700/50 pt-12">
+            {/* DUMMY CONSTANT TO FORCE SERVICE WORKER UPDATE - v1.0.7 */}
+            <div className="hidden" aria-hidden="true" data-cache-bust="v1.0.7"></div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-emerald-500/30 transition-all">
+                  <div className="p-5 bg-emerald-500/10 text-emerald-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/5">
+                     <FileJson size={32} />
+                  </div>
+                  <div>
+                     <h3 className="text-xl font-black text-white font-urdu">ایکسل رپورٹ</h3>
+                     <p className="text-[11px] text-slate-500 mt-2 font-urdu">تمام ممبرز، دکانوں اور اخراجات کی Excel رپورٹ ڈاؤن لوڈ کریں</p>
+                  </div>
+                  <button 
+                    onClick={handleDownloadExcel}
+                    disabled={isExporting || isBackingUp || isRestoring}
+                    className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
+                  >
+                     {isExporting ? (
+                       <>
+                         <Loader2 className="animate-spin" size={20} />
+                         <span className="font-urdu">رپورٹ تیار ہو رہی ہے...</span>
+                       </>
+                     ) : (
+                       <>
+                          <Download size={20} />
+                          <span className="font-black uppercase tracking-widest text-[11px]">Download Excel Report</span>
+                       </>
+                     )}
+                  </button>
+               </div>
 
-           {/* Backup Card */}
-           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-indigo-500/30 transition-all">
-              <div className="p-5 bg-indigo-500/10 text-indigo-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/5">
-                 <Download size={32} />
-              </div>
-              <div>
-                 <h3 className="text-xl font-black text-white font-urdu">ڈیٹا بیک اپ (Export)</h3>
-                 <p className="text-[11px] text-slate-500 mt-2 font-urdu">تمام ممبرز، دکانوں اور مالیاتی ڈیٹا کی JSON فائل ڈاؤن لوڈ کریں</p>
-              </div>
-              <button 
-                onClick={handleBackup}
-                disabled={isBackingUp || isRestoring}
-                className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
-              >
-                 {isBackingUp ? (
-                   <>
-                     <Loader2 className="animate-spin" size={20} />
-                     <span className="font-urdu">بیک اپ بن رہا ہے...</span>
-                   </>
-                 ) : (
-                   <>
-                     <FileJson size={20} />
-                     <span className="font-black uppercase tracking-widest text-[11px]">Download System Backup (JSON)</span>
-                   </>
-                 )}
-              </button>
-           </div>
+               {/* Backup Card */}
+               <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-indigo-500/30 transition-all">
+                  <div className="p-5 bg-indigo-500/10 text-indigo-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/5">
+                     <Download size={32} />
+                  </div>
+                  <div>
+                     <h3 className="text-xl font-black text-white font-urdu">ڈیٹا بیک اپ (Export)</h3>
+                     <p className="text-[11px] text-slate-500 mt-2 font-urdu">تمام ممبرز، دکانوں اور مالیاتی ڈیٹا کی JSON فائل ڈاؤن لوڈ کریں</p>
+                  </div>
+                  <button 
+                    onClick={handleBackup}
+                    disabled={isBackingUp || isRestoring}
+                    className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 py-5 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl"
+                  >
+                     {isBackingUp ? (
+                       <>
+                         <Loader2 className="animate-spin" size={20} />
+                         <span className="font-urdu">بیک اپ بن رہا ہے...</span>
+                       </>
+                     ) : (
+                       <>
+                         <FileJson size={20} />
+                         <span className="font-black uppercase tracking-widest text-[11px]">Download System Backup (JSON)</span>
+                       </>
+                     )}
+                  </button>
+               </div>
 
-           {/* Restore Card */}
-           <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-orange-500/30 transition-all">
-              <div className="p-5 bg-orange-500/10 text-orange-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/5">
-                 <UploadCloud size={32} />
-              </div>
-              <div>
-                 <h3 className="text-xl font-black text-white font-urdu">ڈیٹا ری اسٹور (Import)</h3>
-                 <p className="text-[11px] text-rose-500/60 mt-2 font-urdu font-black uppercase italic tracking-widest">پچھلے ڈیٹا کو اوور رائٹ کریں (احتیاط برتیں)</p>
-              </div>
-              <label 
-                className={`w-full bg-orange-600/10 hover:bg-orange-600/20 border border-orange-500/30 text-orange-500 py-5 rounded-2xl font-black cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl ${isRestoring || isBackingUp ? 'opacity-50 pointer-events-none' : ''}`}
-              >
-                 {isRestoring ? (
-                   <>
-                     <Loader2 className="animate-spin" size={20} />
-                     <span className="font-urdu">ڈیٹا ری اسٹور ہو رہا ہے...</span>
-                   </>
-                 ) : (
-                   <>
-                     <AlertTriangle size={20} />
-                     <span className="font-black uppercase tracking-widest text-[11px]">Restore Data</span>
-                   </>
-                 )}
-                 <input type="file" accept=".json" onChange={handleRestore} className="hidden" disabled={isRestoring || isBackingUp} />
-              </label>
-           </div>
-        </div>
-      </div>
+               {/* Restore Card */}
+               <div className="bg-slate-900/60 p-8 rounded-[32px] border border-slate-700/30 flex flex-col items-center justify-center text-center gap-6 group hover:border-orange-500/30 transition-all">
+                  <div className="p-5 bg-orange-500/10 text-orange-400 rounded-[24px] group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/5">
+                     <UploadCloud size={32} />
+                  </div>
+                  <div>
+                     <h3 className="text-xl font-black text-white font-urdu">ڈیٹا ری اسٹور (Import)</h3>
+                     <p className="text-[11px] text-rose-500/60 mt-2 font-urdu font-black uppercase italic tracking-widest">پچھلے ڈیٹا کو اوور رائٹ کریں (احتیاط برتیں)</p>
+                  </div>
+                  <label 
+                    className={`w-full bg-orange-600/10 hover:bg-orange-600/20 border border-orange-500/30 text-orange-500 py-5 rounded-2xl font-black cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl ${isRestoring || isBackingUp ? 'opacity-50 pointer-events-none' : ''}`}
+                  >
+                     {isRestoring ? (
+                       <>
+                         <Loader2 className="animate-spin" size={20} />
+                         <span className="font-urdu">ڈیٹا ری اسٹور ہو رہا ہے...</span>
+                       </>
+                     ) : (
+                       <>
+                         <AlertTriangle size={20} />
+                         <span className="font-black uppercase tracking-widest text-[11px]">Restore Data</span>
+                       </>
+                     )}
+                     <input type="file" accept=".json" onChange={handleRestore} className="hidden" disabled={isRestoring || isBackingUp} />
+                  </label>
+               </div>
+            </div>
+          </div>
+        )}
+      </section>
 
     </div>
   );
