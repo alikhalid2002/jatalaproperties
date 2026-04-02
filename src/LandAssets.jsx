@@ -157,7 +157,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
             </div>
 
             <div className="w-full space-y-2 pt-4 border-t border-slate-700/30 font-urdu mt-2 overflow-hidden">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-60">
+              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-200 opacity-90">
                 <div className="flex items-center gap-1.5">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                    <span>وصول: {(Number(farmer.totalPaid) || 0).toLocaleString()}</span>
@@ -176,7 +176,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
               </div>
 
               <div className="flex justify-center">
-                 <p className="text-[9px] font-black text-slate-500 italic opacity-30 uppercase tracking-[0.2em]">
+                 <p className="text-[9px] font-black text-slate-400 italic opacity-60 uppercase tracking-[0.2em]">
                    کل رقم: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
               </div>
