@@ -141,7 +141,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
             className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
             <div className="space-y-2">
-              <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{farmer.nameUr}</h3>
+              <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-normal lg:leading-relaxed truncate py-1">{farmer.nameUr || farmer.nameEn}</h3>
               <div className="flex flex-wrap items-center justify-center gap-3">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
                     farmer.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/20 text-orange-400'
@@ -214,7 +214,7 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
     </div>
 
     <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full px-0.5">
-      <span className={`text-${color}-400 text-[10px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)]`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{labelUr}</span>
+      <span className={`text-${color}-400 text-[10px] md:text-[13px] font-black font-urdu leading-normal block w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)] py-0.5`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{labelUr}</span>
       <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black font-urdu text-center w-full`}>{year}</span>
       <p className="text-[11px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
     </div>
