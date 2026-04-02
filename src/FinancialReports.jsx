@@ -373,17 +373,17 @@ export default function FinancialReports({ entries = [], selectedYear }) {
               <tr className="border-b border-slate-700/50">
                 <th
                   onClick={() => toggleSort('date')}
-                  className="p-5 text-[12px] font-black text-slate-500 tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none font-urdu"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none font-urdu"
                 >
                   تاریخ {sortField === 'date' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                <th className="p-5 text-[12px] font-black text-slate-500 tracking-widest font-urdu">قسم</th>
-                <th className="p-5 text-[12px] font-black text-slate-500 tracking-widest font-urdu">کیٹیگری</th>
-                <th className="p-5 text-[12px] font-black text-slate-500 tracking-widest font-urdu">تفصیل</th>
-                <th className="p-5 text-[12px] font-black text-slate-500 tracking-widest font-urdu">پراپرٹی / دکان</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">قسم</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">کیٹیگری</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">تفصیل</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">پراپرٹی / دکان</th>
                 <th
                   onClick={() => toggleSort('amount')}
-                  className="p-5 text-[12px] font-black text-slate-500 tracking-widest text-right cursor-pointer hover:text-white transition-colors select-none font-urdu"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right cursor-pointer hover:text-white transition-colors select-none font-urdu"
                 >
                   رقم {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
@@ -409,15 +409,15 @@ export default function FinancialReports({ entries = [], selectedYear }) {
                     <TypeBadge type={entry._type} />
                   </td>
                   <td className="p-5">
-                    <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest">{entry._category}</span>
+                    <span className="text-[11px] font-black text-white uppercase tracking-widest">{entry._category}</span>
                   </td>
                   <td className="p-5 max-w-[200px]">
-                    <p className="text-slate-300 font-bold text-sm leading-snug truncate font-urdu">{entry._description}</p>
+                    <p className="text-white font-bold text-[15px] leading-snug truncate font-urdu">{entry._description}</p>
                   </td>
                   <td className="p-5">
                     {entry._asset && entry._asset !== '—'
-                      ? <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-urdu">{entry._asset}</span>
-                      : <span className="text-[10px] text-slate-700 font-bold">—</span>
+                      ? <span className="text-[11px] font-black text-white/70 uppercase tracking-widest font-urdu">{entry._asset}</span>
+                      : <span className="text-[11px] text-slate-700 font-bold">—</span>
                     }
                   </td>
                   <td className="p-5 text-right whitespace-nowrap">
