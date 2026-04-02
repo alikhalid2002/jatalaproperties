@@ -15,6 +15,7 @@ const LandAssets = lazy(() => import('./LandAssets'));
 const ShopsPage = lazy(() => import('./ShopsPage'));
 const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
+import PullToRefresh from './PullToRefresh';
 import { db, getDataPath, APP_VERSION } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit, getDocs, writeBatch } from 'firebase/firestore';
 
@@ -102,13 +103,27 @@ const App = () => {
     expenses: expenseVal = 0, 
     entries = [], 
     loading: financeLoading, 
+    refreshFinance,
     addEntry, 
     updateEntry, 
     deleteEntry 
   } = useFinanceData(selectedYear);
   
-  const { farmers, loading: farmersLoading } = useFarmers();
+  const { farmers, loading: farmersLoading, refreshFarmers } = useFarmers();
   const { activities, loading: activityLoading } = useGlobalActivity();
+
+  const handleGlobalRefresh = async () => {
+    console.log("Starting global manual refresh...");
+    // 1. Clear local caches and state
+    localStorage.removeItem('jatala_farmers_cache');
+    
+    // 2. Trigger refreshes for both main hooks
+    if (refreshFinance) refreshFinance();
+    if (refreshFarmers) refreshFarmers();
+    
+    // 3. Small artificial delay to ensure users see the 'Refreshing' state
+    await new Promise(r => setTimeout(r, 600));
+  };
   
   // Use a local state/hook for shops if needed, or stick to the current implementation
   const [shops, setShops] = useState([]);
@@ -401,246 +416,248 @@ const App = () => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="flex-1 overflow-y-auto no-scrollbar lg:px-12 px-4 lg:py-12 py-6">
-          <div className="max-w-[1600px] mx-auto min-h-full flex flex-col">
-            {globalSearch ? (
-              <SearchResults query={globalSearch} data={{ farmers, shops, soldProperties }} onNavigate={(tab) => { setGlobalSearch(''); setActiveTab(tab); }} />
-            ) : activeTab === 'Dashboard' ? (
-              loading ? <DashboardSkeleton /> : (
-                <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0" dir="ltr">
-                  {/* Mobile Year Selector */}
-                  <div className="lg:hidden flex justify-start -mb-2">
-                    <div className="relative">
-                      <button 
-                        onClick={() => setShowYearMenu(!showYearMenu)}
-                        className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-[20px] transition-all group shadow-inner"
-                      >
-                         <Calendar size={16} className="text-indigo-400" />
-                         <span className="text-[14px] font-black text-white font-urdu">{selectedYear}</span>
-                         <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {showYearMenu && (
-                        <div className="absolute left-0 mt-3 w-44 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-y-auto no-scrollbar max-h-[300px] z-[60] animate-in fade-in slide-in-from-top-3 backdrop-blur-2xl">
-                           {['2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((year) => (
-                             <button 
-                               key={year}
-                               onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
-                               className={`w-full px-5 py-4 text-left flex items-center justify-between transition-colors hover:bg-slate-800 ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-400'}`}
-                             >
-                                <span className="text-[13px] font-black font-urdu">{year}</span>
-                                {selectedYear === year && <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>}
-                             </button>
-                           ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Aggregate Summary: 2 Column Layout (Removed Remaining card as requested) */}
-                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full text-center">
-                    <FinanceCard 
-                      labelUr="کل متوقع آمدنی"
-                      year={selectedYear} 
-                      value={revenueVal + pendingVal} 
-                      color="emerald" 
-                      icon={<ArrowUpRight />}
-                    />
-                    <FinanceCard 
-                      labelUr="کل اخراجات"
-                      year={selectedYear} 
-                      value={expenseVal} 
-                      color="rose" 
-                      icon={<ArrowDownRight />}
-                    />
-                  </div>
-                  
-                  {/* Progress Comparison Bar: Received vs Remaining */}
-                  <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-8 font-urdu">
-                    <div className="flex justify-between items-center mb-3">
-                       <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                          <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
-                            وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
-                          </span>
-                       </div>
-                       <div className="flex items-center gap-2">
-                          <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
-                            باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
-                          </span>
-                          <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                       </div>
-                    </div>
-                    <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
-                       <div 
-                         className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
-                         style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
-                       ></div>
-                       <div 
-                         className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)] border-l border-[#0f172a]/30"
-                         style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
-                       ></div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-                    <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-6 lg:p-10 flex flex-col gap-10 shadow-2xl relative overflow-hidden group">
-                      <div className="relative z-10 text-center">
-                        <h2 className="text-3xl font-black text-white italic font-urdu leading-none">مالیاتی جائزہ</h2>
-                        <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-4 italic font-urdu">ریئل ٹائم مانیٹرنگ</p>
-                      </div>
-                      
-                      <div className="flex-1 min-h-[300px] w-full items-center justify-center flex">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData}>
-                            <defs>
-                              <linearGradient id="colorRev" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                              </linearGradient>
-                              <linearGradient id="colorExp" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                            <XAxis 
-                              dataKey="name" 
-                              axisLine={false}
-                              tickLine={false}
-                              tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
-                              dy={10}
-                            />
-                            <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', fontWeight: '900' }} />
-                            <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 flex flex-col gap-6">
-                      <div className="flex flex-col items-center text-center gap-4">
-                        <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl">
-                          <Activity size={24} />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-black text-white italic font-urdu">حالیہ سرگرمی</h3>
-                          <p className="text-[10px] uppercase font-black text-indigo-400 tracking-[0.2em] mt-1 italic font-urdu">تازہ ترین معلومات</p>
-                        </div>
-                      </div>
-
-                      <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar max-h-[400px]">
-                        {activities.length === 0 ? (
-                          <div className="h-full flex flex-col items-center justify-center opacity-30 gap-4 py-20">
-                            <Activity size={48} className="text-slate-600" />
-                            <p className="text-[12px] font-black uppercase tracking-[0.3em] font-urdu">کوئی نئی سرگرمی نہیں</p>
+        {/* Page Content with Pull-to-Refresh Support */}
+        <PullToRefresh onRefresh={handleGlobalRefresh}>
+          <div className="lg:px-12 px-4 lg:py-12 py-6">
+            <div className="max-w-[1600px] mx-auto min-h-full flex flex-col">
+              {globalSearch ? (
+                <SearchResults query={globalSearch} data={{ farmers, shops, soldProperties }} onNavigate={(tab) => { setGlobalSearch(''); setActiveTab(tab); }} />
+              ) : activeTab === 'Dashboard' ? (
+                loading ? <DashboardSkeleton /> : (
+                  <div className="flex-1 flex flex-col gap-6 lg:gap-10 animate-in fade-in duration-500 pb-20 lg:pb-0" dir="ltr">
+                    {/* Mobile Year Selector */}
+                    <div className="lg:hidden flex justify-start -mb-2">
+                      <div className="relative">
+                        <button 
+                          onClick={() => setShowYearMenu(!showYearMenu)}
+                          className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-[20px] transition-all group shadow-inner"
+                        >
+                           <Calendar size={16} className="text-indigo-400" />
+                           <span className="text-[14px] font-black text-white font-urdu">{selectedYear}</span>
+                           <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
+                        </button>
+  
+                        {showYearMenu && (
+                          <div className="absolute left-0 mt-3 w-44 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-y-auto no-scrollbar max-h-[300px] z-[60] animate-in fade-in slide-in-from-top-3 backdrop-blur-2xl">
+                             {['2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((year) => (
+                               <button 
+                                 key={year}
+                                 onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                                 className={`w-full px-5 py-4 text-left flex items-center justify-between transition-colors hover:bg-slate-800 ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-400'}`}
+                               >
+                                  <span className="text-[13px] font-black font-urdu">{year}</span>
+                                  {selectedYear === year && <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>}
+                               </button>
+                             ))}
                           </div>
-                        ) : (
-                          activities.map((act) => (
-                            <div key={act.id} className="group flex items-center justify-between p-4 bg-slate-900/40 border border-slate-700/30 rounded-3xl hover:border-indigo-500/50 transition-all">
-                              <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-2xl ${act.isRevenue ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
-                                  {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
-                                </div>
-                                <div className="text-left font-urdu">
-                                  <p className="text-sm text-white leading-tight">{act.labelUr}</p>
-                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className={`text-sm font-black italic ${act.isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                  {act.isRevenue ? '+' : '-'} {act.amount.toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                          ))
                         )}
                       </div>
                     </div>
-                  </div>
-                </div>
-              )
-            ) : activeTab === 'Land' ? (
-              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
-              </Suspense>
-            ) : activeTab === 'Shops' ? (
-              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                <ShopsPage isAdmin={accountType === 'ali'} />
-              </Suspense>
-            ) : activeTab === 'Expenses' ? (
-              <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
-                <div className="flex justify-between items-center mb-8 px-4">
-                  <div className="flex items-center gap-4 lg:gap-6">
-                    <div className="p-3 lg:p-4 bg-rose-500/20 text-rose-500 rounded-2xl">
-                       <Receipt size={24}/>
+  
+                    {/* Aggregate Summary: 2 Column Layout (Removed Remaining card as requested) */}
+                    <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8 font-urdu px-1 w-full text-center">
+                      <FinanceCard 
+                        labelUr="کل متوقع آمدنی"
+                        year={selectedYear} 
+                        value={revenueVal + pendingVal} 
+                        color="emerald" 
+                        icon={<ArrowUpRight />}
+                      />
+                      <FinanceCard 
+                        labelUr="کل اخراجات"
+                        year={selectedYear} 
+                        value={expenseVal} 
+                        color="rose" 
+                        icon={<ArrowDownRight />}
+                      />
                     </div>
-                    <div>
-                        <h2 className="text-xl lg:text-3xl font-black text-white font-urdu">اخراجات</h2>
-                        <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-[0.2em] mt-2 italic font-urdu">مکمل آڈٹ</p>
+                    
+                    {/* Progress Comparison Bar: Received vs Remaining */}
+                    <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 md:p-6 mb-8 font-urdu">
+                      <div className="flex justify-between items-center mb-3">
+                         <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                            <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
+                              وصول شدہ: Rs. {revenueVal.toLocaleString()} ({((revenueVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                            </span>
+                         </div>
+                         <div className="flex items-center gap-2">
+                            <span className="text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
+                              باقی: Rs. {pendingVal.toLocaleString()} ({((pendingVal / (revenueVal + pendingVal || 1)) * 100).toFixed(1)}%)
+                            </span>
+                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                         </div>
+                      </div>
+                      <div className="h-3 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner">
+                         <div 
+                           className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                           style={{ width: `${(revenueVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+                         ></div>
+                         <div 
+                           className="h-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.3)] border-l border-[#0f172a]/30"
+                           style={{ width: `${(pendingVal / (revenueVal + pendingVal || 1)) * 100}%` }}
+                         ></div>
+                      </div>
+                    </div>
+  
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
+                      <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-6 lg:p-10 flex flex-col gap-10 shadow-2xl relative overflow-hidden group">
+                        <div className="relative z-10 text-center">
+                          <h2 className="text-3xl font-black text-white italic font-urdu leading-none">مالیاتی جائزہ</h2>
+                          <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-4 italic font-urdu">ریئل ٹائم مانیٹرنگ</p>
+                        </div>
+                        
+                        <div className="flex-1 min-h-[300px] w-full items-center justify-center flex">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData}>
+                              <defs>
+                                <linearGradient id="colorRev" x1="0%" y1="0%" x2="0%" y2="100%">
+                                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorExp" x1="0%" y1="0%" x2="0%" y2="100%">
+                                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                              <XAxis 
+                                dataKey="name" 
+                                axisLine={false}
+                                tickLine={false}
+                                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                                dy={10}
+                              />
+                              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', fontWeight: '900' }} />
+                              <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+  
+                      <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 flex flex-col gap-6">
+                        <div className="flex flex-col items-center text-center gap-4">
+                          <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl">
+                            <Activity size={24} />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-black text-white italic font-urdu">حالیہ سرگرمی</h3>
+                            <p className="text-[10px] uppercase font-black text-indigo-400 tracking-[0.2em] mt-1 italic font-urdu">تازہ ترین معلومات</p>
+                          </div>
+                        </div>
+  
+                        <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar max-h-[400px]">
+                          {activities.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center opacity-30 gap-4 py-20">
+                              <Activity size={48} className="text-slate-600" />
+                              <p className="text-[12px] font-black uppercase tracking-[0.3em] font-urdu">کوئی نئی سرگرمی نہیں</p>
+                            </div>
+                          ) : (
+                            activities.map((act) => (
+                              <div key={act.id} className="group flex items-center justify-between p-4 bg-slate-900/40 border border-slate-700/30 rounded-3xl hover:border-indigo-500/50 transition-all">
+                                <div className="flex items-center gap-4">
+                                  <div className={`p-3 rounded-2xl ${act.isRevenue ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                    {act.isRevenue ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
+                                  </div>
+                                  <div className="text-left font-urdu">
+                                    <p className="text-sm text-white leading-tight">{act.labelUr}</p>
+                                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">{act.date} • {act.section}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className={`text-sm font-black italic ${act.isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {act.isRevenue ? '+' : '-'} {act.amount.toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="px-4 lg:px-6 py-3 bg-slate-800 border border-slate-700 rounded-2xl text-[12px] font-black text-white font-urdu">
-                       کل: Rs. {expenseVal.toLocaleString()}
+                )
+              ) : activeTab === 'Land' ? (
+                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                  <LandAssets selectedYear={selectedYear} isAdmin={accountType === 'ali'} />
+                </Suspense>
+              ) : activeTab === 'Shops' ? (
+                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                  <ShopsPage isAdmin={accountType === 'ali'} />
+                </Suspense>
+              ) : activeTab === 'Expenses' ? (
+                <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">
+                  <div className="flex justify-between items-center mb-8 px-4">
+                    <div className="flex items-center gap-4 lg:gap-6">
+                      <div className="p-3 lg:p-4 bg-rose-500/20 text-rose-500 rounded-2xl">
+                         <Receipt size={24}/>
+                      </div>
+                      <div>
+                          <h2 className="text-xl lg:text-3xl font-black text-white font-urdu">اخراجات</h2>
+                          <p className="text-[10px] font-black text-rose-500/60 uppercase tracking-[0.2em] mt-2 italic font-urdu">مکمل آڈٹ</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="px-4 lg:px-6 py-3 bg-slate-800 border border-slate-700 rounded-2xl text-[12px] font-black text-white font-urdu">
+                         کل: Rs. {expenseVal.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+  
+                  <div className="flex-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden flex flex-col">
+                    <div className="overflow-x-auto overflow-y-auto no-scrollbar">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="sticky top-0 bg-[#0f172a] z-10 border-b border-slate-700/50">
+                          <tr>
+                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">تاریخ</th>
+                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-center">کیٹیگری</th>
+                            <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">رقم</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/30">
+                          {entries.filter(e => ['expense', 'shop_expense'].includes(e.type)).map((entry) => (
+                             <tr key={entry.id} className="group hover:bg-white/5 transition-all">
+                                <td className="p-6">
+                                  <p className="text-white font-black italic text-xs mb-1 uppercase">{entry.date}</p>
+                                  <p className="text-[9px] font-black text-slate-500 font-urdu">{entry.labelUr}</p>
+                                </td>
+                                <td className="p-6 text-center">
+                                  <span className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-[9px] font-black uppercase tracking-widest">{entry.type}</span>
+                                </td>
+                                <td className="p-6 text-right">
+                                  <p className="text-lg font-black italic text-rose-400">Rs. {Number(entry.amount).toLocaleString()}</p>
+                                </td>
+                             </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden flex flex-col">
-                  <div className="overflow-x-auto overflow-y-auto no-scrollbar">
-                    <table className="w-full text-left border-collapse">
-                      <thead className="sticky top-0 bg-[#0f172a] z-10 border-b border-slate-700/50">
-                        <tr>
-                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-left">تاریخ</th>
-                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-center">کیٹیگری</th>
-                          <th className="p-6 text-[11px] font-black text-slate-500 font-urdu text-right">رقم</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/30">
-                        {entries.filter(e => ['expense', 'shop_expense'].includes(e.type)).map((entry) => (
-                           <tr key={entry.id} className="group hover:bg-white/5 transition-all">
-                              <td className="p-6">
-                                <p className="text-white font-black italic text-xs mb-1 uppercase">{entry.date}</p>
-                                <p className="text-[9px] font-black text-slate-500 font-urdu">{entry.labelUr}</p>
-                              </td>
-                              <td className="p-6 text-center">
-                                <span className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-[9px] font-black uppercase tracking-widest">{entry.type}</span>
-                              </td>
-                              <td className="p-6 text-right">
-                                <p className="text-lg font-black italic text-rose-400">Rs. {Number(entry.amount).toLocaleString()}</p>
-                              </td>
-                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+              ) : activeTab === 'Reports' ? (
+                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                  <FinancialReports entries={entries} selectedYear={selectedYear} />
+                </Suspense>
+              ) : activeTab === 'Sold' ? (
+                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
+                  <SoldProperties isAdmin={accountType === 'ali'} />
+                </Suspense>
+              ) : activeTab === 'Settings' ? (
+                accountType === 'ali' ? <SettingsPage entries={entries} /> : (
+                  <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
+                    <Settings size={64} className="mb-6 text-slate-500"/>
+                    <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
                   </div>
-                </div>
-              </div>
-            ) : activeTab === 'Reports' ? (
-              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                <FinancialReports entries={entries} selectedYear={selectedYear} />
-              </Suspense>
-            ) : activeTab === 'Sold' ? (
-              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                <SoldProperties isAdmin={accountType === 'ali'} />
-              </Suspense>
-            ) : activeTab === 'Settings' ? (
-              accountType === 'ali' ? <SettingsPage entries={entries} /> : (
-                <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
-                  <Settings size={64} className="mb-6 text-slate-500"/>
-                  <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
-                </div>
-              )
-            ) : (
-                <div className="flex-1 flex flex-col items-center justify-center opacity-20">
-                  <Search size={64} className="mb-6 text-slate-500"/>
-                  <h2 className="text-xl font-black font-urdu">{activeTab}</h2>
-                </div>
-            )}
+                )
+              ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center opacity-20">
+                    <Search size={64} className="mb-6 text-slate-500"/>
+                    <h2 className="text-xl font-black font-urdu">{activeTab}</h2>
+                  </div>
+              )}
+            </div>
           </div>
-        </div>
+        </PullToRefresh>
 
         {/* Floating Action Button - Only for Admin */}
         {accountType === 'ali' && (

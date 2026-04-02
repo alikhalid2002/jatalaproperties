@@ -18,6 +18,9 @@ export const useFinanceData = (selectedYear) => {
     const [expenses, setExpenses] = useState(0);
     const [loading, setLoading] = useState(true);
     const [entries, setEntries] = useState([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const refreshFinance = () => setRefreshKey(prev => prev + 1);
 
     useEffect(() => {
         let unsubRevenue;
@@ -25,6 +28,7 @@ export const useFinanceData = (selectedYear) => {
         let unsubShopExpenses;
         let unsubFarmers;
 
+        setLoading(true);
         try {
             const qRevenue = query(collection(db, getDataPath("revenue")), orderBy("createdAt", "desc"));
             const qExpenses = query(collection(db, getDataPath("expenses")), orderBy("createdAt", "desc"));
@@ -133,7 +137,7 @@ export const useFinanceData = (selectedYear) => {
             if (unsubShopExpenses) unsubShopExpenses();
             if (unsubFarmers) unsubFarmers();
         };
-    }, [selectedYear]);
+    }, [selectedYear, refreshKey]);
 
     const withTimeout = (promise, message = "Operation timed out. Please check your internet or Firebase config.") => {
         return Promise.race([
@@ -180,5 +184,5 @@ export const useFinanceData = (selectedYear) => {
         }
     };
 
-    return { revenue, pending, expenses, entries, loading, addEntry, updateEntry, deleteEntry };
+    return { revenue, pending, expenses, entries, loading, refreshFinance, addEntry, updateEntry, deleteEntry };
 };

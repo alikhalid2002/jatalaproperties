@@ -70,9 +70,16 @@ export const useFarmers = () => {
     }
   });
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshFarmers = () => {
+    localStorage.removeItem('jatala_farmers_cache');
+    setRefreshKey(prev => prev + 1);
+  };
 
   useEffect(() => {
     let unsubscribe;
+    setLoading(true);
     try {
       const q = query(collection(db, getDataPath('farmers')), orderBy('landSize', 'desc'));
       
@@ -100,7 +107,7 @@ export const useFarmers = () => {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, []);
+  }, [refreshKey]);
 
 const updateFarmerFields = async (farmerId, fields) => {
     try {
@@ -371,6 +378,7 @@ const updateFarmerFields = async (farmerId, fields) => {
   return { 
     farmers, 
     loading, 
+    refreshFarmers,
     updateFarmerFields, 
     recordPayment, 
     updateHistory, 
