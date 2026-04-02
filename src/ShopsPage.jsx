@@ -283,11 +283,11 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
           <div 
             key={shop.id}
             onClick={() => setSelectedShop(shop)}
-            className="group bg-slate-800/40 p-10 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-6 text-center relative overflow-hidden"
+            className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
-            <div className="space-y-4">
-              <h3 className="text-2xl lg:text-3xl font-black text-white font-urdu leading-none">{shop.tenant}</h3>
-              <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="space-y-2 text-center w-full">
+              <h3 className="text-xl lg:text-2xl font-black text-white font-urdu leading-none truncate">{shop.tenant}</h3>
+              <div className="flex flex-wrap items-center justify-center gap-2">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
                     shop.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
                  }`}>
@@ -297,31 +297,31 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
               </div>
             </div>
 
-            <div className="w-full space-y-2 pt-4 border-t border-slate-700/30 font-urdu mt-2 overflow-hidden">
+            <div className="w-full space-y-1.5 pt-2 border-t border-slate-700/30 font-urdu mt-1 overflow-hidden">
               {(() => {
                 const status = calculateAnnualProgress(shop);
                 return (
                   <>
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-90">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-95">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                         <span>وصول: {(Number(status.paid) || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
                         <span>باقی: {((Number(status.total) || 0) - (Number(status.paid) || 0)).toLocaleString()}</span>
                       </div>
                     </div>
                     
                     <div className="h-2 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner group">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-600 to-blue-400 group-hover:from-blue-500 group-hover:to-blue-300 transition-all duration-700 rounded-r-sm"
+                        className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 group-hover:from-emerald-500 group-hover:to-emerald-300 transition-all duration-700 rounded-r-sm"
                         style={{ width: `${Number(status.percent) || 0}%` }}
                       ></div>
                     </div>
 
                     <div className="flex justify-center">
-                       <p className="text-[10px] font-black text-white italic opacity-80 uppercase tracking-[0.2em]">
+                       <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] font-urdu">
                          کرایہ: {(Number(shop.rent) || 0).toLocaleString()}
                        </p>
                     </div>
