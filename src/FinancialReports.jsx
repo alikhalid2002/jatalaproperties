@@ -188,27 +188,27 @@ export default function FinancialReports({ entries = [], selectedYear }) {
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden gap-5">
 
       {/* ── Header row ─────────────────────────────────────────── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-4 mb-4">
+      <div className="flex flex-col lg:items-center justify-center gap-6 lg:gap-4 mb-8 text-center">
         
         {/* Row 1: Icon + Title + Year */}
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 shrink-0">
+        <div className="flex flex-col items-center gap-3 min-w-0">
+          <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 mb-2">
             <BarChart3 size={24} />
           </div>
-          <div className="shrink-0">
-            <h2 className="text-2xl lg:text-3xl font-black text-white italic leading-none font-urdu">
+          <div>
+            <h2 className="text-2xl lg:text-4xl font-black text-white italic leading-none font-urdu">
               مالیاتی رپورٹس
             </h2>
-            <p className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-1.5 italic font-urdu">
+            <p className="text-[10px] lg:text-xs font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-3 italic font-urdu">
               تمام ریکارڈز • {selectedYear}-{Number(selectedYear) - 1}
             </p>
           </div>
         </div>
 
         {/* Row 2: Search + Actions (Records, Excel, Filter) */}
-        <div className="flex flex-wrap items-center gap-3 lg:gap-4 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 lg:gap-4 w-full lg:w-auto">
           {/* Compact search */}
-          <div className="relative flex-1 lg:max-w-[260px] min-w-[200px]">
+          <div className="relative w-full max-w-md lg:max-w-[260px]">
             <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input
               type="text"
@@ -219,7 +219,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
                 const isEnglish = /[a-zA-Z]/.test(val);
                 setSearch(isEnglish ? transliterateToUrdu(val) : val);
               }}
-              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all font-urdu"
+              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all font-urdu text-center"
             />
             {search && (
               <button
@@ -231,7 +231,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-center gap-2 shrink-0">
             <span className="px-3 lg:px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[9px] lg:text-[10px] font-black text-white italic uppercase tracking-widest">
               {filtered.length} Records
             </span>
