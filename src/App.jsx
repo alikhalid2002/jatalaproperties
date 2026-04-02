@@ -110,22 +110,6 @@ const App = () => {
   } = useFinanceData(selectedYear);
   
   const { farmers, loading: farmersLoading, refreshFarmers } = useFarmers();
-  const { activities, loading: activityLoading } = useGlobalActivity();
-
-  const handleGlobalRefresh = async () => {
-    console.log("Starting global manual refresh...");
-    // 1. Clear local caches and state
-    localStorage.removeItem('jatala_farmers_cache');
-    
-    // 2. Trigger refreshes for both main hooks
-    if (refreshFinance) refreshFinance();
-    if (refreshFarmers) refreshFarmers();
-    
-    // 3. Small artificial delay to ensure users see the 'Refreshing' state
-    await new Promise(r => setTimeout(r, 600));
-  };
-  
-  // Use a local state/hook for shops if needed, or stick to the current implementation
   const [shops, setShops] = useState([]);
   const [soldProperties, setSoldProperties] = useState([]);
 
@@ -138,6 +122,22 @@ const App = () => {
     });
     return () => { unsubShops(); unsubSold(); };
   }, []);
+
+  const totalDashboardExpected = useMemo(() => {
+    const agEx = farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0) * 60000, 0);
+    const shopEx = shops.reduce((sum, s) => sum + (Number(s.rent) || 0) * 12, 0);
+    return agEx + shopEx;
+  }, [farmers, shops]);
+
+  const { activities, loading: activityLoading } = useGlobalActivity();
+
+  const handleGlobalRefresh = async () => {
+    console.log("Starting global manual refresh...");
+    localStorage.removeItem('jatala_farmers_cache');
+    if (refreshFinance) refreshFinance();
+    if (refreshFarmers) refreshFarmers();
+    await new Promise(r => setTimeout(r, 600));
+  };
 
   const loading = financeLoading || activityLoading || farmersLoading;
 
@@ -459,7 +459,7 @@ const App = () => {
                       <FinanceCard 
                         labelUr="کل متوقع آمدنی"
                         year={selectedYear} 
-                        value={revenueVal + pendingVal} 
+                        value={totalDashboardExpected} 
                         color="emerald" 
                         icon={<ArrowUpRight />}
                       />
