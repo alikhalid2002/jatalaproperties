@@ -63,7 +63,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
           labelUr="باقی رقم"
           year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`} 
           value={pendingVal} 
-          color="indigo" 
+          color="orange" 
           icon={<Clock />}
         />
         <FinanceCard 
