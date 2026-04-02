@@ -257,7 +257,7 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <SummaryCard 
-          label="کل متوقع آمدنی"
+          label="دکانوں کی کل متوقع آمدنی"
           year={shopStats.year}
           value={shopStats.expected}
           color="emerald"
