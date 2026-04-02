@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Store, Receipt, Plus, History, 
   ArrowUpRight, ArrowDownRight, User, 
@@ -13,6 +13,24 @@ import {
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { transliterateToUrdu } from './urduTransliterator';
+
+const SummaryCard = ({ label, year, value, icon, color }) => (
+    <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full relative overflow-hidden group shadow-lg">
+        <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
+        <div className="flex flex-col items-center justify-center relative z-10 w-full mb-4">
+            <div className={`mb-3 p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl transition-transform group-hover:scale-110`}>
+                {React.cloneElement(icon, { size: 24 })}
+            </div>
+            <div className="flex flex-col items-center text-center w-full">
+              <span className={`text-${color}-400 text-lg font-black font-urdu leading-tight`}>{label}</span>
+              <span className={`text-${color}-400 opacity-60 text-[10px] font-black font-urdu mt-1`}>{year}</span>
+            </div>
+        </div>
+        <div className="relative z-10 text-center w-full">
+            <p className="text-2xl font-black italic tracking-tighter text-white">Rs. {value?.toLocaleString()}</p>
+        </div>
+    </div>
+);
 
 const ShopsPage = ({ isAdmin }) => {
   const [shops, setShops] = useState([]);
@@ -30,6 +48,34 @@ const ShopsPage = ({ isAdmin }) => {
   const [editTransData, setEditTransData] = useState({ amount: '', date: '', type: 'Rent' });
   const [isUploadingDoc, setIsUploadingDoc] = useState({ idCard: false, agreement: false });
   const [previewImage, setPreviewImage] = useState(null);
+
+  const shopStats = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const totalExpected = shops.reduce((sum, shop) => sum + (Number(shop.rent) || 0) * 12, 0);
+    
+    const rentPaid = transactions.filter(t => {
+      if (t.type !== 'Rent') return false;
+      let itemYear = null;
+      if (t.date) itemYear = t.date.split('-')[0];
+      else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
+      return itemYear === currentYear.toString();
+    }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+    const totalExpenses = transactions.filter(t => {
+      if (t.type !== 'Expense') return false;
+      let itemYear = null;
+      if (t.date) itemYear = t.date.split('-')[0];
+      else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
+      return itemYear === currentYear.toString();
+    }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+    return {
+      expected: totalExpected,
+      remaining: totalExpected - rentPaid,
+      expenses: totalExpenses,
+      year: `${currentYear-1}-${currentYear}`
+    };
+  }, [shops, transactions]);
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
@@ -207,6 +253,32 @@ const ShopsPage = ({ isAdmin }) => {
 
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
+      
+      {/* Financial Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <SummaryCard 
+          label="کل متوقع آمدنی"
+          year={shopStats.year}
+          value={shopStats.expected}
+          color="emerald"
+          icon={<ArrowUpRight />}
+        />
+        <SummaryCard 
+          label="باقی رقم"
+          year={shopStats.year}
+          value={shopStats.remaining}
+          color="orange"
+          icon={<Clock />}
+        />
+        <SummaryCard 
+          label="کل اخراجات"
+          year={shopStats.year}
+          value={shopStats.expenses}
+          color="rose"
+          icon={<ArrowDownRight />}
+        />
+      </div>
+
       {/* Shops Grid - Responsive 1/2/3 cols */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-24">
         {shops.map((shop) => (
