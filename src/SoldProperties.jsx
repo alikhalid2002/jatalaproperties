@@ -76,9 +76,6 @@ const SoldProperties = ({ isAdmin }) => {
               className="bg-slate-800/40 p-4 lg:p-6 rounded-[24px] border border-slate-700/50 hover:bg-slate-800 transition-all duration-300 shadow-xl cursor-pointer group flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                 <div className="w-14 h-14 lg:w-16 lg:h-16 bg-slate-900 border border-slate-700 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <span className="text-2xl lg:text-3xl font-black text-indigo-400 font-urdu">{prop.nameUr?.charAt(0)}</span>
-                 </div>
                  <div className="text-right">
                     <h3 className="text-xl lg:text-2xl font-black text-white font-urdu leading-none mb-2">{prop.nameUr}</h3>
                     <div className="flex items-center gap-3">
