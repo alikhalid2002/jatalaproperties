@@ -3,8 +3,6 @@ import {
   Search, ArrowUpRight, ArrowDownRight, Store, Clock,
   BarChart3, X, SlidersHorizontal, FileText, Download, FileSpreadsheet, FileBox
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { transliterateToUrdu } from './urduTransliterator';
 
@@ -184,83 +182,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
     XLSX.writeFile(workbook, `Jatala_Report_${selectedYear}_${Number(selectedYear) - 1}.xlsx`);
   };
 
-  const downloadPDFReport = () => {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    
-    // Header
-    doc.setFillColor(31, 41, 55); // Dark Slate
-    doc.rect(0, 0, 210, 40, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("JATALA PROPERTIES", 15, 20);
-    
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Financial Performance Report • Year ${selectedYear}-${Number(selectedYear) - 1}`, 15, 28);
-    doc.text(`Exported: ${new Date().toLocaleString()}`, 15, 33);
 
-    // Summary Section
-    doc.setTextColor(31, 41, 55);
-    doc.setFontSize(12);
-    doc.text("EXECUTIVE SUMMARY", 15, 55);
-    
-    // Summary Cards (manual drawing for "beautiful" look)
-    const drawCard = (label, val, x, color) => {
-       doc.setFillColor(249, 250, 251);
-       doc.setDrawColor(229, 231, 235);
-       doc.roundedRect(x, 60, 44, 25, 3, 3, 'FD');
-       
-       doc.setFontSize(8);
-       doc.setTextColor(100);
-       doc.text(label, x + 5, 68);
-       
-       doc.setFontSize(11);
-       doc.setTextColor(color[0], color[1], color[2]);
-       doc.text(`Rs. ${val.toLocaleString()}`, x + 5, 78);
-    };
-
-    drawCard("TOTAL REVENUE", totals.revenue, 15, [16, 185, 129]); // Emerald
-    drawCard("PENDING", totals.pending, 64, [245, 158, 11]);      // Amber
-    drawCard("EXPENSES", totals.expense, 113, [239, 68, 68]);    // Rose
-    drawCard("NET BALANCE", net, 162, [79, 70, 229]);           // Indigo
-
-    // Transactions Table
-    const tableColumn = ["Date", "Type", "Category", "Item / Description", "Amount"];
-    const tableRows = filtered.map(r => [
-       r._date || '—',
-       (TYPE_CONFIG[r._type] || TYPE_CONFIG.expense).label,
-       r._category,
-       r.nameEn || r.tenant || r.note || r.description || r._description, 
-       `Rs. ${Number(r.amount).toLocaleString()}`
-    ]);
-
-    doc.autoTable({
-       head: [tableColumn],
-       body: tableRows,
-       startY: 95,
-       theme: 'grid',
-       styles: { fontSize: 8, cellPadding: 3 },
-       headStyles: { fillColor: [31, 41, 55], textColor: 255, fontStyle: 'bold' },
-       alternateRowStyles: { fillColor: [250, 250, 250] },
-       columnStyles: {
-          4: { fontStyle: 'bold', halign: 'right' }
-       }
-    });
-
-    // Page numbers
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(`Page ${i} of ${pageCount}`, 180, 285);
-        doc.text("Jatala Properties Dashboard — System Generated Report", 15, 285);
-    }
-
-    doc.save(`Jatala_Financial_Report_${selectedYear}_${Number(selectedYear) - 1}.pdf`);
-  };
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden gap-5">
@@ -318,12 +240,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
           >
             <FileSpreadsheet size={13} /> Excel
           </button>
-          <button
-            onClick={downloadPDFReport}
-            className="flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20"
-          >
-            <FileBox size={13} /> PDF Report
-          </button>
+
           <button
             onClick={() => setShowFilters(f => !f)}
             className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[12px] font-black border transition-all font-urdu ${showFilters ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/40'}`}
