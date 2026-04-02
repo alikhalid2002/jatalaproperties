@@ -583,7 +583,7 @@ const App = () => {
                 </Suspense>
               ) : activeTab === 'Shops' ? (
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-indigo-400" size={40}/></div>}>
-                  <ShopsPage isAdmin={isAdmin} />
+                  <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />
                 </Suspense>
               ) : activeTab === 'Expenses' ? (
                 <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden">

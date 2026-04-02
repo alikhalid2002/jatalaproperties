@@ -32,7 +32,7 @@ const SummaryCard = ({ label, year, value, icon, color }) => (
     </div>
 );
 
-const ShopsPage = ({ isAdmin }) => {
+const ShopsPage = ({ isAdmin, selectedYear }) => {
   const [shops, setShops] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
@@ -50,7 +50,7 @@ const ShopsPage = ({ isAdmin }) => {
   const [previewImage, setPreviewImage] = useState(null);
 
   const shopStats = useMemo(() => {
-    const currentYear = new Date().getFullYear();
+    const activeYear = (selectedYear || new Date().getFullYear()).toString();
     const totalExpected = shops.reduce((sum, shop) => sum + (Number(shop.rent) || 0) * 12, 0);
     
     const rentPaid = transactions.filter(t => {
@@ -58,7 +58,7 @@ const ShopsPage = ({ isAdmin }) => {
       let itemYear = null;
       if (t.date) itemYear = t.date.split('-')[0];
       else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
-      return itemYear === currentYear.toString();
+      return itemYear === activeYear;
     }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
     const totalExpenses = transactions.filter(t => {
@@ -66,16 +66,16 @@ const ShopsPage = ({ isAdmin }) => {
       let itemYear = null;
       if (t.date) itemYear = t.date.split('-')[0];
       else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
-      return itemYear === currentYear.toString();
+      return itemYear === activeYear;
     }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
     return {
       expected: totalExpected,
       remaining: totalExpected - rentPaid,
       expenses: totalExpenses,
-      year: `${currentYear-1}-${currentYear}`
+      year: activeYear
     };
-  }, [shops, transactions]);
+  }, [shops, transactions, selectedYear]);
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
