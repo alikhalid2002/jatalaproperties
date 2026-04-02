@@ -14,22 +14,20 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { transliterateToUrdu } from './urduTransliterator';
 
-const SummaryCard = ({ label, year, value, icon, color }) => (
-    <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full relative overflow-hidden group shadow-lg">
-        <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
-        <div className="flex flex-col items-center justify-center relative z-10 w-full mb-4">
-            <div className={`mb-3 p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl transition-transform group-hover:scale-110`}>
-                {React.cloneElement(icon, { size: 24 })}
-            </div>
-            <div className="flex flex-col items-center text-center w-full">
-              <span className={`text-${color}-400 text-lg font-black font-urdu leading-tight`}>{label}</span>
-              <span className={`text-${color}-400 opacity-60 text-[10px] font-black font-urdu mt-1`}>{year}</span>
-            </div>
-        </div>
-        <div className="relative z-10 text-center w-full">
-            <p className="text-2xl font-black italic tracking-tighter text-white">Rs. {value?.toLocaleString()}</p>
-        </div>
+const FinanceCard = ({ labelUr, year, value, color, icon }) => (
+  <div className="bg-slate-800/40 p-2 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[100px] md:min-h-0 relative overflow-hidden group shadow-lg">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
+    
+    <div className={`mb-2 p-2 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-lg md:rounded-2xl transition-transform group-hover:scale-110 relative z-10`}>
+      {React.cloneElement(icon, { size: 18 })}
     </div>
+
+    <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full px-0.5">
+      <span className={`text-${color}-400 text-[10px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)]`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{labelUr}</span>
+      <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black font-urdu text-center w-full`}>{year}</span>
+      <p className="text-[11px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
+    </div>
+  </div>
 );
 
 const ShopsPage = ({ isAdmin, selectedYear }) => {
@@ -255,23 +253,23 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
       {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <SummaryCard 
-          label="دکانوں کی کل متوقع آمدنی"
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
+        <FinanceCard 
+          labelUr="دکانوں کی کل متوقع آمدنی"
           year={shopStats.year}
           value={shopStats.expected}
           color="emerald"
           icon={<ArrowUpRight />}
         />
-        <SummaryCard 
-          label="باقی رقم"
+        <FinanceCard 
+          labelUr="باقی رقم"
           year={shopStats.year}
           value={shopStats.remaining}
           color="orange"
           icon={<Clock />}
         />
-        <SummaryCard 
-          label="کل اخراجات"
+        <FinanceCard 
+          labelUr="کل اخراجات"
           year={shopStats.year}
           value={shopStats.expenses}
           color="rose"
