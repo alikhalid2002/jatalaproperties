@@ -5,10 +5,11 @@ import {
   Plus, UserPlus, Trash2, Loader2, Save, CheckCircle,
   ArrowUpRight, ArrowDownRight, Clock, Activity, Search as SearchIcon,
   Shield, User, X, Lock, Calendar, Home, RefreshCw,
-  Download, UploadCloud, AlertTriangle, FileJson
+  Download, UploadCloud, AlertTriangle, FileJson, Check, Info, Calendar as CalendarIcon, Mail, ChevronRight
 } from 'lucide-react';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
+import { useReminders } from './useReminders';
 import { useGlobalActivity } from './useGlobalActivity';
 import AddEntryModal from './AddEntryModal';
 const LandAssets = lazy(() => import('./LandAssets'));
@@ -17,7 +18,7 @@ const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
 import PullToRefresh from './PullToRefresh';
 import { db, getDataPath, APP_VERSION } from './firebase';
-import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, query, orderBy, limit, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -83,6 +84,7 @@ const App = () => {
   const [globalSearch, setGlobalSearch] = useState('');
   const [authStage, setAuthStage] = useState('selection'); // selection, password
   const [passwordInput, setPasswordInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
   const handleAdminLogin = (e) => {
@@ -128,6 +130,30 @@ const App = () => {
     const shopEx = shops.reduce((sum, s) => sum + (Number(s.rent) || 0) * 12, 0);
     return agEx + shopEx;
   }, [farmers, shops]);
+
+  const { 
+    reminders, 
+    activeReminders, 
+    addReminder, 
+    deleteReminder, 
+    markAsRead 
+  } = useReminders();
+  const [isReminderDrawerOpen, setIsReminderDrawerOpen] = useState(false);
+  const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
+
+  const handleCreateReminder = async (e) => {
+    e.preventDefault();
+    if (!newReminder.title || !newReminder.targetDate) return;
+    setIsSaving(true);
+    const res = await addReminder({
+      ...newReminder,
+      targetDate: Timestamp.fromDate(new Date(newReminder.targetDate))
+    });
+    if (res.success) {
+      setNewReminder({ title: '', description: '', targetDate: '', type: 'Reminder' });
+    }
+    setIsSaving(false);
+  };
 
   const { activities, loading: activityLoading } = useGlobalActivity();
 
@@ -364,9 +390,16 @@ const App = () => {
 
           {/* Right: Controls */}
           <div className="flex items-center gap-2 lg:gap-3">
-            <button className="p-2 lg:p-3 text-slate-400 hover:text-white transition-all relative">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#0f172a]"></span>
+            <button 
+              onClick={() => setIsReminderDrawerOpen(true)}
+              className="p-2.5 lg:p-3.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-2xl text-slate-400 hover:text-white transition-all relative group"
+            >
+              <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+              {activeReminders.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 rounded-full border-2 border-[#0f172a] flex items-center justify-center text-[10px] font-black text-white shadow-lg animate-pulse">
+                  {activeReminders.length}
+                </span>
+              )}
             </button>
 
             <div className="relative ml-1 lg:ml-2">
@@ -1034,6 +1067,95 @@ const SettingsPage = ({ entries = [] }) => {
           </div>
         )}
       </section>
+
+      {/* Reminder & Notification Manager */}
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500">
+        <button 
+           onClick={() => setExpandedSection(expandedSection === 'reminders' ? null : 'reminders')}
+           className="w-full flex justify-between items-center p-8 hover:bg-white/5 transition-all text-left"
+        >
+          <div className="flex items-center gap-4">
+             <div className={`p-3 rounded-2xl transition-all duration-500 ${expandedSection === 'reminders' ? 'bg-amber-600 text-white rotate-12 scale-110 shadow-lg shadow-amber-600/20' : 'bg-slate-900 border border-slate-700 text-slate-500'}`}>
+                <Bell size={24}/>
+             </div>
+             <div>
+                 <h2 className="text-2xl font-black text-white italic leading-none font-urdu">ریمنڈر مینیجر</h2>
+                 <div className="flex items-center gap-2 mt-2">
+                    <div className="w-8 h-[1px] bg-amber-500/20"></div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none font-urdu">نوٹیفیکیشن اور ضروری انتباہ</p>
+                 </div>
+              </div>
+          </div>
+          <ChevronDown className={`text-slate-500 transition-transform duration-500 ${expandedSection === 'reminders' ? 'rotate-180 text-white' : ''}`} size={24}/>
+        </button>
+
+        {expandedSection === 'reminders' && (
+          <div className="p-8 pt-0 animate-in slide-in-from-top-4 duration-500">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 border-t border-slate-700/50 pt-12">
+                <div className="space-y-8">
+                  <h3 className="font-black text-[12px] text-amber-400 opacity-60 ml-4 font-urdu">نیا ریمنڈر شامل کریں</h3>
+                  <form onSubmit={handleCreateReminder} className="space-y-6">
+                    <input required value={newReminder.title} onChange={(e) => {
+                       const val = e.target.value;
+                       const isEnglish = /[a-zA-Z]/.test(val);
+                       setNewReminder({...newReminder, title: isEnglish ? transliterateToUrdu(val) : val});
+                    }} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-urdu text-xl text-white outline-none focus:border-amber-500 transition-all shadow-inner" placeholder="ریمنڈر کا عنوان" />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <input required type="date" value={newReminder.targetDate} onChange={(e) => setNewReminder({...newReminder, targetDate: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-black text-white outline-none focus:border-amber-500 font-urdu" />
+                      <select value={newReminder.type} onChange={(e) => setNewReminder({...newReminder, type: e.target.value})} className="bg-slate-900 border border-slate-700 rounded-2xl p-5 text-[12px] font-black uppercase text-white outline-none font-urdu">
+                        <option>Reminder</option>
+                        <option>Warning</option>
+                      </select>
+                    </div>
+                    <textarea value={newReminder.description} onChange={(e) => {
+                       const val = e.target.value;
+                       const isEnglish = /[a-zA-Z]/.test(val);
+                       setNewReminder({...newReminder, description: isEnglish ? transliterateToUrdu(val) : val});
+                    }} className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-5 font-urdu text-base text-white outline-none focus:border-amber-500 transition-all h-32" placeholder="مزید تفصیلات..." />
+                    
+                    <button type="submit" disabled={isSaving} className="w-full bg-amber-600 py-6 rounded-3xl text-white font-black shadow-xl shadow-amber-600/20 active:scale-95 transition-all font-urdu text-lg flex items-center justify-center gap-3">
+                      {isSaving ? <Loader2 className="animate-spin" /> : <> <CalendarIcon size={20} /> محفوظ کریں </>}
+                    </button>
+                  </form>
+                </div>
+                <div className="flex flex-col max-h-[550px] overflow-hidden bg-slate-900/40 rounded-[24px] border border-slate-700/30">
+                  <div className="p-8 border-b border-slate-700/50 flex justify-between items-center text-[11px] font-black text-slate-500 italic font-urdu">تمام ریمنڈرز <span>{reminders.length} کل</span></div>
+                  <div className="overflow-y-auto no-scrollbar divide-y divide-slate-800/30">
+                    {reminders.length === 0 ? (
+                      <div className="p-20 text-center opacity-20">
+                        <Bell size={48} className="mx-auto mb-4" />
+                        <p className="font-urdu">کوئی ریکارڈ نہیں ملا</p>
+                      </div>
+                    ) : (
+                      reminders.map(r => (
+                        <div key={r.id} className={`p-6 flex justify-between items-start group hover:bg-amber-500/5 transition-all ${r.isRead ? 'opacity-50' : ''}`}>
+                          <div className="flex gap-4">
+                             <div className={`p-3 rounded-xl mt-1 ${r.type === 'Warning' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                {r.type === 'Warning' ? <AlertTriangle size={16}/> : <Info size={16}/>}
+                             </div>
+                             <div>
+                                <p className="font-urdu text-white text-lg leading-tight">{r.title}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">
+                                  {r.targetDate?.toDate()?.toLocaleDateString()} • {r.type}
+                                </p>
+                             </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                             {!r.isRead && (
+                               <button onClick={() => markAsRead(r.id)} className="p-3 text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-all" title="Mark as Read"><Check size={16}/></button>
+                             )}
+                             <button onClick={() => deleteReminder(r.id)} className="p-3 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><Trash2 size={16}/></button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+             </div>
+          </div>
+        )}
+      </section>
       
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-[32px] overflow-hidden transition-all duration-500 mb-20">
         <button 
@@ -1146,6 +1268,87 @@ const SettingsPage = ({ entries = [] }) => {
           </div>
         )}
       </section>
+
+      {/* Notification Drawer */}
+      {isReminderDrawerOpen && (
+        <div className="fixed inset-0 z-[100] flex justify-end">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setIsReminderDrawerOpen(false)}></div>
+          <div className="w-full max-w-md bg-[#0f172a] border-l border-slate-800 h-full shadow-2xl relative flex flex-col animate-in slide-in-from-right duration-500">
+            <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/30">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl">
+                   <Bell size={24} className="animate-bounce" />
+                </div>
+                <div>
+                   <h2 className="text-2xl font-black text-white italic leading-none font-urdu">نوٹیفیکیشنز</h2>
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Today's Reminders</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsReminderDrawerOpen(false)}
+                className="p-3 hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 no-scrollbar space-y-4">
+               {activeReminders.length === 0 ? (
+                 <div className="h-full flex flex-col items-center justify-center opacity-30 gap-6">
+                    <div className="p-8 bg-slate-800 rounded-full">
+                       <CheckCircle size={64} className="text-slate-500" />
+                    </div>
+                    <p className="text-lg font-black uppercase tracking-[0.3em] font-urdu text-center">آج کے لیے کوئی نیا<br/>ریمنڈر نہیں ہے</p>
+                 </div>
+               ) : (
+                 activeReminders.map(r => (
+                   <div key={r.id} className={`p-6 rounded-[28px] border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/50 transition-all group flex flex-col gap-4`}>
+                      <div className="flex justify-between items-start">
+                         <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                           r.type === 'Warning' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                         }`}>
+                           {r.type}
+                         </div>
+                         <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black italic">
+                           <Clock size={12} />
+                           {r.targetDate?.toDate()?.toLocaleDateString()}
+                         </div>
+                      </div>
+                      <div>
+                         <h3 className="text-xl font-black text-white font-urdu leading-tight mb-2">{r.title}</h3>
+                         <p className="text-[14px] text-slate-400 font-urdu leading-relaxed">{r.description}</p>
+                      </div>
+                      <div className="pt-4 border-t border-slate-700/30 flex gap-2">
+                         <button 
+                           onClick={() => markAsRead(r.id)}
+                           className="flex-1 py-3 bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                         >
+                           <Check size={14} /> Mark as Read
+                         </button>
+                         <button 
+                           onClick={() => deleteReminder(r.id)}
+                           className="p-3 bg-rose-500/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                         >
+                           <Trash2 size={16} />
+                         </button>
+                      </div>
+                   </div>
+                 ))
+               )}
+            </div>
+
+            <div className="p-8 border-t border-slate-800 bg-slate-900/30">
+               <button 
+                 onClick={() => { setIsReminderDrawerOpen(false); setActiveTab('Settings'); setExpandedSection('reminders'); }}
+                 className="w-full py-5 bg-slate-800 border border-slate-700 text-white rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-700 transition-all shadow-xl active:scale-95"
+               >
+                 <Settings size={20} className="text-slate-500" />
+                 <span className="text-[11px] font-black uppercase tracking-widest font-urdu">ریمنڈر مینیج کریں</span>
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
