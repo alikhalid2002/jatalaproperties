@@ -42,18 +42,18 @@ const AMOUNT_COLORS = {
 const SummaryCard = ({ label, year, value, sub, icon, color }) => (
     <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
         <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
-        <div className="flex flex-col items-center justify-center relative z-10 w-full">
+        <div className="flex flex-col items-center justify-center relative z-10 w-full px-0">
             <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110`}>
                 {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
             </div>
-            <div className="flex flex-col items-center text-center w-full px-0.5">
+            <div className="flex flex-col items-center text-center w-full px-0">
               <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{label}</span>
-              <span className={`text-${color}-400 opacity-80 text-[6.5px] md:text-xs font-black font-urdu`}>{year}</span>
+              <span className={`text-${color}-400 opacity-80 text-[7px] md:text-xs font-black font-urdu`}>{year}</span>
             </div>
         </div>
-        <div className="relative z-10 text-center w-full px-0.5">
-            <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
-            <span className="text-slate-500 text-[6.5px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
+        <div className="relative z-10 text-center w-full px-0">
+            <p className="text-[9px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
+            <span className="text-slate-500 text-[9px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
         </div>
     </div>
 );

@@ -686,10 +686,10 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
       {React.cloneElement(icon, { size: 18 })}
     </div>
 
-    <div className="flex flex-col items-center text-center relative z-10 w-full px-0.5">
+    <div className="flex flex-col items-center text-center relative z-10 w-full px-0">
       <span className={`text-${color}-400 text-[11px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)]`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : '244,63,94' }}>{labelUr}</span>
-      <span className={`text-${color}-400 opacity-80 text-[9px] md:text-xs font-black font-urdu`}>{year}</span>
-      <p className="text-[14px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
+      <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black font-urdu`}>{year}</span>
+      <p className="text-[12px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
 );
