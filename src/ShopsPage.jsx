@@ -232,13 +232,13 @@ const ShopsPage = ({ isAdmin }) => {
                 const status = calculateAnnualProgress(shop);
                 return (
                   <>
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-60">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-90">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                         <span>وصول: {(Number(status.paid) || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-700"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
                         <span>باقی: {((Number(status.total) || 0) - (Number(status.paid) || 0)).toLocaleString()}</span>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ const ShopsPage = ({ isAdmin }) => {
                     </div>
 
                     <div className="flex justify-center">
-                       <p className="text-[9px] font-black text-slate-500 italic opacity-30 uppercase tracking-[0.2em]">
+                       <p className="text-[10px] font-black text-white italic opacity-80 uppercase tracking-[0.2em]">
                          کرایہ: {(Number(shop.rent) || 0).toLocaleString()}
                        </p>
                     </div>
