@@ -176,7 +176,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
               </div>
 
               <div className="flex justify-center">
-                 <p className="text-[9px] font-black text-slate-400 italic opacity-60 uppercase tracking-[0.2em]">
+                 <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] font-urdu">
                    کل رقم: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
               </div>
