@@ -139,21 +139,6 @@ const App = () => {
     markAsRead 
   } = useReminders();
   const [isReminderDrawerOpen, setIsReminderDrawerOpen] = useState(false);
-  const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
-
-  const handleCreateReminder = async (e) => {
-    e.preventDefault();
-    if (!newReminder.title || !newReminder.targetDate) return;
-    setIsSaving(true);
-    const res = await addReminder({
-      ...newReminder,
-      targetDate: Timestamp.fromDate(new Date(newReminder.targetDate))
-    });
-    if (res.success) {
-      setNewReminder({ title: '', description: '', targetDate: '', type: 'Reminder' });
-    }
-    setIsSaving(false);
-  };
 
   const { activities, loading: activityLoading } = useGlobalActivity();
 
@@ -746,7 +731,14 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
 );
 
 const SettingsPage = ({ entries = [] }) => {
-  const { farmers, addNewFarmer, deleteFarmer } = useFarmers();
+  const { farmers, deleteFarmer } = useFarmers();
+  const { 
+    reminders, 
+    addReminder, 
+    deleteReminder, 
+    markAsRead 
+  } = useReminders();
+  
   const [isSaving, setIsSaving] = useState(false);
   const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
   const [shops, setShops] = useState([]);
@@ -756,6 +748,28 @@ const SettingsPage = ({ entries = [] }) => {
   const [isRestoring, setIsRestoring] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
+  const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
+
+  const handleCreateReminder = async (e) => {
+    e.preventDefault();
+    if (!newReminder.title || !newReminder.targetDate) return;
+    setIsSaving(true);
+    try {
+      const res = await addReminder({
+        ...newReminder,
+        targetDate: Timestamp.fromDate(new Date(newReminder.targetDate))
+      });
+      if (res.success) {
+        setNewReminder({ title: '', description: '', targetDate: '', type: 'Reminder' });
+        alert("Reminder saved successfully!");
+      }
+    } catch (err) {
+      console.error("Reminder Error:", err);
+      alert("Error saving reminder");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
