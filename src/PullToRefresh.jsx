@@ -66,7 +66,7 @@ const PullToRefresh = ({ onRefresh, children }) => {
   return (
     <div 
       ref={containerRef}
-      className="relative h-full overflow-y-auto no-scrollbar touch-pan-y"
+      className="relative flex-1 h-full overflow-y-auto no-scrollbar touch-pan-y"
       style={{ 
         overscrollBehaviorY: 'contain',
         WebkitOverflowScrolling: 'touch'
