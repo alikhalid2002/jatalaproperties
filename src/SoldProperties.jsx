@@ -43,31 +43,48 @@ const SoldProperties = ({ isAdmin }) => {
             <div 
               key={prop.id}
               onClick={() => handlePropertyClick(prop)}
-              className="bg-slate-800/40 p-4 lg:p-6 rounded-[24px] border border-slate-700/50 hover:bg-slate-800 transition-all duration-300 shadow-xl cursor-pointer group flex items-center justify-between gap-4"
+              className="bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group"
             >
-              <div className="flex items-center gap-4 lg:gap-6">
-                 <div className="text-right">
-                    <h3 className="text-xl lg:text-2xl font-black text-white font-urdu leading-none mb-2">{prop.nameUr}</h3>
-                    <div className="flex items-center gap-3">
-                       <span className={`px-3 py-1 rounded-lg text-[9px] lg:text-[10px] font-black uppercase tracking-widest border font-urdu ${
-                          isPaid ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
-                       }`}>
-                          {isPaid ? 'مکمل ادائیگی' : 'قسط جاری'}
-                       </span>
-                        <div className="flex flex-col text-right">
-                           <span className="text-[8px] lg:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">خریدار</span>
-                           <span className="text-[13px] lg:text-[15px] font-black text-white font-urdu leading-tight">{prop.buyerName}</span>
-                        </div>
-                    </div>
-                 </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                  <div className="text-right hidden sm:block">
-                    <p className="text-[12px] font-black text-white leading-none">Rs. {totalPaid.toLocaleString()}</p>
-                    <p className="text-[8px] font-bold text-slate-500 mt-1 uppercase">Paid</p>
+               <div className="space-y-2 text-center w-full">
+                  <h3 className="text-xl lg:text-2xl font-black text-white font-urdu leading-normal lg:leading-relaxed truncate py-1">{prop.nameUr}</h3>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                     <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
+                        isPaid ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+                     }`}>
+                        {isPaid ? 'مکمل ادائیگی' : 'قسط جاری'}
+                     </span>
+                     <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700">
+                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">خریدار</span>
+                        <span className="text-[13px] font-black text-white font-urdu leading-tight">{prop.buyerName}</span>
+                     </div>
                   </div>
-              </div>
+               </div>
+
+               <div className="w-full space-y-1.5 pt-2 border-t border-slate-700/30 font-urdu mt-1 overflow-hidden">
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-95">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        <span>وصول: {totalPaid.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
+                        <span>باقی: {(totalPrice - totalPaid).toLocaleString()}</span>
+                      </div>
+                  </div>
+                  
+                  <div className="h-2 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner group">
+                    <div 
+                      className={`h-full bg-gradient-to-r ${isPaid ? 'from-emerald-600 to-emerald-400' : 'from-indigo-600 to-indigo-400'} group-hover:opacity-80 transition-all duration-700 rounded-r-sm`}
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+
+                  <div className="flex justify-center">
+                     <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] font-urdu">
+                       کل رقم: {totalPrice.toLocaleString()}
+                     </p>
+                  </div>
+               </div>
             </div>
           );
         })}
