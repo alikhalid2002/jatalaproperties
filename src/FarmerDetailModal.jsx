@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, DollarSign, Map, Scale, Save, Calculator, ImageIcon, Upload, Loader2, ExternalLink, CheckCircle, AlertCircle, FileText, Shield, User, Receipt, CreditCard, Plus, Edit3 } from 'lucide-react';
 import { transliterateToUrdu } from './urduTransliterator';
 
@@ -94,8 +95,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center p-0 lg:p-6 bg-[#0f172a]/80 backdrop-blur-md animate-in fade-in duration-300 overflow-hidden no-scrollbar">
+  const modalContent = (
+    <div className="fixed inset-0 z-[999] flex items-end lg:items-center justify-center p-0 lg:p-6 bg-[#0f172a]/80 backdrop-blur-md animate-in fade-in duration-300">
       <div className="bg-[#1e293b] border-t lg:border border-slate-700 w-full max-w-4xl lg:rounded-[32px] rounded-t-[32px] overflow-hidden shadow-2xl animate-slide-up lg:animate-zoom-in duration-500 flex flex-col relative h-[90vh] lg:h-auto lg:max-h-[85vh]">
         
         {/* Image Preview Popup (Lightbox) */}
@@ -405,6 +406,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    entry={entry} 
                    globalIsEditing={isEditing}
                    setPreviewImage={setPreviewImage}
+                   isAdmin={isAdmin}
                    onUpdate={(updated) => onUpdateHistory(farmer.id, idx, updated)}
                    onDelete={() => {
                      if (window.confirm("Are you sure?")) onDeleteHistory(farmer.id, idx);
@@ -467,13 +469,14 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
              </>
            )}
         </div>
-
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 });
 
-const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImage }) => {
+const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImage, isAdmin }) => {
   const [editData, setEditData] = useState({ ...entry });
 
   // Update local state if the entry props change (e.g. from parent/Firebase)

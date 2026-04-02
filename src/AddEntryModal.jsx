@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save, Plus } from 'lucide-react';
 
 const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
@@ -26,9 +27,9 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-[#1e293b] border border-slate-700 w-full max-w-md p-8 rounded-[32px] shadow-2xl animate-in zoom-in-95 duration-300">
+  const modalContent = (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-[#1e293b] border border-slate-700 w-full max-w-md p-8 rounded-[32px] shadow-2xl animate-in zoom-in-95 duration-300 mx-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-black text-white font-urdu">نیا خرچہ درج کریں</h2>
           <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
@@ -103,6 +104,8 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default AddEntryModal;
