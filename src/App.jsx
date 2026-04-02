@@ -690,6 +690,7 @@ const App = () => {
         isOpen={isAddEntryModalOpen} 
         onClose={() => setIsAddEntryModalOpen(false)} 
         onAdd={addEntry} 
+        isAdmin={accountType === 'ali'}
       />
     </div>
   );

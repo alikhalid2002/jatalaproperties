@@ -523,10 +523,9 @@ const ShopsPage = ({ isAdmin }) => {
                            {editingTransId === item.id ? (
                              <input 
                                type="date"
-                               value={editTransData.date}
-                               onClick={(e) => e.target.showPicker()}
+                               disabled={!isAdmin}
                                onChange={(e) => setEditTransData({...editTransData, date: e.target.value})}
-                               className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-transparent border-b border-indigo-500 outline-none cursor-pointer"
+                               className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-transparent border-b border-indigo-500 outline-none cursor-pointer disabled:opacity-50"
                              />
                            ) : (
                              <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-40">{item.date}</div>
@@ -537,9 +536,10 @@ const ShopsPage = ({ isAdmin }) => {
                               {editingTransId === item.id ? (
                                 <input 
                                   type="number"
+                                  disabled={!isAdmin}
                                   value={editTransData.amount}
                                   onChange={(e) => setEditTransData({...editTransData, amount: e.target.value})}
-                                  className="bg-slate-800 border-b border-indigo-500 text-xl font-black italic text-white leading-none outline-none w-32"
+                                  className="bg-slate-800 border-b border-indigo-500 text-xl font-black italic text-white leading-none outline-none w-32 disabled:opacity-50"
                                 />
                               ) : (
                                 <p className="text-xl font-black italic text-white leading-none">Rs. {Number(item.amount).toLocaleString()}</p>
@@ -551,9 +551,10 @@ const ShopsPage = ({ isAdmin }) => {
                               <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Method</p>
                               {editingTransId === item.id ? (
                                 <select 
+                                  disabled={!isAdmin}
                                   value={editTransData.type}
                                   onChange={(e) => setEditTransData({...editTransData, type: e.target.value})}
-                                  className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-slate-800 border-none outline-none appearance-none cursor-pointer"
+                                  className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-slate-800 border-none outline-none appearance-none cursor-pointer disabled:opacity-50"
                                 >
                                   <option value="Rent">Cash</option>
                                   <option value="Bank">Bank</option>

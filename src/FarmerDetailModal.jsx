@@ -147,7 +147,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                      const isEnglish = /[a-zA-Z]/.test(val);
                      setEditData({...editData, nameUr: isEnglish ? transliterateToUrdu(val) : val});
                    }}
-                   className="bg-transparent border-b border-indigo-500/50 text-center outline-none px-2 w-48"
+                   disabled={!isAdmin}
+                   className="bg-transparent border-b border-indigo-500/50 text-center outline-none px-2 w-48 disabled:opacity-50"
                  />
                ) : farmer.nameUr}
              </h2>
@@ -157,6 +158,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                  <input 
                    type="number"
                    value={editData.landSize}
+                   disabled={!isAdmin}
                    onChange={(e) => {
                      const newSize = e.target.value;
                      const currentTheka = Number(editData.theka) || 0;
@@ -166,7 +168,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                        totalPayable: Math.round(Number(newSize) * currentTheka).toString()
                      }));
                    }}
-                   className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-20"
+                   className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-20 disabled:opacity-50"
                  />
                ) : farmer.landSize} Acres
              </span>
@@ -202,6 +204,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   <input 
                     type="number"
                     value={editData.totalPayable}
+                    disabled={!isAdmin}
                     onChange={(e) => {
                       const newVal = e.target.value;
                       setEditData(prev => {
@@ -213,7 +216,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         };
                       });
                     }}
-                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl"
+                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
                   />
                 ) : (
                   <p className="text-2xl font-black text-white italic">Rs. {Number(farmer.totalPayable)?.toLocaleString() || 0}</p>
@@ -242,6 +245,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   <input 
                     type="number"
                     value={editData.theka}
+                    disabled={!isAdmin}
                     onChange={(e) => {
                       const newTheka = e.target.value;
                       setEditData(prev => {
@@ -253,7 +257,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         };
                       });
                     }}
-                    className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl"
+                    className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
                   />
                 ) : (
                   <p className="text-2xl font-black text-white italic">Rs. {Number(farmer.theka)?.toLocaleString() || 0}</p>
@@ -376,9 +380,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                            <input 
                               type="number"
                               value={amount}
+                              disabled={!isAdmin}
                               onChange={(e) => setAmount(e.target.value)}
                               placeholder="رقم درج کریں..."
-                              className="bg-transparent flex-1 py-5 pr-8 text-right text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none font-urdu"
+                              className="bg-transparent flex-1 py-5 pr-8 text-right text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none font-urdu disabled:opacity-50"
                            />
                         </div>
                      </div>
@@ -489,8 +494,9 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
           <input 
             type="date"
             value={editData.date}
+            disabled={!isAdmin}
             onChange={(e) => handleChange('date', e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none focus:border-indigo-500 transition-colors"
+            className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none focus:border-indigo-500 transition-colors disabled:opacity-50"
           />
         ) : (
           <span className="text-[13px] font-bold text-slate-300">{entry.date}</span>
@@ -502,8 +508,9 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
             <input 
               type="number"
               value={editData.amount}
+              disabled={!isAdmin}
               onChange={(e) => handleChange('amount', e.target.value)}
-              className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none focus:border-indigo-500 transition-colors w-24"
+              className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none focus:border-indigo-500 transition-colors w-24 disabled:opacity-50"
             />
           ) : (
             <span className="text-[13px] font-black text-emerald-400">Rs. {Number(entry.amount)?.toLocaleString()}</span>
@@ -526,8 +533,9 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
         {globalIsEditing ? (
           <select 
             value={editData.method || 'Cash'}
+            disabled={!isAdmin}
             onChange={(e) => handleChange('method', e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer uppercase font-black tracking-widest"
+            className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer uppercase font-black tracking-widest disabled:opacity-50"
           >
             <option value="Cash">Cash</option>
             <option value="Bank Payment">Bank Payment</option>

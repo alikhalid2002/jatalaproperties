@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Save, Plus } from 'lucide-react';
 
-const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
+const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [labelUr, setLabelUr] = useState('');
@@ -14,12 +14,12 @@ const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     setIsSaving(true);
     try {
       await onAdd(type, { amount, labelUr, status, date });
       onClose();
     } catch (error) {
-       // Error is already alerted in the hook, but we need to stop the loading state here
        console.error("Modal Save Error:", error);
     } finally {
       setIsSaving(false);
@@ -43,21 +43,23 @@ const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
             <input 
               type="date" 
               value={date}
+              disabled={!isAdmin}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-bold focus:border-indigo-500 transition-all outline-none cursor-pointer font-urdu"
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-bold focus:border-indigo-500 transition-all outline-none cursor-pointer font-urdu disabled:opacity-50"
               required
             />
           </div>
 
-          {/* Common Expense Selection */}
           <div>
             <label className="block text-[12px] font-black text-slate-400 mb-2 font-urdu">خرچے کی قسم</label>
             <select 
+              disabled={!isAdmin}
+              value={labelUr}
               onChange={(e) => {
                 const val = e.target.value;
                 if (val) setLabelUr(val);
               }}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-bold focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer mb-2 font-urdu"
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-bold focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer mb-2 font-urdu disabled:opacity-50"
             >
               <option value="">-- منتخب کریں --</option>
               <option value="سفر">سفر</option>
@@ -75,21 +77,28 @@ const AddEntryModal = ({ isOpen, onClose, onAdd }) => {
               <input 
                 type="number" 
                 value={amount}
+                disabled={!isAdmin}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none font-urdu"
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none font-urdu disabled:opacity-50"
                 required
               />
             </div>
           </div>
 
-          <button 
-            type="submit"
-            disabled={isSaving}
-            className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 font-urdu text-lg ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isSaving ? 'محفوظ ہو رہا ہے...' : 'ریکارڈ محفوظ کریں'}
-          </button>
+          {isAdmin ? (
+            <button 
+              type="submit"
+              disabled={isSaving}
+              className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 font-urdu text-lg ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isSaving ? 'محفوظ ہو رہا ہے...' : 'ریکارڈ محفوظ کریں'}
+            </button>
+          ) : (
+            <div className="p-4 bg-slate-800/50 rounded-2xl text-center text-rose-400 text-xs font-black uppercase tracking-widest font-urdu">
+              صرف ایڈمن تبدیلی کر سکتا ہے
+            </div>
+          )}
         </form>
       </div>
     </div>
