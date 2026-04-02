@@ -703,6 +703,86 @@ const App = () => {
              </button>
            ))}
         </nav>
+        {/* Notification Drawer */}
+        {isReminderDrawerOpen && (
+          <div className="fixed inset-0 z-[100] flex justify-end">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setIsReminderDrawerOpen(false)}></div>
+            <div className="w-full max-w-md bg-[#0f172a] border-l border-slate-800 h-full shadow-2xl relative flex flex-col animate-in slide-in-from-right duration-500">
+              <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/30">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl">
+                     <Bell size={24} className="animate-bounce" />
+                  </div>
+                  <div>
+                     <h2 className="text-2xl font-black text-white italic leading-none font-urdu">نوٹیفیکیشنز</h2>
+                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Today's Reminders</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsReminderDrawerOpen(false)}
+                  className="p-3 hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 no-scrollbar space-y-4">
+                 {activeReminders.length === 0 ? (
+                   <div className="h-full flex flex-col items-center justify-center opacity-30 gap-6">
+                      <div className="p-8 bg-slate-800 rounded-full">
+                         <CheckCircle size={64} className="text-slate-500" />
+                      </div>
+                      <p className="text-lg font-black uppercase tracking-[0.3em] font-urdu text-center">آج کے لیے کوئی نیا<br/>ریمنڈر نہیں ہے</p>
+                   </div>
+                 ) : (
+                   activeReminders.map(r => (
+                     <div key={r.id} className={`p-6 rounded-[28px] border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/50 transition-all group flex flex-col gap-4`}>
+                        <div className="flex justify-between items-start">
+                           <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                             r.type === 'Warning' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                           }`}>
+                             {r.type}
+                           </div>
+                           <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black italic">
+                             <Clock size={12} />
+                             {r.targetDate?.toDate()?.toLocaleDateString()}
+                           </div>
+                        </div>
+                        <div>
+                           <h3 className="text-xl font-black text-white font-urdu leading-tight mb-2">{r.title}</h3>
+                           <p className="text-[14px] text-slate-400 font-urdu leading-relaxed">{r.description}</p>
+                        </div>
+                        <div className="pt-4 border-t border-slate-700/30 flex gap-2">
+                           <button 
+                             onClick={() => markAsRead(r.id)}
+                             className="flex-1 py-3 bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                           >
+                             <Check size={14} /> Mark as Read
+                           </button>
+                           <button 
+                             onClick={() => deleteReminder(r.id)}
+                             className="p-3 bg-rose-500/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                           >
+                             <Trash2 size={16} />
+                           </button>
+                        </div>
+                     </div>
+                   ))
+                 )}
+              </div>
+
+              <div className="p-8 border-t border-slate-800 bg-slate-900/30">
+                 <button 
+                   onClick={() => { setIsReminderDrawerOpen(false); setActiveTab('Settings'); setExpandedSection('reminders'); }}
+                   className="w-full py-5 bg-slate-800 border border-slate-700 text-white rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-700 transition-all shadow-xl active:scale-95"
+                 >
+                   <Settings size={20} className="text-slate-500" />
+                   <span className="text-[11px] font-black uppercase tracking-widest font-urdu">ریمنڈر مینیج کریں</span>
+                 </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <AddEntryModal 
         isOpen={isAddEntryModalOpen} 
@@ -1282,87 +1362,6 @@ const SettingsPage = ({ entries = [] }) => {
           </div>
         )}
       </section>
-
-      {/* Notification Drawer */}
-      {isReminderDrawerOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-end">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setIsReminderDrawerOpen(false)}></div>
-          <div className="w-full max-w-md bg-[#0f172a] border-l border-slate-800 h-full shadow-2xl relative flex flex-col animate-in slide-in-from-right duration-500">
-            <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/30">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl">
-                   <Bell size={24} className="animate-bounce" />
-                </div>
-                <div>
-                   <h2 className="text-2xl font-black text-white italic leading-none font-urdu">نوٹیفیکیشنز</h2>
-                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Today's Reminders</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsReminderDrawerOpen(false)}
-                className="p-3 hover:bg-slate-800 rounded-2xl transition-all text-slate-400 hover:text-white"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 no-scrollbar space-y-4">
-               {activeReminders.length === 0 ? (
-                 <div className="h-full flex flex-col items-center justify-center opacity-30 gap-6">
-                    <div className="p-8 bg-slate-800 rounded-full">
-                       <CheckCircle size={64} className="text-slate-500" />
-                    </div>
-                    <p className="text-lg font-black uppercase tracking-[0.3em] font-urdu text-center">آج کے لیے کوئی نیا<br/>ریمنڈر نہیں ہے</p>
-                 </div>
-               ) : (
-                 activeReminders.map(r => (
-                   <div key={r.id} className={`p-6 rounded-[28px] border border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/50 transition-all group flex flex-col gap-4`}>
-                      <div className="flex justify-between items-start">
-                         <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                           r.type === 'Warning' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                         }`}>
-                           {r.type}
-                         </div>
-                         <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black italic">
-                           <Clock size={12} />
-                           {r.targetDate?.toDate()?.toLocaleDateString()}
-                         </div>
-                      </div>
-                      <div>
-                         <h3 className="text-xl font-black text-white font-urdu leading-tight mb-2">{r.title}</h3>
-                         <p className="text-[14px] text-slate-400 font-urdu leading-relaxed">{r.description}</p>
-                      </div>
-                      <div className="pt-4 border-t border-slate-700/30 flex gap-2">
-                         <button 
-                           onClick={() => markAsRead(r.id)}
-                           className="flex-1 py-3 bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2"
-                         >
-                           <Check size={14} /> Mark as Read
-                         </button>
-                         <button 
-                           onClick={() => deleteReminder(r.id)}
-                           className="p-3 bg-rose-500/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
-                         >
-                           <Trash2 size={16} />
-                         </button>
-                      </div>
-                   </div>
-                 ))
-               )}
-            </div>
-
-            <div className="p-8 border-t border-slate-800 bg-slate-900/30">
-               <button 
-                 onClick={() => { setIsReminderDrawerOpen(false); setActiveTab('Settings'); setExpandedSection('reminders'); }}
-                 className="w-full py-5 bg-slate-800 border border-slate-700 text-white rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-700 transition-all shadow-xl active:scale-95"
-               >
-                 <Settings size={20} className="text-slate-500" />
-                 <span className="text-[11px] font-black uppercase tracking-widest font-urdu">ریمنڈر مینیج کریں</span>
-               </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
