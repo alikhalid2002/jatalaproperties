@@ -52,8 +52,8 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
         {/* Header */}
         <div className="p-6 lg:p-8 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
           <div className="text-left flex-1 mr-4">
-            <h2 className="text-2xl lg:text-3xl font-black text-white font-urdu">{property.nameUr}</h2>
-            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-1 font-urdu">خریدار: {property.buyerName}</p>
+            <h2 className="text-2xl lg:text-3xl font-black text-white italic uppercase tracking-tighter">{property.nameEn || property.nameUr}</h2>
+            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-1 italic">Buyer: {property.buyerName}</p>
           </div>
 
           <div className="flex items-center gap-4">
@@ -63,7 +63,7 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
               : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
             }`}>
               {isPaid ? <CheckCircle size={16} /> : <Clock size={16} />}
-              <span className="text-[11px] font-black uppercase tracking-widest font-urdu pt-0.5">{isPaid ? 'مکمل ادائیگی' : 'جاری قسطیں'}</span>
+              <span className="text-[11px] font-black uppercase tracking-widest pt-0.5">{isPaid ? 'Fully Paid' : 'Active Installments'}</span>
             </div>
             
             <button 
@@ -79,9 +79,9 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
           {/* Header Stats */}
           <div className="p-6 lg:p-8 bg-slate-900/10 border-b border-slate-700">
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <MiniStat label="Total Sale Price" value={`Rs. ${Number(property.totalPrice || 0).toLocaleString()}`} labelUr="کل قیمت" color="blue" />
-                <MiniStat label="Total Received" value={`Rs. ${Number(property.totalPaid || 0).toLocaleString()}`} labelUr="وصول شدہ رقم" color="emerald" />
-                <MiniStat label="Remaining Balance" value={`Rs. ${Number(property.remainingBalance || 0).toLocaleString()}`} labelUr="بقیہ رقم" color="orange" isHighlight={true} />
+                <MiniStat label="Total Sale Price" value={`Rs. ${Number(property.totalPrice || 0).toLocaleString()}`} color="blue" />
+                <MiniStat label="Total Received" value={`Rs. ${Number(property.totalPaid || 0).toLocaleString()}`} color="emerald" />
+                <MiniStat label="Remaining Balance" value={`Rs. ${Number(property.remainingBalance || 0).toLocaleString()}`} color="orange" isHighlight={true} />
              </div>
           </div>
 
@@ -209,12 +209,11 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
   );
 };
 
-const MiniStat = ({ label, value, labelUr, color, isHighlight }) => (
+const MiniStat = ({ label, value, color, isHighlight }) => (
     <div className={`p-4 rounded-2xl transition-all duration-500 ${isHighlight ? 'bg-orange-500/10 border border-orange-500/30 font-black shadow-lg shadow-orange-500/5' : `bg-slate-800/40 border border-slate-700/50`}`}>
         <div className="flex flex-col items-center text-center gap-1.5">
-            <h4 className="text-[13px] font-black text-white font-urdu leading-none">{labelUr}</h4>
-            <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em]">{label}</p>
-            <p className={`text-sm lg:text-base font-black italic mt-1 ${isHighlight ? 'text-orange-400' : 'text-slate-200'}`}>{value}</p>
+            <h4 className={`text-[13px] font-black uppercase tracking-widest leading-none ${isHighlight ? 'text-orange-400' : 'text-slate-400'}`}>{label}</h4>
+            <p className={`text-base lg:text-lg font-black italic mt-1 ${isHighlight ? 'text-orange-400' : 'text-white'}`}>{value}</p>
         </div>
     </div>
 );

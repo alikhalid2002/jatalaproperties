@@ -21,8 +21,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
       setIsEditing(false);
       setPreviewImage(null);
       setEditData({
-        nameUr: farmer.nameUr || '',
-        nameEn: farmer.nameEn || '',
+        name: farmer.nameEn || farmer.nameUr || '',
         landSize: farmer.landSize || '',
         totalPayable: farmer.totalPayable || (Number(farmer.totalPaid) + Number(farmer.totalRemaining)) || '',
         theka: farmer.theka || 0
@@ -67,8 +66,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
     setIsSaving(true);
     try {
       await onUpdateFarmer(farmer.id, {
-        nameUr: editData.nameUr,
-        nameEn: editData.nameEn,
+        nameEn: editData.name,
         landSize: editData.landSize,
         totalPayable: Number(editData.totalPayable),
         theka: Number(editData.theka)
@@ -138,23 +136,18 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         {/* Header */}
         <div className="p-8 pb-4 flex flex-col items-center justify-center relative">
           <div className="flex items-center gap-3">
-             <h2 className="text-2xl lg:text-3xl font-black text-white font-urdu text-center leading-none">
+             <h2 className="text-2xl lg:text-3xl font-black text-white italic uppercase tracking-tighter text-center leading-none">
                {isEditing ? (
                  <input 
-                   value={editData.nameUr}
-                   dir="rtl"
-                   onChange={(e) => {
-                     const val = e.target.value;
-                     const isEnglish = /[a-zA-Z]/.test(val);
-                     setEditData({...editData, nameUr: isEnglish ? transliterateToUrdu(val) : val});
-                   }}
+                   value={editData.name}
+                   onChange={(e) => setEditData({...editData, name: e.target.value})}
                    disabled={!isAdmin}
                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none px-2 w-48 disabled:opacity-50"
                  />
-               ) : farmer.nameUr}
+               ) : (farmer.nameEn || farmer.nameUr)}
              </h2>
              <span className="text-slate-500 font-black">•</span>
-             <span className="text-lg lg:text-xl font-black text-slate-300 tracking-tighter italic font-urdu">
+             <span className="text-lg lg:text-xl font-black text-slate-300 tracking-tighter italic whitespace-nowrap">
                {isEditing ? (
                  <input 
                    type="number"
@@ -199,7 +192,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-indigo-400">
                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
-                   <span className="text-[11px] font-black uppercase tracking-widest font-urdu">کل واجبات</span>
+                   <span className="text-[11px] font-black uppercase tracking-widest text-indigo-400/80">Annual Dues</span>
                 </div>
                 {isEditing ? (
                   <input 
@@ -226,21 +219,21 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-emerald-400">
                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                   <span className="text-[11px] font-black uppercase tracking-widest font-urdu">کل ادا رقم</span>
+                   <span className="text-[11px] font-black uppercase tracking-widest">Total Paid</span>
                 </div>
                 <p className="text-2xl font-black text-white italic">Rs. {farmer.totalPaid?.toLocaleString() || 0}</p>
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-orange-400">
                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
-                   <span className="text-[11px] font-black uppercase tracking-widest font-urdu">بقایا رقم</span>
+                   <span className="text-[11px] font-black uppercase tracking-widest">Balance Due</span>
                 </div>
                 <p className="text-2xl font-black text-white italic">Rs. {farmer.totalRemaining?.toLocaleString() || 0}</p>
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-violet-400">
                    <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse"></div>
-                   <span className="text-[11px] font-black uppercase tracking-widest font-urdu">ٹھیکہ</span>
+                   <span className="text-[11px] font-black uppercase tracking-widest">Theka Rate</span>
                 </div>
                 {isEditing ? (
                   <input 
@@ -269,21 +262,21 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent mb-10"></div>
 
           {/* Document Vault Section */}
-          <div className="mb-10 font-urdu">
+          <div className="mb-10">
             <div className="flex items-center justify-end gap-2 mb-6">
-               <span className="text-[11px] font-black text-emerald-400/80 uppercase tracking-widest italic">دستاویزات</span>
+               <span className="text-[11px] font-black text-emerald-400/80 uppercase tracking-widest italic">Documents</span>
                <Shield size={12} className="text-emerald-500" />
             </div>
-
+ 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-800/30 border border-slate-700/40 p-5 rounded-[28px] relative group transition-all hover:bg-slate-800/50">
-                  <div className="flex items-center justify-between mb-4 font-urdu">
+                  <div className="flex items-center justify-between mb-4">
                      <div className="flex items-center gap-2">
                         <User size={14} className="text-slate-500" />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">شناختی کارڈ</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National ID</span>
                      </div>
                      {farmer.idCardUrl && (
-                        <button onClick={() => setPreviewImage(farmer.idCardUrl)} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 font-urdu underline">دیکھیں</button>
+                        <button onClick={() => setPreviewImage(farmer.idCardUrl)} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 underline uppercase tracking-widest">View</button>
                      )}
                   </div>
                   
@@ -292,24 +285,24 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                        {isUploadingDoc.idCard ? <Loader2 size={18} className="animate-spin text-indigo-500" /> : (
                          <>
                            <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
-                           <span className="text-[10px] font-black text-slate-500 mt-2 font-urdu">اپ لوڈ کریں</span>
+                           <span className="text-[10px] font-black text-slate-500 mt-2">Upload File</span>
                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.idCardUrl && (
-                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20 font-urdu">دستیاب نہیں</div>
+                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
                   )}
                 </div>
-
+ 
                 <div className="bg-slate-800/30 border border-slate-700/40 p-5 rounded-[28px] relative group transition-all hover:bg-slate-800/50">
-                  <div className="flex items-center justify-between mb-4 font-urdu">
+                  <div className="flex items-center justify-between mb-4">
                      <div className="flex items-center gap-2">
                         <FileText size={14} className="text-slate-500" />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">معاہدہ</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Agreement</span>
                      </div>
                      {farmer.agreementUrl && (
-                        <button onClick={() => window.open(farmer.agreementUrl, '_blank')} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 font-urdu underline">دیکھیں</button>
+                        <button onClick={() => window.open(farmer.agreementUrl, '_blank')} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 underline uppercase tracking-widest">View</button>
                      )}
                   </div>
                   
@@ -318,13 +311,13 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                        {isUploadingDoc.agreement ? <Loader2 size={18} className="animate-spin text-indigo-500" /> : (
                          <>
                            <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
-                           <span className="text-[10px] font-black text-slate-500 mt-2 font-urdu">اپ لوڈ کریں</span>
+                           <span className="text-[10px] font-black text-slate-500 mt-2">Upload Legal</span>
                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.agreementUrl && (
-                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20 font-urdu">دستیاب نہیں</div>
+                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
                   )}
                 </div>
             </div>
@@ -335,8 +328,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           {/* Record New Payment Section - Styled as Shop */}
           {isAdmin && !isEditing && (
             <div className="mb-10 animate-in slide-in-from-top-4 duration-500">
-               <div className="flex items-center justify-end gap-2 mb-6 font-urdu">
-                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">ادائیگی کا اندراج</span>
+               <div className="flex items-center justify-end gap-2 mb-6">
+                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Record New Payment</span>
                   <CreditCard size={12} className="text-indigo-400" />
                </div>
 
@@ -348,33 +341,32 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors mb-4">
                               {file ? <CheckCircle size={32} className="text-emerald-500" /> : <Plus size={32} strokeWidth={1} />}
                            </div>
-                           <div className="text-center font-urdu">
-                              <p className="text-[14px] font-black text-slate-300">تصویر منتخب کریں</p>
-                              <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic font-sans">PNG, JPEG SUPPORT</p>
+                           <div className="text-center">
+                              <p className="text-[14px] font-black text-slate-300">Choose Receipt</p>
+                              <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic">PNG, JPEG SUPPORT</p>
                            </div>
                            <input type="file" className="hidden" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
                         </label>
                      </div>
 
-                     {/* Right: Method & Amount */}
                      <div className="space-y-6">
-                        <div className="flex gap-3 font-urdu">
-                           {['Expense', 'Bank', 'Cash'].reverse().map((m) => (
+                        <div className="flex gap-3">
+                           {['Expense', 'Bank', 'Cash'].map((m) => (
                              <button 
                                 key={m}
-                                onClick={() => setMethod(m === 'Cash' ? 'نقد (Cash)' : m === 'Bank' ? 'بینک ٹرانسفر' : 'اخراجات')}
-                                className={`flex-1 py-4 px-2 text-[12px] font-black rounded-2xl border transition-all font-urdu ${
-                                  (method === 'نقد (Cash)' && m === 'Cash') || (method === 'بینک ٹرانسفر' && m === 'Bank') || (method === 'اخراجات' && m === 'Expense')
+                                onClick={() => setMethod(m)}
+                                className={`flex-1 py-4 px-2 text-[12px] font-black rounded-2xl border transition-all ${
+                                  method === m
                                   ? 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/30' 
                                   : 'bg-slate-900 border-slate-700 text-slate-500 hover:text-slate-300'
                                 }`}
                              >
-                               {m === 'Cash' ? 'نقد' : m === 'Bank' ? 'بینک' : 'اخراجات'}
+                               {m}
                              </button>
                            ))}
                         </div>
 
-                        <div className="relative bg-slate-900/80 border border-slate-700 rounded-[32px] p-2 flex items-center shadow-inner group/input focus-within:border-indigo-500/50 transition-all font-urdu">
+                          <div className="relative bg-slate-900/80 border border-slate-700 rounded-[32px] p-2 flex items-center shadow-inner group/input focus-within:border-indigo-500/50 transition-all font-sans">
                            <div className="w-14 h-14 flex items-center justify-center text-slate-600">
                               <CreditCard size={24} />
                            </div>
@@ -383,10 +375,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                               value={amount}
                               disabled={!isAdmin}
                               onChange={(e) => setAmount(e.target.value)}
-                              placeholder="رقم درج کریں..."
-                              className="bg-transparent flex-1 py-5 pr-8 text-right text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none font-urdu disabled:opacity-50"
+                              placeholder="Enter amount..."
+                              className="bg-transparent flex-1 py-5 pr-8 text-right text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none disabled:opacity-50"
                            />
-                        </div>
+                          </div>
                      </div>
                   </div>
                </div>
@@ -394,9 +386,9 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           )}
 
           {/* History Section */}
-          <div className="animate-in fade-in duration-700 pb-10 font-urdu">
+          <div className="animate-in fade-in duration-700 pb-10">
             <div className="flex items-center justify-end gap-2 mb-8">
-               <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">ادائیگیوں کی تفصیلات</span>
+               <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Payment Details</span>
             </div>
             
             <div className="space-y-4">
@@ -416,7 +408,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                {!farmer.history?.length && (
                  <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
                     <Receipt size={48} className="text-slate-400" />
-                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500 font-urdu">کوئی ریکارڈ موجود نہیں</p>
+                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500">No History Records</p>
                  </div>
                )}
             </div>
@@ -424,31 +416,31 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         </div>
 
         {/* Footer Actions */}
-        <div className="p-8 border-t border-slate-700/50 bg-[#1e293b] flex gap-4 font-urdu">
+        <div className="p-8 border-t border-slate-700/50 bg-[#1e293b] flex gap-4">
            {!isEditing ? (
              <>
                {isAdmin && (
                  <button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="flex-[2] h-16 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:scale-[1.02] active:scale-95 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 text-lg"
+                  className="flex-[2] h-16 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:scale-[1.02] active:scale-95 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 text-lg uppercase tracking-widest"
                  >
-                   {isSaving ? <Loader2 className="animate-spin" /> : <><Receipt size={22} /> ادائیگی درج کریں</>}
+                   {isSaving ? <Loader2 className="animate-spin" /> : <><Receipt size={22} /> Record Payment</>}
                  </button>
                )}
                {isAdmin && (
                  <button 
                   onClick={() => setIsEditing(true)}
-                  className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                  >
-                   تبدیل کریں
+                   Edit
                  </button>
                )}
                <button 
                 onClick={onClose}
-                className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center"
+                className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest"
                >
-                 بند کریں
+                 Close
                </button>
              </>
            ) : (
@@ -456,15 +448,15 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                <button 
                 onClick={handleUpdateInfo}
                 disabled={isSaving}
-                className="flex-[2] h-16 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3"
+                className="flex-[2] h-16 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 uppercase tracking-widest"
                >
-                 {isSaving ? <Loader2 className="animate-spin" /> : <><Save size={22} /> محفوظ کریں</>}
+                 {isSaving ? <Loader2 className="animate-spin" /> : <><Save size={22} /> Save Changes</>}
                </button>
                <button 
                 onClick={() => setIsEditing(false)}
-                className="flex-1 h-16 bg-slate-800 text-slate-400 font-black rounded-2xl transition-all active:scale-95"
+                className="flex-1 h-16 bg-slate-800 text-slate-400 font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest"
                >
-                 کینسل
+                 Cancel
                </button>
              </>
            )}

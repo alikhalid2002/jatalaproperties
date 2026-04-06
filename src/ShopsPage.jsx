@@ -14,7 +14,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import { transliterateToUrdu } from './urduTransliterator';
 
-const FinanceCard = ({ labelUr, year, value, color, icon }) => (
+const FinanceCard = ({ label, year, value, color, icon }) => (
   <div className="bg-slate-800/40 p-2 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[100px] md:min-h-0 relative overflow-hidden group shadow-lg">
     <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
     
@@ -23,8 +23,8 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
     </div>
 
     <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full px-0.5">
-      <span className={`text-${color}-400 text-[10px] md:text-[13px] font-black font-urdu leading-normal block w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)] py-0.5`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{labelUr}</span>
-      <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black font-urdu text-center w-full`}>{year}</span>
+      <span className={`text-${color}-400 text-[10px] md:text-[13px] font-black leading-normal block w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)] py-0.5 uppercase tracking-tighter`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{label}</span>
+      <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black text-center w-full`}>{year}</span>
       <p className="text-[11px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
@@ -116,7 +116,7 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
         type: transType,
         method: paymentMethod, // Store specific method for later use
         amount: amountNum,
-        note: entryNote || (transType === 'Rent' ? 'کرایہ وصولی' : 'مرمت/خرچہ'),
+        note: entryNote || (transType === 'Rent' ? 'Rent Collection' : 'Repair/Expense'),
         date: new Date().toISOString().split('T')[0],
         createdAt: serverTimestamp()
       };
@@ -253,23 +253,23 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
       {/* Financial Summary Cards */}
-      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 font-urdu px-1 w-full text-center">
+      <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 px-1 w-full text-center">
         <FinanceCard 
-          labelUr="دکانوں کی کل متوقع آمدنی"
+          label="Expected Shop Revenue"
           year={shopStats.year}
           value={shopStats.expected}
           color="emerald"
           icon={<ArrowUpRight />}
         />
         <FinanceCard 
-          labelUr="باقی رقم"
+          label="Remaining Balance"
           year={shopStats.year}
           value={shopStats.remaining}
           color="orange"
           icon={<Clock />}
         />
         <FinanceCard 
-          labelUr="کل اخراجات"
+          label="Total Shop Expenses"
           year={shopStats.year}
           value={shopStats.expenses}
           color="rose"
@@ -286,18 +286,18 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
             className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
             <div className="space-y-2 text-center w-full">
-              <h3 className="text-xl lg:text-2xl font-black text-white font-urdu leading-normal lg:leading-relaxed truncate py-1">{shop.tenant}</h3>
+              <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{shop.tenant}</h3>
               <div className="flex flex-wrap items-center justify-center gap-2">
-                 <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border font-urdu ${
+                 <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
                     shop.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
                  }`}>
-                    {shop.status === 'Paid' ? 'ادا شدہ' : 'بقایا'}
+                    {shop.status === 'Paid' ? 'Paid' : 'Pending'}
                  </span>
-                 <span className="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400 font-urdu">{shop.area}</span>
+                 <span className="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400">{shop.area}</span>
               </div>
             </div>
 
-            <div className="w-full space-y-1.5 pt-2 border-t border-slate-700/30 font-urdu mt-1 overflow-hidden">
+            <div className="w-full space-y-1.5 pt-2 border-t border-slate-700/30 mt-1 overflow-hidden">
               {(() => {
                 const status = calculateAnnualProgress(shop);
                 return (
@@ -305,11 +305,11 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-95">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span>وصول: {(Number(status.paid) || 0).toLocaleString()}</span>
+                        <span>Recv: {(Number(status.paid) || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
-                        <span>باقی: {((Number(status.total) || 0) - (Number(status.paid) || 0)).toLocaleString()}</span>
+                        <span>Bal: {((Number(status.total) || 0) - (Number(status.paid) || 0)).toLocaleString()}</span>
                       </div>
                     </div>
                     
@@ -319,10 +319,10 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
                         style={{ width: `${Number(status.percent) || 0}%` }}
                       ></div>
                     </div>
-
+ 
                     <div className="flex justify-center">
-                       <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] font-urdu">
-                         کرایہ: {(Number(shop.rent) || 0).toLocaleString()}
+                       <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
+                         Annual Rent: {(Number(shop.rent || 0) * 12).toLocaleString()} 
                        </p>
                     </div>
                   </>
@@ -374,7 +374,7 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
               
               {/* Shop Identity - Always Visible */}
               <div className="flex items-center gap-4 mb-6">
-                <h2 className="text-3xl lg:text-4xl font-black text-white font-urdu italic leading-none">{selectedShop.tenant}</h2>
+                <h2 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-none">{selectedShop.tenant}</h2>
                 <div className="w-2 h-2 rounded-full bg-slate-700"></div>
                 <p className="text-2xl font-black italic text-slate-300">{selectedShop.area || '12x15'}</p>
               </div>
@@ -387,14 +387,9 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
                    </div>
                   <input 
                     value={editData.tenant}
-                    dir="rtl"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const isEnglish = /[a-zA-Z]/.test(val);
-                      setEditData({...editData, tenant: isEnglish ? transliterateToUrdu(val) : val});
-                    }}
-                    className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-8 text-2xl font-urdu text-white text-center leading-[2.5] w-full"
-                    placeholder="Type name (e.g. 'ali')"
+                    onChange={(e) => setEditData({...editData, tenant: e.target.value})}
+                    className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-8 text-2xl font-black uppercase text-white text-center leading-[2.5] w-full italic"
+                    placeholder="Tenant Name"
                   />
                   <div className="flex gap-4">
                     <input 
@@ -420,27 +415,27 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
             <div className={`flex-1 overflow-y-auto no-scrollbar p-8 lg:p-12 ${isEditing ? 'space-y-0' : 'space-y-12'}`}>
               
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold uppercase tracking-widest italic">
                  <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-indigo-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-indigo-400 opacity-60">
                        <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest font-urdu">کل واجبات</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest">Annual Dues</span>
                     </div>
-                    <p className="text-2xl font-black italic text-white">Rs. {Number(selectedShop.rent || 0).toLocaleString()}</p>
+                    <p className="text-2xl font-black italic text-white">Rs. {Number((selectedShop.rent || 0) * 12).toLocaleString()}</p>
                  </div>
                  <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-emerald-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-emerald-400 opacity-60">
                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest font-urdu">کل ادا رقم</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest">Total Received</span>
                     </div>
                     <p className="text-2xl font-black italic text-white">Rs. {getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0).toLocaleString()}</p>
                  </div>
                  <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-orange-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-orange-400 opacity-60">
                        <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest font-urdu">بقایا رقم</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest">Balance Due</span>
                     </div>
-                    <p className="text-2xl font-black italic text-white">Rs. {Math.max(0, Number(selectedShop.rent || 0) - getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
+                    <p className="text-2xl font-black italic text-white">Rs. {Math.max(0, Number((selectedShop.rent || 0) * 12) - getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
                  </div>
               </div>
 
@@ -688,23 +683,23 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
             <div className="p-8 lg:p-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-xl grid grid-cols-1 md:grid-cols-3 gap-6">
                <button 
                 onClick={() => setSelectedShop(null)}
-                className={`py-5 px-8 rounded-3xl border border-slate-700 font-urdu text-[16px] text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'md:order-1' : ''}`}
-              >بند کریں</button>
+                className={`py-5 px-8 rounded-3xl border border-slate-700 tracking-widest text-white uppercase italic tracking-tighter text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'md:order-1' : ''}`}
+              >Close</button>
               {isAdmin && (
                 <button 
                   onClick={() => isEditing ? handleUpdateShop() : setIsEditing(true)}
-                  className={`py-5 px-8 rounded-3xl border font-urdu text-[16px] transition-all order-3 md:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                  className={`py-5 px-8 rounded-3xl border tracking-widest text-white uppercase italic tracking-tighter transition-all order-3 md:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
                 >
-                  {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'محفوظ کریں' : 'تبدیل کریں'}
+                  {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'Save Changes' : 'Edit Info'}
                 </button>
               )}
               {isAdmin && (
                 <button 
                   disabled={isSaving || isEditing}
                   onClick={handleSaveTransaction}
-                  className={`py-5 px-8 rounded-3xl font-urdu text-[16px] text-white shadow-xl transition-all flex items-center justify-center gap-3 order-1 md:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
+                  className={`py-5 px-8 rounded-3xl tracking-widest text-white uppercase italic tracking-tighter text-white shadow-xl transition-all flex items-center justify-center gap-3 order-1 md:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
                 >
-                  {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Save size={18}/> کرایہ درج کریں</>}
+                  {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Save size={18}/> Record Payment</>}
                 </button>
               )}
             </div>

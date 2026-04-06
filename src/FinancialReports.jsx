@@ -9,20 +9,20 @@ import { transliterateToUrdu } from './urduTransliterator';
 const CATEGORY_MAP = (entry) => {
   if (entry.type === 'shop_expense') return 'Shop Repair';
   if (entry.type === 'revenue') return entry.status === 'received' ? 'Rent Received' : 'Rent Pending';
-  if (entry.labelUr?.includes('(')) return entry.labelUr.split('(')[1].replace(')', '');
-  const text = (entry.labelUr || entry.note || '');
-  if (text.includes('سفر') || text.includes('Travel')) return 'Travel';
-  if (text.includes('بل') || text.includes('Bill')) return 'Utility';
-  if (text.includes('تنخواہ') || text.includes('Salary')) return 'Salary';
-  if (text.includes('مرمت') || text.includes('Repair')) return 'Maintenance';
+  if (entry.label?.includes('(')) return entry.label.split('(')[1].replace(')', '');
+  const text = (entry.label || entry.note || '');
+  if (text.toLowerCase().includes('travel') || text.toLowerCase().includes('fuel')) return 'Travel';
+  if (text.toLowerCase().includes('bill')) return 'Utility';
+  if (text.toLowerCase().includes('salary')) return 'Salary';
+  if (text.toLowerCase().includes('repair') || text.toLowerCase().includes('maintenance')) return 'Maintenance';
   return 'Operational';
 };
 
 const TYPE_CONFIG = {
-  revenue:      { label: 'آمدنی',     color: 'emerald' },
-  pending:      { label: 'بقایا',     color: 'amber'   },
-  expense:      { label: 'خرچہ',     color: 'rose'    },
-  shop_expense: { label: 'مرمت', color: 'orange'  },
+  revenue:      { label: 'Revenue',     color: 'emerald' },
+  pending:      { label: 'Pending',     color: 'amber'   },
+  expense:      { label: 'Expense',     color: 'rose'    },
+  shop_expense: { label: 'Repair',      color: 'orange'  },
 };
 
 const BADGE_COLORS = {
@@ -47,13 +47,13 @@ const SummaryCard = ({ label, year, value, sub, icon, color }) => (
                 {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
             </div>
             <div className="flex flex-col items-center text-center w-full px-0.5">
-              <span className={`text-${color}-400 text-[9px] md:text-sm font-black font-urdu leading-tight whitespace-nowrap overflow-hidden w-full`}>{label}</span>
-              <span className={`text-${color}-400 opacity-80 text-[6.5px] md:text-xs font-black font-urdu`}>{year}</span>
+              <span className={`text-${color}-400 text-[9px] md:text-sm font-black leading-tight whitespace-nowrap overflow-hidden w-full uppercase tracking-tighter`}>{label}</span>
+              <span className={`text-${color}-400 opacity-80 text-[6.5px] md:text-xs font-black`}>{year}</span>
             </div>
         </div>
         <div className="relative z-10 text-center w-full px-0.5">
             <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
-            <span className="text-slate-500 text-[6.5px] md:text-xs font-black font-urdu hidden md:block">{sub}</span>
+            <span className="text-slate-500 text-[6.5px] md:text-xs font-black hidden md:block uppercase tracking-widest">{sub}</span>
         </div>
     </div>
 );
@@ -61,7 +61,7 @@ const SummaryCard = ({ label, year, value, sub, icon, color }) => (
 function TypeBadge({ type }) {
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.expense;
   return (
-    <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-black border font-urdu ${BADGE_COLORS[cfg.color]}`}>
+    <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-black border uppercase tracking-widest ${BADGE_COLORS[cfg.color]}`}>
       {cfg.label}
     </span>
   );
@@ -84,7 +84,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
       ...e,
       _type: rowType,
       _date: date,
-      _description: e.labelUr || e.note || e.description || e.tenant || '—',
+      _description: e.label || e.note || e.description || e.tenant || '—',
       _asset: e.shopName || e.farmerName || e.target || '—',
       _category: CATEGORY_MAP(e),
     };
@@ -196,11 +196,11 @@ export default function FinancialReports({ entries = [], selectedYear }) {
             <BarChart3 size={24} />
           </div>
           <div>
-            <h2 className="text-2xl lg:text-4xl font-black text-white italic leading-none font-urdu">
-              مالیاتی رپورٹس
+            <h2 className="text-2xl lg:text-4xl font-black text-white italic leading-none uppercase tracking-tighter">
+              Financial Reports
             </h2>
-            <p className="text-[10px] lg:text-xs font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-3 italic font-urdu">
-              تمام ریکارڈز • {selectedYear}-{Number(selectedYear) - 1}
+            <p className="text-[10px] lg:text-xs font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-3 italic">
+              All Records • {selectedYear}-{Number(selectedYear) - 1}
             </p>
           </div>
         </div>
@@ -212,14 +212,10 @@ export default function FinancialReports({ entries = [], selectedYear }) {
             <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input
               type="text"
-              placeholder="تلاش کریں..."
+              placeholder="Search reports..."
               value={search}
-              onChange={e => {
-                const val = e.target.value;
-                const isEnglish = /[a-zA-Z]/.test(val);
-                setSearch(isEnglish ? transliterateToUrdu(val) : val);
-              }}
-              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all font-urdu text-center"
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all text-center uppercase font-black italic tracking-widest"
             />
             {search && (
               <button
@@ -243,10 +239,10 @@ export default function FinancialReports({ entries = [], selectedYear }) {
             </button>
             <button
               onClick={() => setShowFilters(f => !f)}
-              className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-2xl text-[11px] lg:text-[12px] font-black border transition-all font-urdu ${showFilters ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/40'}`}
+              className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-2xl text-[11px] lg:text-[12px] font-black border transition-all uppercase tracking-widest ${showFilters ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/40'}`}
             >
               <SlidersHorizontal size={13} />
-              فلٹر
+              Filter
               {hasFilters && <span className="w-2 h-2 bg-indigo-400 rounded-full" />}
             </button>
           </div>
@@ -256,36 +252,36 @@ export default function FinancialReports({ entries = [], selectedYear }) {
       {/* Financial Summary Cards: Strictly single row on mobile */}
       <div className="grid grid-cols-4 gap-1 md:gap-4 mb-10 w-full px-1">
         <SummaryCard 
-          label="کل آمدنی"    
+          label="Total Revenue"    
           year={`${selectedYear}-${Number(selectedYear)-1}`}
           value={totals.revenue}    
           color="emerald" 
           icon={<ArrowUpRight />}   
-          sub={`${filtered.filter(r=>r._type==='revenue').length} ادائیگی`}
+          sub={`${filtered.filter(r=>r._type==='revenue').length} Received`}
         />
         <SummaryCard 
-          label="بقایا وصولی"    
+          label="Pending Dues"    
           year={`${selectedYear}-${Number(selectedYear)-1}`}
           value={totals.pending}    
           color="amber"   
           icon={<Clock />}          
-          sub={`${filtered.filter(r=>r._type==='pending').length} بقایا`}
+          sub={`${filtered.filter(r=>r._type==='pending').length} Pending`}
         />
         <SummaryCard 
-          label="کل خرچہ"   
+          label="Total Expense"   
           year={`${selectedYear}-${Number(selectedYear)-1}`}
           value={totals.expense}    
           color="rose"    
           icon={<ArrowDownRight />} 
-          sub={`${filtered.filter(r=>r._type==='expense').length} ریکارڈ`}
+          sub={`${filtered.filter(r=>r._type==='expense').length} Records`}
         />
         <SummaryCard 
-          label="مرمت دکان" 
+          label="Shop Repairs" 
           year={`${selectedYear}-${Number(selectedYear)-1}`}
           value={totals.shopRepair} 
           color="orange"  
           icon={<Store />}         
-          sub={`${filtered.filter(r=>r._type==='shop_expense').length} مرمت`}
+          sub={`${filtered.filter(r=>r._type==='shop_expense').length} Repair Logs`}
         />
       </div>
 
@@ -296,7 +292,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
 
             {/* Type */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 font-urdu">قسم</label>
+              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">Type</label>
               <div className="flex flex-wrap gap-2">
                 {types.map(t => (
                   <button
@@ -312,7 +308,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
 
             {/* Category */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 font-urdu">کیٹیگری</label>
+              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">Category</label>
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
@@ -324,7 +320,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
 
             {/* Date From */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 font-urdu">شروع تاریخ</label>
+              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">From Date</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -335,7 +331,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
 
             {/* Date To */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 font-urdu">ختم تاریخ</label>
+              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">To Date</label>
               <input
                 type="date"
                 value={dateTo}
@@ -373,19 +369,19 @@ export default function FinancialReports({ entries = [], selectedYear }) {
               <tr className="border-b border-slate-700/50">
                 <th
                   onClick={() => toggleSort('date')}
-                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none font-urdu"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none italic"
                 >
-                  تاریخ {sortField === 'date' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
+                  Date {sortField === 'date' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">قسم</th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">کیٹیگری</th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">تفصیل</th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest font-urdu">پراپرٹی / دکان</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Type</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Category</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Description</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Property / Shop</th>
                 <th
                   onClick={() => toggleSort('amount')}
-                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right cursor-pointer hover:text-white transition-colors select-none font-urdu"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right cursor-pointer hover:text-white transition-colors select-none italic"
                 >
-                  رقم {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
+                  Amount {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
               </tr>
             </thead>
@@ -412,11 +408,11 @@ export default function FinancialReports({ entries = [], selectedYear }) {
                     <span className="text-[11px] font-black text-white uppercase tracking-widest">{entry._category}</span>
                   </td>
                   <td className="p-5 max-w-[200px]">
-                    <p className="text-white font-bold text-[15px] leading-snug truncate font-urdu">{entry._description}</p>
+                    <p className="text-white font-bold text-[15px] leading-snug truncate italic">{entry._description}</p>
                   </td>
                   <td className="p-5">
                     {entry._asset && entry._asset !== '—'
-                      ? <span className="text-[11px] font-black text-white/70 uppercase tracking-widest font-urdu">{entry._asset}</span>
+                      ? <span className="text-[11px] font-black text-white/70 uppercase tracking-widest italic">{entry._asset}</span>
                       : <span className="text-[11px] text-slate-700 font-bold">—</span>
                     }
                   </td>

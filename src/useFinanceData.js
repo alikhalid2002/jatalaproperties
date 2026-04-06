@@ -72,7 +72,7 @@ export const useFinanceData = (selectedYear) => {
                     if (itemYear === selectedYear) {
                         if (data.type === 'Rent') {
                             totalRev += Number(data.amount) || 0;
-                            allEntries.push({ id: doc.id, type: 'revenue', ...data, labelUr: `دکان کرایہ (${data.shopName || ''})` });
+                            allEntries.push({ id: doc.id, type: 'revenue', ...data, label: `Shop Rent (${data.shopName || ''})` });
                         } else {
                             totalExp += Number(data.amount) || 0;
                             allEntries.push({ id: doc.id, type: 'shop_expense', ...data });
@@ -94,7 +94,7 @@ export const useFinanceData = (selectedYear) => {
                                     type: 'revenue', 
                                     amount: h.amount, 
                                     date: h.date, 
-                                    labelUr: `ادائیگی: ${f.nameUr}`,
+                                    label: `Payment: ${f.nameEn || f.nameUr}`,
                                     status: 'received'
                                 });
                             }

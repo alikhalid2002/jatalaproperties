@@ -30,8 +30,7 @@ export const useGlobalActivity = () => {
           allF.push({
             id: `f_${doc.id}_${h.date}_${h.amount}`,
             type: 'Farmer Payment',
-            labelUr: `قسط وصولی - ${data.nameUr}`,
-            labelEn: `Payment from ${data.nameEn}`,
+            label: `Payment from ${data.nameEn || data.nameUr}`,
             amount: Number(h.amount),
             date: h.date,
             method: h.method || 'Cash',
@@ -51,8 +50,7 @@ export const useGlobalActivity = () => {
         return {
           id: doc.id,
           type: data.type === 'Rent' ? 'Shop Rent' : 'Shop Repair',
-          labelUr: data.type === 'Rent' ? `کرایہ وصولی - ${data.shopName || 'Shop'}` : `مرمت دکان - ${data.shopName || 'Shop'}`,
-          labelEn: data.type === 'Rent' ? `Rent Received - ${data.shopName || 'Shop'}` : `Repair - ${data.shopName || 'Shop'}`,
+          label: data.type === 'Rent' ? `Rent Received - ${data.shopName || 'Shop'}` : `Repair - ${data.shopName || 'Shop'}`,
           amount: Number(data.amount),
           date: data.date || new Date().toISOString().split('T')[0],
           method: data.method || 'Cash',
@@ -73,8 +71,7 @@ export const useGlobalActivity = () => {
           allP.push({
             id: `p_${doc.id}_${inst.id}`,
             type: 'Property Installment',
-            labelUr: `پراپرٹی قسط - ${data.nameUr}`,
-            labelEn: `Installment - ${data.nameUr}`,
+            label: `Installment - ${data.nameEn || data.nameUr}`,
             amount: Number(inst.amount),
             date: inst.date,
             method: inst.method || 'Cash',
@@ -94,8 +91,7 @@ export const useGlobalActivity = () => {
         return {
           id: doc.id,
           type: 'Expense',
-          labelUr: data.labelUr || 'اخراجات',
-          labelEn: data.labelEn || 'General Expense',
+          label: data.labelEn || data.labelUr || 'General Expense',
           amount: Number(data.amount),
           date: data.date || new Date().toISOString().split('T')[0],
           section: 'Land',
