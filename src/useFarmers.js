@@ -63,7 +63,8 @@ export const useFarmers = () => {
   const [farmers, setFarmers] = useState(() => {
     try {
       const cached = localStorage.getItem('jatala_farmers_cache');
-      return cached ? JSON.parse(cached) : [];
+      const parsed = cached ? JSON.parse(cached) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
       console.warn("Failed to parse farmers cache:", e);
       return [];

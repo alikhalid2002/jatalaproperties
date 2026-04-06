@@ -86,6 +86,7 @@ const App = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [expandedSection, setExpandedSection] = useState(null);
 
   const handleAdminLogin = (e) => {
     e?.preventDefault();
@@ -98,7 +99,6 @@ const App = () => {
     }
   };
 
-  // Stats Data from Firebase
   const { 
     revenue: revenueVal = 0, 
     pending: pendingVal = 0, 
@@ -152,9 +152,6 @@ const App = () => {
 
   const loading = financeLoading || activityLoading || farmersLoading;
 
-  const totalComparison = revenueVal + pendingVal;
-  const revenuePercent = totalComparison > 0 ? Math.round((revenueVal / totalComparison) * 100) : 0;
-  const pendingPercent = totalComparison > 0 ? Math.round((pendingVal / totalComparison) * 100) : 0;
 
   // Prepare chart data (Monthly trend)
   const chartData = useMemo(() => {
@@ -180,7 +177,7 @@ const App = () => {
     { id: 'Settings', labelUr: 'ترتیبات', icon: <Settings size={20} /> }
   ];
 
-  const years = ['2024', '2025', '2026', '2027', '2028', '2029', '2030'];
+  // No-op - years removed
 
   if (!accountType) {
     return (
@@ -661,7 +658,7 @@ const App = () => {
                   <SoldProperties isAdmin={isAdmin} />
                 </Suspense>
               ) : activeTab === 'Settings' ? (
-                isAdmin ? <SettingsPage entries={entries} /> : (
+                isAdmin ? <SettingsPage entries={entries} expandedSection={expandedSection} setExpandedSection={setExpandedSection} /> : (
                   <div className="flex flex-col items-center justify-center flex-1 opacity-20 py-40">
                     <Settings size={64} className="mb-6 text-slate-500"/>
                     <h2 className="text-3xl font-black text-white font-urdu">رسائی کی اجازت نہیں</h2>
@@ -810,8 +807,8 @@ const FinanceCard = ({ labelUr, year, value, color, icon }) => (
   </div>
 );
 
-const SettingsPage = ({ entries = [] }) => {
-  const { farmers, deleteFarmer } = useFarmers();
+const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => {
+  const { farmers, deleteFarmer, addNewFarmer } = useFarmers();
   const { 
     reminders, 
     addReminder, 
@@ -823,7 +820,6 @@ const SettingsPage = ({ entries = [] }) => {
   const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
   const [shops, setShops] = useState([]);
   const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
-  const [expandedSection, setExpandedSection] = useState(null);
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isExporting, setIsExporting] = useState(false);

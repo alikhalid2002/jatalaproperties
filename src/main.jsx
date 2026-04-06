@@ -3,19 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-// EMERGENCY: Kill all Service Workers and Clear All Caches once and for all
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    registrations.forEach(reg => {
-      console.log('Unregistering Service Worker:', reg.active?.scriptURL);
-      reg.unregister().then(() => {
-        console.log('SW Unregistration Success');
-        // Force reload from server
-        window.location.reload(true);
-      });
-    });
-  });
-}
+// Service workers and caches will be handled by the Vite PWA plugin
+
 
 if ('caches' in window) {
   caches.keys().then(names => {
