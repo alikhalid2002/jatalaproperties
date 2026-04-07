@@ -190,21 +190,6 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
       {/* ── Header row ─────────────────────────────────────────── */}
       <div className="flex flex-col lg:items-start justify-start gap-6 lg:gap-4 mb-8 text-left">
         
-        {/* Row 1: Icon + Title + Year */}
-        <div className="flex flex-col items-start gap-3 min-w-0">
-          <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 mb-2">
-            <BarChart3 size={24} />
-          </div>
-          <div>
-            <h2 className="text-2xl lg:text-4xl font-black text-white italic leading-none uppercase tracking-tighter">
-              Financial Reports
-            </h2>
-            <p className="text-[10px] lg:text-xs font-black text-indigo-400/60 uppercase tracking-[0.3em] mt-3 italic">
-              All Records • {selectedYear}-{Number(selectedYear) - 1}
-            </p>
-          </div>
-        </div>
-
         {/* Row 2: Search + Actions (Records, Excel, Filter) */}
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start gap-3 lg:gap-4 w-full lg:w-auto">
           {/* Compact search */}
