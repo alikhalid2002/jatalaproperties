@@ -372,11 +372,11 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                  </button>
               </div>
               
-              {/* Shop Identity - Always Visible */}
-              <div className="flex items-center gap-4 mb-6">
-                <h2 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-none">{selectedShop.tenantEn || transliterateToEnglish(selectedShop.tenant)}</h2>
-                <div className="w-2 h-2 rounded-full bg-slate-700"></div>
-                <p className="text-2xl font-black italic text-slate-300">{selectedShop.area || '12x15'}</p>
+              {/* Shop Identity - Optimized for mobile */}
+              <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 mb-4 lg:mb-6">
+                <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-tight">{selectedShop.tenantEn || transliterateToEnglish(selectedShop.tenant)}</h2>
+                <div className="hidden lg:block w-2 h-2 rounded-full bg-slate-700"></div>
+                <p className="text-xl lg:text-2xl font-black italic text-slate-400 opacity-80">{selectedShop.area || '12x15'}</p>
               </div>
 
               {isEditing && (
@@ -416,26 +416,26 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
               
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold uppercase tracking-widest italic">
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-indigo-500/30 transition-all">
+                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-indigo-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-indigo-400 opacity-60">
-                       <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest">Annual Dues</span>
+                       <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Annual Dues</span>
                     </div>
-                    <p className="text-2xl font-black italic text-white">Rs. {Number((selectedShop.rent || 0) * 12).toLocaleString()}</p>
+                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Number((selectedShop.rent || 0) * 12).toLocaleString()}</p>
                  </div>
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-emerald-500/30 transition-all">
+                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-emerald-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-emerald-400 opacity-60">
-                       <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest">Total Received</span>
+                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Received</span>
                     </div>
-                    <p className="text-2xl font-black italic text-white">Rs. {getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0).toLocaleString()}</p>
+                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0).toLocaleString()}</p>
                  </div>
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-8 rounded-[32px] text-center space-y-4 hover:border-orange-500/30 transition-all">
+                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-orange-500/30 transition-all">
                     <div className="flex items-center justify-center gap-2 text-orange-400 opacity-60">
-                       <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                       <span className="text-[10px] font-black uppercase tracking-widest">Balance Due</span>
+                       <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Balance</span>
                     </div>
-                    <p className="text-2xl font-black italic text-white">Rs. {Math.max(0, Number((selectedShop.rent || 0) * 12) - getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
+                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Math.max(0, Number((selectedShop.rent || 0) * 12) - getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
                  </div>
               </div>
 
@@ -679,27 +679,27 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="p-8 lg:p-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-xl grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Actions Optimized for all screens */}
+            <div className="p-6 lg:p-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-xl flex gap-3 lg:gap-6">
                <button 
                 onClick={() => setSelectedShop(null)}
-                className={`py-5 px-8 rounded-3xl border border-slate-700 tracking-widest text-white uppercase italic tracking-tighter text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'md:order-1' : ''}`}
+                className={`flex-1 h-14 lg:h-16 rounded-2xl border border-slate-700 text-[10px] lg:text-sm font-black uppercase tracking-widest text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'lg:order-1' : ''}`}
               >Close</button>
               {isAdmin && (
                 <button 
                   onClick={() => isEditing ? handleUpdateShop() : setIsEditing(true)}
-                  className={`py-5 px-8 rounded-3xl border tracking-widest text-white uppercase italic tracking-tighter transition-all order-3 md:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                  className={`flex-1 h-14 lg:h-16 rounded-2xl border text-[10px] lg:text-sm font-black uppercase tracking-widest transition-all order-3 lg:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
                 >
-                  {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'Save Changes' : 'Edit Info'}
+                  {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'Save' : 'Edit'}
                 </button>
               )}
               {isAdmin && (
                 <button 
                   disabled={isSaving || isEditing}
                   onClick={handleSaveTransaction}
-                  className={`py-5 px-8 rounded-3xl tracking-widest text-white uppercase italic tracking-tighter text-white shadow-xl transition-all flex items-center justify-center gap-3 order-1 md:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
+                  className={`flex-[2] h-14 lg:h-16 rounded-2xl text-[10px] lg:text-[13px] font-black uppercase tracking-tighter lg:tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2 lg:gap-3 order-1 lg:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
                 >
-                  {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Save size={18}/> Record Payment</>}
+                  {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Receipt size={18} className="hidden sm:block" /> Record Payment</>}
                 </button>
               )}
             </div>
