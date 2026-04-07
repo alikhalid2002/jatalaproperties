@@ -38,12 +38,14 @@ button, [role="button"], label.cursor-pointer, .cursor-pointer {
 }
 
 button:active, [role="button"]:active, label.cursor-pointer:active, .cursor-pointer:active {
-  transform: scale(0.96) !important;
-  filter: brightness(1.1);
+  transform: scale(0.92) !important;
+  filter: brightness(0.8) !important;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.4) !important;
+  transition-duration: 0.05s;
 }
 
 button:hover, [role="button"]:hover, label.cursor-pointer:hover, .cursor-pointer:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.1);
 }
 
 /* Custom scrollbar to match the midnight theme */
