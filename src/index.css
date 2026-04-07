@@ -31,6 +31,21 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* Premium Button Interactions */
+button, [role="button"], label.cursor-pointer, .cursor-pointer {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active, [role="button"]:active, label.cursor-pointer:active, .cursor-pointer:active {
+  transform: scale(0.96) !important;
+  filter: brightness(1.1);
+}
+
+button:hover, [role="button"]:hover, label.cursor-pointer:hover, .cursor-pointer:hover {
+  filter: brightness(1.05);
+}
+
 /* Custom scrollbar to match the midnight theme */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

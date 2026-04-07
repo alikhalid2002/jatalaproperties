@@ -72,6 +72,34 @@ const App = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
+  
+  // 🔊 PREMIUM AUDIO FEEDBACK: Subtle click sound for interactions
+  useEffect(() => {
+    const playClick = () => {
+      try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, context.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.04, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(context.destination);
+        osc.start();
+        osc.stop(context.currentTime + 0.05);
+      } catch (e) { /* Audio context might be blocked */ }
+    };
+
+    const handleGlobalClick = (e) => {
+      const target = e.target.closest('button, [role="button"], label.cursor-pointer, .cursor-pointer');
+      if (target) playClick();
+    };
+
+    window.addEventListener('mousedown', handleGlobalClick);
+    return () => window.removeEventListener('mousedown', handleGlobalClick);
+  }, []);
 
   const handleAdminLogin = (e) => {
     e?.preventDefault();
