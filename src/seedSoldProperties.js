@@ -5,7 +5,8 @@ export const seedSoldProperties = async () => {
     const properties = [
         {
             nameUr: 'پلاٹ #12 - بلاک بی',
-            buyerName: 'محمد احمد',
+            nameEn: 'Plot #12 - Block B',
+            buyerName: 'Muhammad Ahmad',
             totalPrice: 2500000,
             status: 'Ongoing Installments',
             installments: [
@@ -15,7 +16,8 @@ export const seedSoldProperties = async () => {
         },
         {
             nameUr: 'کمرشل شاپ #5 - مین روڈ',
-            buyerName: 'عثمان غنی',
+            nameEn: 'Commercial Shop #5 - Main Road',
+            buyerName: 'Usman Ghani',
             totalPrice: 4500000,
             status: 'Ongoing Installments',
             installments: [
@@ -24,7 +26,8 @@ export const seedSoldProperties = async () => {
         },
         {
             nameUr: 'پلاٹ #45 - سیکٹر ڈی',
-            buyerName: 'ارسلان خان',
+            nameEn: 'Plot #45 - Sector D',
+            buyerName: 'Arslan Khan',
             totalPrice: 1200000,
             status: 'Fully Paid',
             installments: [

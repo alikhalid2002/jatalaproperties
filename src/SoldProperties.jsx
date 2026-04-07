@@ -3,7 +3,7 @@ import { useSoldProperties } from './useSoldProperties';
 import { Home, User, CreditCard, ChevronRight, CheckCircle, Clock } from 'lucide-react';
 import SoldPropertyDetailModal from './SoldPropertyDetailModal';
 import { seedSoldProperties } from './seedSoldProperties';
-import { transliterateToUrdu } from './urduTransliterator';
+import { transliterateToEnglish, transliterateToUrdu } from './urduTransliterator';
 
 const SoldProperties = ({ isAdmin }) => {
   const { properties, loading, recordInstallment, addProperty, deleteProperty } = useSoldProperties();
@@ -46,7 +46,7 @@ const SoldProperties = ({ isAdmin }) => {
               className="bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group"
             >
                <div className="space-y-2 text-center w-full">
-                  <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{prop.nameEn || prop.nameUr}</h3>
+                  <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{prop.nameEn || transliterateToEnglish(prop.nameUr)}</h3>
                   <div className="flex flex-wrap items-center justify-center gap-2">
                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
                         isPaid ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
@@ -55,7 +55,7 @@ const SoldProperties = ({ isAdmin }) => {
                      </span>
                      <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700">
                         <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">Buyer</span>
-                        <span className="text-[13px] font-black text-white leading-tight italic">{prop.buyerName}</span>
+                        <span className="text-[13px] font-black text-white leading-tight italic">{prop.buyerNameEn || transliterateToEnglish(prop.buyerName)}</span>
                      </div>
                   </div>
                </div>
