@@ -163,7 +163,7 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
                     <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Date</th>
                     <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Amount</th>
                     <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Method</th>
-                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500 text-right">Balance</th>
+                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500 text-left">Balance</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
@@ -178,7 +178,7 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
                       <td className="py-4 p-2">
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{inst.method}</span>
                       </td>
-                      <td className="py-4 p-2 text-right">
+                      <td className="py-4 p-2 text-left">
                         <span className="text-[11px] font-black text-slate-400 italic">Rs. {Number(inst.remainingBalanceAfter || 0).toLocaleString()}</span>
                       </td>
                     </tr>

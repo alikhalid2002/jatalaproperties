@@ -263,7 +263,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
 
           {/* Document Vault Section */}
           <div className="mb-10">
-            <div className="flex items-center justify-end gap-2 mb-6">
+            <div className="flex items-center justify-start gap-2 mb-6">
                <span className="text-[11px] font-black text-emerald-400/80 uppercase tracking-widest italic">Documents</span>
                <Shield size={12} className="text-emerald-500" />
             </div>
@@ -328,7 +328,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           {/* Record New Payment Section - Styled as Shop */}
           {isAdmin && !isEditing && (
             <div className="mb-10 animate-in slide-in-from-top-4 duration-500">
-               <div className="flex items-center justify-end gap-2 mb-6">
+               <div className="flex items-center justify-start gap-2 mb-6">
                   <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Record New Payment</span>
                   <CreditCard size={12} className="text-indigo-400" />
                </div>
@@ -376,7 +376,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                               disabled={!isAdmin}
                               onChange={(e) => setAmount(e.target.value)}
                               placeholder="Enter amount..."
-                              className="bg-transparent flex-1 py-5 pr-8 text-right text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none disabled:opacity-50"
+                              className="bg-transparent flex-1 py-5 pl-8 text-left text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none disabled:opacity-50"
                            />
                           </div>
                      </div>
@@ -387,7 +387,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
 
           {/* History Section */}
           <div className="animate-in fade-in duration-700 pb-10">
-            <div className="flex items-center justify-end gap-2 mb-8">
+            <div className="flex items-center justify-start gap-2 mb-8">
                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Payment Details</span>
             </div>
             
@@ -579,7 +579,7 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
 };
 
 const MiniStat = ({ label, value, icon, color }) => (
-    <div className={`p-4 rounded-2xl bg-${color}-500/5 border border-${color}-500/10 text-center`}>
+    <div className={`p-4 rounded-2xl bg-${color}-500/5 border border-${color}-500/10 text-left`}>
         <div className={`flex items-center justify-center gap-2 mb-1.5 text-${color}-400`}>
             {icon}
             <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>

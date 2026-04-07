@@ -6,7 +6,7 @@ import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircl
 import FarmerDetailModal from './FarmerDetailModal';
 import AddEntryModal from './AddEntryModal';
 
-const LandAssets = ({ selectedYear, isAdmin }) => {
+const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmin }) => {
   const { 
     farmers, 
     loading: farmersLoading, 
@@ -121,7 +121,7 @@ const LandAssets = ({ selectedYear, isAdmin }) => {
                  <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
                     <Map size={18} />
                  </div>
-                 <div className="text-right">
+                 <div className="text-left">
                     <h4 className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
                     <p className="text-xl font-black text-white italic tracking-tighter leading-none">
                        {farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0).toLocaleString()} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>

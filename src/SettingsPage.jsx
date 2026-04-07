@@ -1,0 +1,145 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  ChevronDown, UserPlus, Store, Trash2, Loader2, Bell, AlertTriangle, 
+  Info, Check, RefreshCw, FileJson, Download, Calendar as CalendarIcon, Settings 
+} from 'lucide-react';
+import { useFarmers } from './useFarmers';
+import { useReminders } from './useReminders';
+import { db, getDataPath } from './firebase';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
+
+const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => {
+  const { farmers, deleteFarmer, addNewFarmer } = useFarmers();
+  const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
+  const [isSaving, setIsSaving] = useState(false);
+  const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
+  const [shops, setShops] = useState([]);
+  const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
+  const [isBackingUp, setIsBackingUp] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
+  const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
+
+  const handleCreateReminder = async (e) => {
+    e.preventDefault();
+    if (!newReminder.title || !newReminder.targetDate) return;
+    setIsSaving(true);
+    try {
+      await addReminder({ ...newReminder, targetDate: Timestamp.fromDate(new Date(newReminder.targetDate)) });
+      setNewReminder({ title: '', description: '', targetDate: '', type: 'Reminder' });
+      alert("Reminder saved!");
+    } catch (err) { alert("Error saving reminder"); } finally { setIsSaving(false); }
+  };
+
+  useEffect(() => {
+    const unsubShops = onSnapshot(collection(db, getDataPath('shops')), (snapshot) => {
+      setShops(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubShops();
+  }, []);
+
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try { await addNewFarmer(newFarmer); setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' }); alert("Registered!"); } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
+  };
+
+  const handleAddShop = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try { await addDoc(collection(db, getDataPath('shops')), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop Registered!"); } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
+  };
+
+  const handleDeleteShop = async (id) => { 
+    if (window.confirm('Delete Shop?')) await deleteDoc(doc(db, getDataPath('shops'), id));
+  };
+
+  const handleDownloadExcel = async () => {
+    setIsExporting(true);
+    try {
+      const XLSX = await import('xlsx');
+      const wb = XLSX.utils.book_new();
+      const farmersWS = XLSX.utils.json_to_sheet(farmers.map(f => ({ Name: f.nameEn || f.nameUr, Land: `${f.landSize} ${f.landUnit}`, Status: f.totalRemaining > 0 ? 'Pending' : 'Paid' })));
+      XLSX.utils.book_append_sheet(wb, farmersWS, 'Members');
+      XLSX.writeFile(wb, `Jatala_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+      alert("Excel Downloaded!");
+    } catch (err) { alert("Excel Export Failed"); } finally { setIsExporting(false); }
+  };
+
+  const handleBackup = async () => {
+    setIsBackingUp(true);
+    try {
+      const backupData = {};
+      const collections = ['farmers', 'shops', 'sold_properties', 'revenue', 'expenses'];
+      for (const col of collections) {
+        const snap = await getDocs(collection(db, getDataPath(col)));
+        backupData[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      alert("Backup Finished!");
+    } catch (err) { alert("Backup Failed"); } finally { setIsBackingUp(false); }
+  };
+
+  const handleRestore = async (e) => {
+    const file = e.target.files[0]; if (!file || !window.confirm("Overwrite Database?")) return;
+    setIsRestoring(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        const batch = writeBatch(db);
+        for (const col in data) {
+          data[col]?.forEach(item => { if (item.id) batch.set(doc(db, getDataPath(col), item.id), item, { merge: true }); });
+        }
+        await batch.commit(); alert("Restored!");
+      } catch (err) { alert("Restore Failed"); } finally { setIsRestoring(false); }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div className="flex-1 flex flex-col gap-8 pb-32 overflow-y-auto no-scrollbar">
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
+        <button onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')} className="w-full flex justify-between p-8 font-black uppercase">Member Management <ChevronDown className={expandedSection === 'members' ? 'rotate-180' : ''} /></button>
+        {expandedSection === 'members' && <div className="p-8 border-t border-slate-700/50 grid grid-cols-1 lg:grid-cols-2 gap-8">
+           <form onSubmit={handleAddMember} className="space-y-4">
+             <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
+             <input type="number" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
+             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black">Register Member</button>
+           </form>
+           <div className="max-h-[300px] overflow-y-auto no-scrollbar divide-y divide-slate-800">
+             {farmers.map(f => <div key={f.id} className="py-4 flex justify-between"><div className="font-black text-sm uppercase">{f.nameEn || f.nameUr}</div><button onClick={() => deleteFarmer(f.id)}><Trash2 size={16} className="text-slate-600"/></button></div>)}
+           </div>
+        </div>}
+      </section>
+
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
+        <button onClick={() => setExpandedSection(expandedSection === 'shops' ? null : 'shops')} className="w-full flex justify-between p-8 font-black uppercase">Commercial Shops <ChevronDown className={expandedSection === 'shops' ? 'rotate-180' : ''} /></button>
+        {expandedSection === 'shops' && <div className="p-8 border-t border-slate-700/50">
+           <form onSubmit={handleAddShop} className="grid grid-cols-2 gap-4 mb-8">
+             <input value={newShop.tenant} onChange={e => setNewShop({...newShop, tenant: e.target.value})} className="bg-slate-900 p-4 rounded-xl font-black text-xs" placeholder="Tenant" />
+             <input value={newShop.name} onChange={e => setNewShop({...newShop, name: e.target.value})} className="bg-slate-900 p-4 rounded-xl font-black text-xs" placeholder="ID" />
+             <button className="col-span-2 bg-blue-600 py-4 rounded-xl font-black">Add Shop</button>
+           </form>
+           <div className="divide-y divide-slate-800">{shops.map(s => <div key={s.id} className="py-4 flex justify-between font-black uppercase text-xs"><span>{s.tenant} - {s.name}</span><button onClick={() => handleDeleteShop(s.id)}><Trash2 size={16}/></button></div>)}</div>
+        </div>}
+      </section>
+
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
+        <button onClick={() => setIsBackupOpen(!isBackupOpen)} className="w-full flex justify-between p-8 font-black uppercase">System Tools <ChevronDown/></button>
+        {isBackupOpen && <div className="p-8 border-t border-slate-700/50 grid grid-cols-3 gap-4">
+           <button onClick={handleDownloadExcel} className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-emerald-400 border border-slate-700">Excel Export</button>
+           <button onClick={handleBackup} className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-indigo-400 border border-slate-700">Database Backup</button>
+           <label className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-orange-400 border border-slate-700 cursor-pointer text-center">Restore Data <input type="file" className="hidden" onChange={handleRestore} /></label>
+        </div>}
+      </section>
+    </div>
+  );
+};
+
+export default SettingsPage;

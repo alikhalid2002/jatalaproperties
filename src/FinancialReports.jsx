@@ -67,9 +67,9 @@ function TypeBadge({ type }) {
   );
 }
 
-export default function FinancialReports({ entries = [], selectedYear }) {
+export default function FinancialReports({ entries = [], selectedYear = new Date().getFullYear().toString(), preFilter = 'All' }) {
   const [search, setSearch]               = useState('');
-  const [typeFilter, setTypeFilter]       = useState('All');
+  const [typeFilter, setTypeFilter]       = useState(preFilter);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [dateFrom, setDateFrom]           = useState('');
   const [dateTo, setDateTo]               = useState('');
@@ -188,10 +188,10 @@ export default function FinancialReports({ entries = [], selectedYear }) {
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden gap-5">
 
       {/* ── Header row ─────────────────────────────────────────── */}
-      <div className="flex flex-col lg:items-center justify-center gap-6 lg:gap-4 mb-8 text-center">
+      <div className="flex flex-col lg:items-start justify-start gap-6 lg:gap-4 mb-8 text-left">
         
         {/* Row 1: Icon + Title + Year */}
-        <div className="flex flex-col items-center gap-3 min-w-0">
+        <div className="flex flex-col items-start gap-3 min-w-0">
           <div className="p-4 bg-indigo-500/20 text-indigo-400 rounded-2xl shadow-lg shadow-indigo-500/10 mb-2">
             <BarChart3 size={24} />
           </div>
@@ -206,7 +206,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
         </div>
 
         {/* Row 2: Search + Actions (Records, Excel, Filter) */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 lg:gap-4 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start gap-3 lg:gap-4 w-full lg:w-auto">
           {/* Compact search */}
           <div className="relative w-full max-w-md lg:max-w-[260px]">
             <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
@@ -227,7 +227,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
             )}
           </div>
 
-          <div className="flex items-center justify-center gap-2 shrink-0">
+          <div className="flex items-center justify-start gap-2 shrink-0">
             <span className="px-3 lg:px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[9px] lg:text-[10px] font-black text-white italic uppercase tracking-widest">
               {filtered.length} Records
             </span>
@@ -379,7 +379,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
                 <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Property / Shop</th>
                 <th
                   onClick={() => toggleSort('amount')}
-                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right cursor-pointer hover:text-white transition-colors select-none italic"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-left cursor-pointer hover:text-white transition-colors select-none italic"
                 >
                   Amount {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
@@ -416,7 +416,7 @@ export default function FinancialReports({ entries = [], selectedYear }) {
                       : <span className="text-[11px] text-slate-700 font-bold">—</span>
                     }
                   </td>
-                  <td className="p-5 text-right whitespace-nowrap">
+                  <td className="p-5 text-left whitespace-nowrap">
                     <p className={`text-lg font-black italic ${AMOUNT_COLORS[entry._type]}`}>
                       {['revenue', 'pending'].includes(entry._type) ? '+' : '−'} Rs. {Number(entry.amount).toLocaleString()}
                     </p>

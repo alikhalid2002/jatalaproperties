@@ -30,7 +30,7 @@ const FinanceCard = ({ label, year, value, color, icon }) => (
   </div>
 );
 
-const ShopsPage = ({ isAdmin, selectedYear }) => {
+const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString() }) => {
   const [shops, setShops] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
@@ -394,7 +394,7 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
                   <div className="flex gap-4">
                     <input 
                       value={editData.area}
-                      dir="rtl"
+                      dir="ltr"
                       onChange={(e) => setEditData({...editData, area: e.target.value})}
                       className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-3 text-sm font-black text-white text-center flex-1"
                       placeholder="Area (e.g. 10x12)"
@@ -612,7 +612,7 @@ const ShopsPage = ({ isAdmin, selectedYear }) => {
                            </div>
                         </div>
                         <div className="flex items-center gap-6">
-                           <div className="text-right">
+                           <div className="text-left">
                               <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Method</p>
                               {editingTransId === item.id ? (
                                 <select 
