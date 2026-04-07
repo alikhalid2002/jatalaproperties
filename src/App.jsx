@@ -161,7 +161,7 @@ const App = () => {
               className={`w-full flex items-start gap-4 p-4 rounded-2xl transition-all duration-300 ${
                 activeTab === item.id 
                 ? 'bg-indigo-500/10 text-indigo-400 border-l-4 border-indigo-500' 
-                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/20'
+                : 'text-white hover:text-white hover:bg-slate-800'
               }`}
             >
               <div className={activeTab === item.id ? 'text-indigo-400' : 'text-slate-500'}>
@@ -256,14 +256,14 @@ const App = () => {
             key={item.id} 
             onClick={() => setActiveTab(item.id)} 
             className={`flex-1 flex flex-col items-center justify-center py-2 gap-1 transition-all duration-300 relative ${
-              activeTab === item.id ? 'text-indigo-400' : 'text-slate-500'
+              activeTab === item.id ? 'text-indigo-400' : 'text-white'
             }`}
           >
-            <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110' : 'scale-100 opacity-70'}`}>
+            <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110 opacity-100' : 'scale-100 opacity-90'}`}>
               {React.cloneElement(item.icon, { size: 18 })}
             </div>
             <span className={`text-[8px] font-black uppercase tracking-tighter transition-all duration-300 text-center leading-none ${
-              activeTab === item.id ? 'opacity-100' : 'opacity-60'
+              activeTab === item.id ? 'opacity-100' : 'opacity-100'
             }`}>
               {item.label}
             </span>
