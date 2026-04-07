@@ -65,7 +65,7 @@ const App = () => {
 
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const isAdmin = accountType === 'ali';
+  const isAdmin = accountType === 'admin';
   const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const [authStage, setAuthStage] = useState('selection');
@@ -76,7 +76,7 @@ const App = () => {
   const handleAdminLogin = (e) => {
     e?.preventDefault();
     if (passwordInput === 'ali321') {
-      setAccountType('ali');
+      setAccountType('admin');
       setAuthStage('selection');
     } else {
       setLoginError(true);
@@ -138,8 +138,8 @@ const App = () => {
           <h1 className="text-5xl lg:text-7xl font-black text-white uppercase">Jatala Properties</h1>
           {authStage === 'selection' ? (
             <div className="grid grid-cols-2 gap-8 max-w-xl mx-auto">
-              <button onClick={() => setAuthStage('password')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-indigo-600 flex flex-col items-center gap-6"><Shield size={40} /><span className="text-3xl font-black">Ali</span></button>
-              <button onClick={() => setAccountType('guest')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-slate-800 flex flex-col items-center gap-6"><User size={40} /><span className="text-3xl font-black">Guest</span></button>
+              <button onClick={() => setAuthStage('password')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-indigo-600 flex flex-col items-center gap-6"><Shield size={40} /><span className="text-3xl font-black italic uppercase tracking-tighter">Admin</span></button>
+              <button onClick={() => setAccountType('user')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-slate-800 flex flex-col items-center gap-6"><User size={40} /><span className="text-3xl font-black italic uppercase tracking-tighter">User</span></button>
             </div>
           ) : (
             <div className="max-w-md mx-auto w-full"><form onSubmit={handleAdminLogin} className="space-y-6"><input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder="Password" className="w-full bg-slate-900 border border-slate-700 p-5 rounded-2xl text-white text-center font-black" /><div className="flex gap-4"><button type="submit" className="flex-1 py-5 bg-indigo-600 rounded-2xl font-black">Login</button></div></form></div>
