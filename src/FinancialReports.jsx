@@ -373,10 +373,8 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
                 >
                   Date {sortField === 'date' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                {typeFilter !== 'Expense' && <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Type</th>}
                 <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Category</th>
                 <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Description</th>
-                {typeFilter !== 'Expense' && <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Property / Shop</th>}
                 <th
                   onClick={() => toggleSort('amount')}
                   className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-left cursor-pointer hover:text-white transition-colors select-none italic"
@@ -388,7 +386,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
             <tbody className="divide-y divide-slate-800/40">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={typeFilter === 'Expense' ? 4 : 6} className="py-24 text-center">
+                  <td colSpan={4} className="py-24 text-center">
                     <div className="flex flex-col items-center gap-4 opacity-30">
                       <FileText size={48} className="text-slate-500" />
                       <p className="text-lg font-black uppercase tracking-widest text-slate-500">No Records Found</p>
@@ -401,25 +399,12 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
                   <td className="p-5 whitespace-nowrap">
                     <p className="text-white font-black italic uppercase tracking-widest text-xs">{entry._date || '—'}</p>
                   </td>
-                  {typeFilter !== 'Expense' && (
-                    <td className="p-5">
-                      <TypeBadge type={entry._type} />
-                    </td>
-                  )}
                   <td className="p-5">
                     <span className="text-[11px] font-black text-white uppercase tracking-widest">{entry._category}</span>
                   </td>
                   <td className="p-5 max-w-[200px]">
                     <p className="text-white font-bold text-[15px] leading-snug truncate italic">{entry._description}</p>
                   </td>
-                  {typeFilter !== 'Expense' && (
-                    <td className="p-5">
-                      {entry._asset && entry._asset !== '—'
-                        ? <span className="text-[11px] font-black text-white/70 uppercase tracking-widest italic">{entry._asset}</span>
-                        : <span className="text-[11px] text-slate-700 font-bold">—</span>
-                      }
-                    </td>
-                  )}
                   <td className="p-5 text-left whitespace-nowrap">
                     <p className={`text-lg font-black italic ${AMOUNT_COLORS[entry._type]}`}>
                       {['revenue', 'pending'].includes(entry._type) ? '+' : '−'} Rs. {Number(entry.amount).toLocaleString()}
