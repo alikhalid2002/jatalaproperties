@@ -286,7 +286,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
             className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
             <div className="space-y-2 text-center w-full">
-              <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{shop.tenant}</h3>
+              <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{shop.tenantEn || shop.tenant}</h3>
               <div className="flex flex-wrap items-center justify-center gap-2">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
                     shop.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
@@ -374,7 +374,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
               
               {/* Shop Identity - Always Visible */}
               <div className="flex items-center gap-4 mb-6">
-                <h2 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-none">{selectedShop.tenant}</h2>
+                <h2 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-none">{selectedShop.tenantEn || selectedShop.tenant}</h2>
                 <div className="w-2 h-2 rounded-full bg-slate-700"></div>
                 <p className="text-2xl font-black italic text-slate-300">{selectedShop.area || '12x15'}</p>
               </div>
