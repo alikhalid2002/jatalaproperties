@@ -423,22 +423,22 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                  <button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="flex-[2] h-16 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:scale-[1.02] active:scale-95 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 text-lg uppercase tracking-widest"
+                  className="flex-[2] h-14 lg:h-16 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:scale-[1.02] active:scale-95 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 lg:gap-3 text-[10px] lg:text-lg uppercase tracking-tight lg:tracking-widest px-2"
                  >
-                   {isSaving ? <Loader2 className="animate-spin" /> : <><Receipt size={22} /> Record Payment</>}
+                   {isSaving ? <Loader2 className="animate-spin" /> : <><Receipt size={18} className="lg:w-[22px] lg:h-[22px]" /> Record Payment</>}
                  </button>
                )}
                {isAdmin && (
                  <button 
                   onClick={() => setIsEditing(true)}
-                  className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                  className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 text-[10px] lg:text-sm uppercase tracking-widest px-2"
                  >
                    Edit
                  </button>
                )}
                <button 
                 onClick={onClose}
-                className="flex-1 h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest"
+                className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center text-[10px] lg:text-sm uppercase tracking-widest px-2"
                >
                  Close
                </button>
