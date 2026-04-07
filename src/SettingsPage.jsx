@@ -132,11 +132,26 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setIsBackupOpen(!isBackupOpen)} className="w-full flex justify-between p-8 font-black uppercase">System Tools <ChevronDown/></button>
-        {isBackupOpen && <div className="p-8 border-t border-slate-700/50 grid grid-cols-3 gap-4">
-           <button onClick={handleDownloadExcel} className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-emerald-400 border border-slate-700">Excel Export</button>
-           <button onClick={handleBackup} className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-indigo-400 border border-slate-700">Database Backup</button>
-           <label className="p-6 bg-slate-900 rounded-3xl font-black uppercase text-[10px] text-orange-400 border border-slate-700 cursor-pointer text-center">Restore Data <input type="file" className="hidden" onChange={handleRestore} /></label>
-        </div>}
+        {isBackupOpen && (
+          <div className="p-4 lg:p-8 border-t border-slate-700/50 grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-6">
+            <button 
+              onClick={handleDownloadExcel} 
+              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-emerald-400 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
+            >
+              Excel Export
+            </button>
+            <button 
+              onClick={handleBackup} 
+              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-indigo-400 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
+            >
+              Database Backup
+            </button>
+            <label className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-orange-400 border border-slate-700/50 hover:bg-slate-800 transition-all cursor-pointer text-center leading-tight gap-2">
+              Restore Data 
+              <input type="file" className="hidden" onChange={handleRestore} />
+            </label>
+          </div>
+        )}
       </section>
     </div>
   );
