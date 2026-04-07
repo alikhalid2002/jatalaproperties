@@ -141,8 +141,10 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
             onClick={() => handleFarmerClick(farmer)}
             className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
           >
-            <div className="space-y-2">
-              <h3 className="text-2xl lg:text-3xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{farmer.nameEn || transliterateToEnglish(farmer.nameUr)}</h3>
+            <div className="space-y-1">
+              <h3 className="text-lg lg:text-3xl font-black text-white leading-tight lg:leading-relaxed py-1 uppercase tracking-tight lg:tracking-tighter break-words">
+                {farmer.nameEn || transliterateToEnglish(farmer.nameUr)}
+              </h3>
               <div className="flex flex-wrap items-center justify-center gap-3">
                  <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
                     farmer.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/20 text-orange-400'
