@@ -32,7 +32,22 @@ export const transliterateToUrdu = (text) => {
 
 export const handleUrduChange = (e, setter) => {
   const val = e.target.value;
-  // If it contains english letters, transliterate them
   const isEnglish = /[a-zA-Z]/.test(val);
   setter(isEnglish ? transliterateToUrdu(val) : val);
+};
+
+export const urduToEnglishMap = {
+  'ا': 'a', 'آ': 'aa', 'ب': 'b', 'پ': 'p', 'ت': 't', 'ٹ': 'T', 'ث': 's', 'ج': 'j', 'چ': 'ch', 'ح': 'h', 'خ': 'kh', 'د': 'd', 'ڈ': 'D', 'ذ': 'z', 'ر': 'r', 'ڑ': 'R', 'ز': 'z', 'ژ': 'zh', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'z', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ک': 'k', 'گ': 'g', 'ل': 'l', 'م': 'm', 'ن': 'n', 'و': 'u', 'ہ': 'h', 'ی': 'i', 'ے': 'e', ' ': ' ', '-': '-'
+};
+
+export const transliterateToEnglish = (urduText) => {
+  if (!urduText) return '';
+  // Basic heuristic: if it already has English, return it
+  if (/[a-zA-Z]/.test(urduText)) return urduText;
+  
+  let result = '';
+  for (let char of urduText) {
+    result += urduToEnglishMap[char] || char;
+  }
+  return result;
 };
