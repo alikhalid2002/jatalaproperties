@@ -179,7 +179,7 @@ const App = () => {
         <header className="h-24 lg:h-28 border-b border-slate-800 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-40 sticky top-0">
           <div className="flex items-center gap-6">
              <button onClick={() => setShowYearMenu(!showYearMenu)} className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 rounded-[20px] font-black text-[13px]">{selectedYear} <ChevronDown/></button>
-             {showYearMenu && <div className="absolute top-20 bg-slate-900 border border-slate-700 rounded-2xl z-50">{['2026','2025','2024'].map(y => <button key={y} onClick={() => {setSelectedYear(y); setShowYearMenu(false);}} className="block p-4 font-black">{y}</button>)}</div>}
+             {showYearMenu && <div className="absolute top-20 bg-slate-900 border border-slate-700 rounded-2xl z-50 overflow-y-auto max-h-60 no-scrollbar">{['2030','2029','2028','2027','2026','2025','2024','2023','2022','2021'].map(y => <button key={y} onClick={() => {setSelectedYear(y); setShowYearMenu(false);}} className="block w-full p-4 font-black hover:bg-slate-800 transition-colors uppercase tracking-widest text-[13px]">{y}</button>)}</div>}
              <div className="relative lg:flex hidden"><Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/><input type="text" placeholder="Search..." className="bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-14 pr-6 text-sm" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/></div>
           </div>
           <div className="flex items-center gap-3">
