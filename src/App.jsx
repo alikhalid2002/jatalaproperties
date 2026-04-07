@@ -275,7 +275,7 @@ const App = () => {
           </div>
         </PullToRefresh>
 
-        {isAdmin && <button onClick={() => setIsAddEntryModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center shadow-2xl z-50"><Plus size={32}/></button>}
+        {isAdmin && <button onClick={() => setIsAddEntryModalOpen(true)} className="fixed lg:bottom-10 lg:right-10 bottom-28 right-8 w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center shadow-2xl z-[150] transition-all active:scale-95 hover:bg-indigo-500 ring-4 ring-slate-900/50"><Plus size={32}/></button>}
         
         {isReminderDrawerOpen && (
           <div className="fixed inset-0 z-[100] flex justify-end"><div className="absolute inset-0 bg-black/40" onClick={() => setIsReminderDrawerOpen(false)}/>
