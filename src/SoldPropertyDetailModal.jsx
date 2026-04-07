@@ -50,28 +50,30 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
       <div className="bg-[#1e293b] border-t lg:border border-slate-700 w-full max-w-4xl lg:rounded-[32px] rounded-t-[32px] overflow-hidden shadow-2xl animate-slide-up lg:animate-zoom-in duration-500 flex flex-col relative h-[90vh] lg:h-auto lg:max-h-[85vh]">
         
         {/* Header */}
-        <div className="p-6 lg:p-8 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-          <div className="text-left flex-1 mr-4">
-            <h2 className="text-2xl lg:text-3xl font-black text-white italic uppercase tracking-tighter">{property.nameEn || property.nameUr}</h2>
-            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-1 italic">Buyer: {property.buyerName}</p>
+        {/* Header - Optimized for mobile */}
+        <div className="p-6 lg:p-10 border-b border-slate-700 bg-slate-900/40 relative flex flex-col items-center text-center">
+          <div className="absolute top-6 right-6 flex items-center gap-3">
+             <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-2xl transition-all group">
+               <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+             </button>
           </div>
-
-          <div className="flex items-center gap-4">
-            <div className={`px-4 py-2 rounded-full border flex items-center gap-2 ${
-              isPaid 
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-              : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
-            }`}>
-              {isPaid ? <CheckCircle size={16} /> : <Clock size={16} />}
-              <span className="text-[11px] font-black uppercase tracking-widest pt-0.5">{isPaid ? 'Fully Paid' : 'Active Installments'}</span>
+          
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-tight text-center">
+              {property.nameEn || property.nameUr}
+            </h2>
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] lg:text-[11px] font-black text-slate-400 uppercase tracking-widest italic">Buyer: {property.buyerName}</span>
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-700"></div>
+               <div className={`px-3 py-1 rounded-xl border flex items-center gap-1.5 ${
+                 isPaid 
+                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                 : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+               }`}>
+                 {isPaid ? <CheckCircle size={12} /> : <Clock size={12} />}
+                 <span className="text-[9px] font-black uppercase tracking-widest">{isPaid ? 'Paid' : 'Active'}</span>
+               </div>
             </div>
-            
-            <button 
-              onClick={onClose}
-              className="p-3 bg-slate-700/50 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-2xl transition-all active:scale-95"
-            >
-              <X size={20} />
-            </button>
           </div>
         </div>
 
@@ -194,14 +196,14 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-6 lg:p-8 border-t border-slate-700 bg-slate-900/50 flex gap-4">
-          <button 
+        {/* Footer Actions - Optimized for consistency */}
+        <div className="p-6 lg:p-10 border-t border-slate-700 bg-[#1e293b] flex gap-4">
+           <button 
             onClick={onClose}
-            className="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95"
-          >
+            className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest text-[10px] lg:text-sm"
+           >
             Close Ledger
-          </button>
+           </button>
         </div>
 
       </div>
