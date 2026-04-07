@@ -178,13 +178,23 @@ const App = () => {
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <header className="h-24 lg:h-28 border-b border-slate-800 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-40 sticky top-0">
           <div className="flex items-center gap-6">
-             <button onClick={() => setShowYearMenu(!showYearMenu)} className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 rounded-[20px] font-black text-[13px]">{selectedYear} <ChevronDown/></button>
-             {showYearMenu && <div className="absolute top-20 bg-slate-900 border border-slate-700 rounded-2xl z-50 overflow-y-auto max-h-60 no-scrollbar">{['2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'].map(y => <button key={y} onClick={() => {setSelectedYear(y); setShowYearMenu(false);}} className="block w-full p-4 font-black hover:bg-slate-800 transition-colors uppercase tracking-widest text-[13px]">{y}</button>)}</div>}
-             <div className="relative lg:flex hidden"><Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/><input type="text" placeholder="Search..." className="bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-14 pr-6 text-sm" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/></div>
+             <div className="relative">
+               <button onClick={() => setShowYearMenu(!showYearMenu)} className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 rounded-[20px] font-black text-[13px] hover:bg-slate-800 transition-colors">{selectedYear} <ChevronDown className={`transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} /></button>
+               {showYearMenu && <div className="absolute top-16 left-0 w-32 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl overflow-y-auto max-h-60 no-scrollbar animate-in slide-in-from-top-2">{['2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'].map(y => <button key={y} onClick={() => {setSelectedYear(y); setShowYearMenu(false);}} className="block w-full p-4 font-black hover:bg-indigo-600 transition-colors uppercase tracking-widest text-[13px] text-center border-b border-slate-800/50 last:border-b-0">{y}</button>)}</div>}
+             </div>
+             <div className="relative lg:flex hidden"><Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/><input type="text" placeholder="Search..." className="bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/></div>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setIsReminderDrawerOpen(true)} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-2xl relative"><Bell size={20}/>{activeReminders.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 rounded-full flex items-center justify-center text-[10px] font-black">{activeReminders.length}</span>}</button>
-            <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-slate-800/40 rounded-full border border-slate-700"><div className="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center"><UserCircle size={20}/></div><span className="text-[13px] font-black uppercase lg:block hidden">{accountType}</span></button>
+             <div className="relative">
+               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-slate-800/40 rounded-full border border-slate-700 hover:bg-slate-800 transition-all"><div className="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={20}/></div><span className="text-[13px] font-black uppercase lg:block hidden">{accountType}</span></button>
+               {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
+                 <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
+                   <Lock size={16} className="group-hover:rotate-12 transition-transform" />
+                   <span className="text-xs font-black uppercase tracking-widest">Switch Account</span>
+                 </button>
+               </div>}
+             </div>
           </div>
         </header>
 

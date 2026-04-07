@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db, getDataPath } from './firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { transliterateToEnglish } from './urduTransliterator';
 
 export const useGlobalActivity = () => {
   const [activities, setActivities] = useState([]);
@@ -91,7 +92,7 @@ export const useGlobalActivity = () => {
         return {
           id: doc.id,
           type: 'Expense',
-          label: data.labelEn || data.labelUr || 'General Expense',
+          label: data.labelEn || transliterateToEnglish(data.labelUr) || 'General Expense',
           amount: Number(data.amount),
           date: data.date || new Date().toISOString().split('T')[0],
           section: 'Land',
