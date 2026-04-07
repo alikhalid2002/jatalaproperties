@@ -202,6 +202,7 @@ const App = () => {
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                       <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-10">
+                        <h3 className="text-xl font-black mb-6 flex items-center gap-3"><BarChart3/> Revenue Analysis</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <AreaChart data={chartData}><XAxis dataKey="name" hide /><Area type="monotone" dataKey="revenue" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1}/></AreaChart>
                         </ResponsiveContainer>
