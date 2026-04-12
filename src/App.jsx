@@ -149,12 +149,12 @@ const App = () => {
   }, [entries]);
 
   const navHubItems = [
-    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, color: 'from-blue-500/20 to-indigo-500/20' },
-    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, color: 'from-emerald-500/20 to-teal-500/20' },
-    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, color: 'from-rose-500/20 to-pink-500/20' },
-    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, color: 'from-amber-500/20 to-orange-500/20' },
-    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, color: 'from-violet-500/20 to-purple-500/20' },
-    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, color: 'from-slate-500/20 to-slate-700/20', adminOnly: true }
+    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, baseColor: 'emerald' },
+    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, baseColor: 'cyan' },
+    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, baseColor: 'rose' },
+    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, baseColor: 'amber' },
+    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, baseColor: 'purple' },
+    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, baseColor: 'slate', adminOnly: true }
   ];
 
   if (!accountType) {
@@ -268,11 +268,11 @@ const App = () => {
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl w-full sm:w-auto`}
+                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/20 to-${item.baseColor}-600/5 backdrop-blur-md border border-${item.baseColor}-500/30 rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl w-full sm:w-auto`}
                             >
-                              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
+                              <div className={`absolute inset-0 bg-gradient-to-br from-${item.baseColor}-500/10 to-${item.baseColor}-600/20 opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
                               <div className="relative z-10 flex flex-row sm:flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                                <div className="p-3.5 sm:p-8 bg-white/5 rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-indigo-600/20 shrink-0">
+                                <div className={`p-3.5 sm:p-8 bg-white/5 rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-${item.baseColor}-600/20 shrink-0`}>
                                   <div className="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center">
                                     {React.cloneElement(item.icon, { size: '100%', className: "text-white" })}
                                   </div>
