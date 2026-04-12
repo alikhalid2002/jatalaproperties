@@ -187,7 +187,34 @@ const App = () => {
           </div>
           
           <div className="flex-1 flex justify-center">
-            {/* Title removed as requested */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowYearMenu(!showYearMenu)} 
+                className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all font-black text-xs tracking-[0.15em] text-white uppercase italic shadow-lg"
+              >
+                <Calendar size={18} className="text-indigo-400" />
+                FY {selectedYear}-{Number(selectedYear)-1}
+                <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showYearMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
+                  <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-slate-900 border border-white/10 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
+                    {["2026", "2025", "2024", "2023"].map(year => (
+                      <button 
+                        key={year} 
+                        onClick={() => { setSelectedYear(year); setShowYearMenu(false); }} 
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${selectedYear === year ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
+                      >
+                        <span className="text-xs font-black uppercase tracking-widest">{year}-{Number(year)-1}</span>
+                        {selectedYear === year && <CheckCircle size={16} />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           
           <div className="flex-1 flex justify-end items-center gap-4">
