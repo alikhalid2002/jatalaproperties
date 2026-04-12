@@ -148,14 +148,13 @@ const App = () => {
     });
   }, [entries]);
 
-  const menuItems = [
-    { id: 'Dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'Land', label: 'Land Assets', icon: <Map size={20} /> },
-    { id: 'Shops', label: 'Shops', icon: <Store size={20} /> },
-    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={20} /> },
-    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={20} /> },
-    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={20} /> },
-    { id: 'Settings', label: 'Settings', icon: <Settings size={20} /> }
+  const navHubItems = [
+    { id: 'Land', label: 'Land Assets', urdu: 'زمین کے اثاثے', icon: <Map size={48} />, color: 'from-blue-500/20 to-indigo-500/20' },
+    { id: 'Shops', label: 'Shops', urdu: 'دکانیں', icon: <Store size={48} />, color: 'from-emerald-500/20 to-teal-500/20' },
+    { id: 'Expenses', label: 'Expenses', urdu: 'اخراجات', icon: <Receipt size={48} />, color: 'from-rose-500/20 to-pink-500/20' },
+    { id: 'Sold', label: 'Sold', urdu: 'فروخت شدہ', icon: <CheckCircle size={48} />, color: 'from-amber-500/20 to-orange-500/20' },
+    { id: 'Reports', label: 'Reports', urdu: 'رپورٹیں', icon: <BarChart3 size={48} />, color: 'from-violet-500/20 to-purple-500/20' },
+    { id: 'Settings', label: 'Settings', urdu: 'سیٹنگز', icon: <Settings size={48} />, color: 'from-slate-500/20 to-slate-700/20', adminOnly: true }
   ];
 
   if (!accountType) {
@@ -179,43 +178,33 @@ const App = () => {
 
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
-      <aside className="hidden lg:flex w-[280px] bg-slate-900 border-r border-slate-800 flex-col py-12 px-6">
-        <div className="mb-14 h-8" /> {/* Spacer for removed title */}
-        <nav className="flex-1 space-y-2">
-          {menuItems.map((item) => (
-            <button 
-              key={item.id} 
-              onClick={() => setActiveTab(item.id)} 
-              className={`w-full flex items-start gap-4 p-4 rounded-2xl transition-all duration-300 ${
-                activeTab === item.id 
-                ? 'bg-indigo-500/10 text-indigo-400 border-l-4 border-indigo-500' 
-                : 'text-white hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              <div className={activeTab === item.id ? 'text-indigo-400' : 'text-slate-500'}>
-                {React.cloneElement(item.icon, { size: 18 })}
-              </div>
-              <span className="text-[13px] font-black uppercase text-left leading-tight flex-1 tracking-wider">
-                {item.label}
-              </span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-24 lg:h-28 border-b border-slate-800 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-40 sticky top-0">
-          <div className="flex items-center gap-6">
-             <div className="relative">
-               <button onClick={() => setShowYearMenu(!showYearMenu)} className="flex items-center gap-3 px-5 py-3.5 bg-slate-800/40 rounded-[20px] font-black text-[13px] hover:bg-slate-800 transition-colors">{selectedYear} <ChevronDown className={`transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} /></button>
-               {showYearMenu && <div className="absolute top-16 left-0 w-32 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl overflow-y-auto max-h-60 no-scrollbar animate-in slide-in-from-top-2">{['2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'].map(y => <button key={y} onClick={() => {setSelectedYear(y); setShowYearMenu(false);}} className="block w-full p-4 font-black hover:bg-indigo-600 transition-colors uppercase tracking-widest text-[13px] text-center border-b border-slate-800/50 last:border-b-0">{y}</button>)}</div>}
-             </div>
-             <div className="relative lg:flex hidden"><Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/><input type="text" placeholder="Search..." className="bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/></div>
+        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full">
+          <div onClick={() => setActiveTab('Dashboard')} className="flex items-center gap-3 cursor-pointer group">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:rotate-6 transition-all duration-300">
+              <Home size={22} />
+            </div>
+            <h1 className="text-xl font-black italic uppercase tracking-[0.2em] hidden sm:block">Jatala Properties</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setIsReminderDrawerOpen(true)} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-2xl relative"><Bell size={20}/>{activeReminders.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 rounded-full flex items-center justify-center text-[10px] font-black">{activeReminders.length}</span>}</button>
+          
+          <div className="flex items-center gap-4">
+             {activeTab !== 'Dashboard' && (
+               <div className="relative lg:flex hidden mr-4">
+                 <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/>
+                 <input type="text" placeholder="Search..." className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/>
+               </div>
+             )}
+             
+            <button onClick={() => setIsReminderDrawerOpen(true)} className="p-3.5 bg-white/5 border border-white/10 rounded-2xl relative hover:bg-white/10 transition-all group">
+              <Bell size={22} className="group-hover:rotate-12 transition-transform duration-300"/>
+              {activeReminders.length > 0 && <span className="absolute top-2.5 right-2.5 w-3 h-3 bg-rose-600 rounded-full border-2 border-[#0f172a]" />}
+            </button>
+
              <div className="relative">
-               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-slate-800/40 rounded-full border border-slate-700 hover:bg-slate-800 transition-all"><div className="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={20}/></div><span className="text-[13px] font-black uppercase lg:block hidden">{accountType}</span></button>
+               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
+                 <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={22}/></div>
+                 <span className="text-xs font-black uppercase lg:block hidden tracking-widest">{accountType}</span>
+               </button>
                {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
                  <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
                    <Lock size={16} className="group-hover:rotate-12 transition-transform" />
@@ -234,11 +223,36 @@ const App = () => {
               ) : activeTab === 'Dashboard' ? (
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
-                    <div>
-                      <h1 className="text-3xl lg:text-5xl font-black italic uppercase tracking-widest mb-10 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent text-center">Jatala Properties</h1>
-                      <div className="grid grid-cols-2 gap-3 md:gap-6">
-                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight/>} value={revenueVal + pendingVal} />
-                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight/>} value={expenseVal} />
+                    <div className="mb-14">
+                      <h1 className="text-3xl lg:text-7xl font-black italic uppercase tracking-[0.3em] mb-12 bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent text-center">Jatala Properties</h1>
+                      
+                      <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-16">
+                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight size={28}/>} value={revenueVal + pendingVal} />
+                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight size={28}/>} value={expenseVal} />
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr max-w-6xl mx-auto">
+                        {navHubItems.map((item) => {
+                          if (item.adminOnly && !isAdmin) return null;
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={() => setActiveTab(item.id)}
+                              className={`group flex flex-col items-center justify-center p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[40px] hover:scale-105 hover:bg-indigo-600/10 hover:border-indigo-500/50 transition-all duration-500 relative overflow-hidden`}
+                            >
+                              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                              <div className="relative z-10 flex flex-col items-center gap-4">
+                                <div className="p-6 bg-white/5 rounded-3xl group-hover:rotate-6 transition-transform duration-500 border border-white/10 shadow-xl">
+                                  {React.cloneElement(item.icon, { size: 40, className: "text-white/90" })}
+                                </div>
+                                <div className="text-center">
+                                  <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 group-hover:text-indigo-300 transition-colors uppercase">{item.id === 'Land' ? 'Land Assets' : item.label}</span>
+                                  <span className="block text-2xl font-black urdu-text leading-tight group-hover:scale-110 transition-transform duration-500">{item.urdu}</span>
+                                </div>
+                              </div>
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
 
@@ -261,38 +275,32 @@ const App = () => {
           </div>
         </PullToRefresh>
 
-        {isAdmin && <button onClick={() => setIsAddEntryModalOpen(true)} className="fixed lg:bottom-10 lg:right-10 bottom-28 right-8 w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center shadow-2xl z-[150] transition-all active:scale-95 hover:bg-indigo-500 ring-4 ring-slate-900/50"><Plus size={32}/></button>}
-        
         {isReminderDrawerOpen && (
-          <div className="fixed inset-0 z-[100] flex justify-end"><div className="absolute inset-0 bg-black/40" onClick={() => setIsReminderDrawerOpen(false)}/>
-          <div className="w-full max-w-md bg-slate-900 h-full p-8 relative flex flex-col"><div className="flex justify-between items-center mb-8"><h2 className="text-2xl font-black">Notifications</h2><button onClick={() => setIsReminderDrawerOpen(false)}><X/></button></div><div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">{activeReminders.map(r => <div key={r.id} className="p-6 bg-slate-800 rounded-3xl"><h4 className="font-black">{r.title}</h4><p className="text-sm opacity-60 m-2">{r.description}</p><button onClick={() => markAsRead(r.id)} className="text-[10px] uppercase font-black text-emerald-400">Mark Read</button></div>)}</div></div></div>
+          <div className="fixed inset-0 z-[150] flex justify-end">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsReminderDrawerOpen(false)}/>
+            <div className="w-full max-w-md bg-slate-900 border-l border-white/5 h-full p-8 relative flex flex-col animate-in slide-in-from-right duration-300">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-black uppercase tracking-widest italic">Notifications</h2>
+                <button onClick={() => setIsReminderDrawerOpen(false)} className="p-2 hover:bg-white/5 rounded-xl transition-colors"><X/></button>
+              </div>
+              <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
+                {activeReminders.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-4 opacity-50">
+                    <Bell size={48}/>
+                    <p className="font-black uppercase tracking-widest text-xs">No active alerts</p>
+                  </div>
+                ) : activeReminders.map(r => (
+                  <div key={r.id} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all">
+                    <h4 className="font-black text-indigo-400 mb-1">{r.title}</h4>
+                    <p className="text-xs font-medium text-slate-400 leading-relaxed mb-4">{r.description}</p>
+                    <button onClick={() => markAsRead(r.id)} className="text-[10px] uppercase font-black text-emerald-400 hover:text-emerald-300 transition-colors">Mark as Read</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </main>
-
-      {/* MOBILE BOTTOM NAVIGATION - FIXED SPACING & ALIGNMENT */}
-      <nav className="lg:hidden fixed bottom-1 left-4 right-4 bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-[32px] p-2 flex items-center justify-between z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        {menuItems.map((item) => (
-          <button 
-            key={item.id} 
-            onClick={() => setActiveTab(item.id)} 
-            className={`flex-1 flex flex-col items-center justify-center py-2 gap-1 transition-all duration-300 relative ${
-              activeTab === item.id ? 'text-indigo-400' : 'text-white'
-            }`}
-          >
-            <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110 opacity-100' : 'scale-100 opacity-90'}`}>
-              {React.cloneElement(item.icon, { size: 18 })}
-            </div>
-            <span className={`text-[8px] font-black uppercase tracking-wide transition-all duration-300 text-center leading-none ${
-              activeTab === item.id ? 'opacity-100' : 'opacity-100'
-            }`}>
-              {item.label}
-            </span>
-            {activeTab === item.id && (
-              <div className="absolute top-0 w-8 h-1 bg-indigo-500 rounded-full blur-[4px] -translate-y-2 opacity-50"></div>
-            )}
-          </button>
-        ))}
-      </nav>
 
       <AddEntryModal isOpen={isAddEntryModalOpen} onClose={() => setIsAddEntryModalOpen(false)} onAdd={addEntry} isAdmin={isAdmin} />
     </div>
