@@ -241,52 +241,7 @@ const App = () => {
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight/>} value={expenseVal} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                      <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 lg:p-10 flex flex-col">
-                        <h3 className="text-xl font-black mb-6 flex items-center gap-3"><BarChart3 className="text-indigo-400"/> Revenue Analysis</h3>
-                        <div className="flex-1 overflow-x-auto no-scrollbar touch-pan-x cursor-grab active:cursor-grabbing">
-                          <div className="min-w-[600px] lg:min-w-0">
-                            <ResponsiveContainer width="100%" height={300}>
-                              <AreaChart data={chartData}>
-                                <XAxis 
-                                  dataKey="name" 
-                                  axisLine={false} 
-                                  tickLine={false} 
-                                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }} 
-                                  dy={10} 
-                                  interval={0}
-                                />
-                                <Tooltip 
-                                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px', fontSize: '12px', fontWeight: 'bold' }} 
-                                  itemStyle={{ color: '#6366f1' }}
-                                />
-                                <Area 
-                                  type="monotone" 
-                                  dataKey="revenue" 
-                                  stroke="#6366f1" 
-                                  strokeWidth={3}
-                                  fill="url(#colorRev)" 
-                                />
-                                <defs>
-                                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                                  </linearGradient>
-                                </defs>
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                        <div className="lg:hidden mt-4 flex items-center justify-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest animate-pulse">
-                          <span>Swipe to pan</span>
-                          <div className="w-10 h-0.5 bg-slate-700/50 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div className="lg:col-span-2 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8">
-                        <h3 className="text-xl font-black mb-6 flex items-center gap-3"><Activity/> Recent Activity</h3>
-                        <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar">{activities.map(a => <div key={a.id} className="p-4 bg-slate-900/40 rounded-2xl flex justify-between"><div><p className="font-black text-sm">{a.label}</p><p className="text-[10px] text-slate-500 uppercase">{a.date}</p></div><p className={`font-black ${a.isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>{a.isRevenue?'+':'-'} {a.amount.toLocaleString()}</p></div>)}</div>
-                      </div>
-                    </div>
+
                   </div>
                 )
               ) : activeTab === 'Land' ? (
