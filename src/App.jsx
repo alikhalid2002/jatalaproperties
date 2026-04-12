@@ -166,8 +166,8 @@ const App = () => {
           <h1 className="text-5xl lg:text-7xl font-black text-white uppercase">Jatala Properties</h1>
           {authStage === 'selection' ? (
             <div className="grid grid-cols-2 gap-8 max-w-xl mx-auto">
-              <button onClick={() => setAuthStage('password')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-indigo-600 flex flex-col items-center gap-6"><Shield size={40} /><span className="text-3xl font-black italic uppercase tracking-tighter">Admin</span></button>
-              <button onClick={() => setAccountType('user')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-slate-800 flex flex-col items-center gap-6"><User size={40} /><span className="text-3xl font-black italic uppercase tracking-tighter">User</span></button>
+              <button onClick={() => setAuthStage('password')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-indigo-600 flex flex-col items-center gap-6"><Shield size={40} /><span className="text-3xl font-black italic uppercase tracking-wide">Admin</span></button>
+              <button onClick={() => setAccountType('user')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-slate-800 flex flex-col items-center gap-6"><User size={40} /><span className="text-3xl font-black italic uppercase tracking-wide">User</span></button>
             </div>
           ) : (
             <div className="max-w-md mx-auto w-full"><form onSubmit={handleAdminLogin} className="space-y-6"><input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder="Password" className="w-full bg-slate-900 border border-slate-700 p-5 rounded-2xl text-white text-center font-black" /><div className="flex gap-4"><button type="submit" className="flex-1 py-5 bg-indigo-600 rounded-2xl font-black">Login</button></div></form></div>
@@ -180,7 +180,7 @@ const App = () => {
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
       <aside className="hidden lg:flex w-[280px] bg-slate-900 border-r border-slate-800 flex-col py-12 px-6">
-        <h1 className="text-2xl font-black mb-14 px-4 italic tracking-tighter text-left uppercase">Jatala Properties</h1>
+        <div className="mb-14 h-8" /> {/* Spacer for removed title */}
         <nav className="flex-1 space-y-2">
           {menuItems.map((item) => (
             <button 
@@ -234,9 +234,12 @@ const App = () => {
               ) : activeTab === 'Dashboard' ? (
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
-                    <div className="grid grid-cols-2 gap-3 md:gap-6">
-                      <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight/>} value={revenueVal + pendingVal} />
-                      <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight/>} value={expenseVal} />
+                    <div>
+                      <h1 className="text-3xl lg:text-5xl font-black italic uppercase tracking-widest mb-10 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent text-center">Jatala Properties</h1>
+                      <div className="grid grid-cols-2 gap-3 md:gap-6">
+                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight/>} value={revenueVal + pendingVal} />
+                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight/>} value={expenseVal} />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                       <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 lg:p-10 flex flex-col">
@@ -324,7 +327,7 @@ const App = () => {
             <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110 opacity-100' : 'scale-100 opacity-90'}`}>
               {React.cloneElement(item.icon, { size: 18 })}
             </div>
-            <span className={`text-[8px] font-black uppercase tracking-tighter transition-all duration-300 text-center leading-none ${
+            <span className={`text-[8px] font-black uppercase tracking-wide transition-all duration-300 text-center leading-none ${
               activeTab === item.id ? 'opacity-100' : 'opacity-100'
             }`}>
               {item.label}
