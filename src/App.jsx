@@ -236,6 +236,10 @@ const App = () => {
                   <div className="flex flex-col gap-10">
                     <div>
                       <h1 className="text-3xl lg:text-5xl font-black italic uppercase tracking-widest mb-10 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent text-center">Jatala Properties</h1>
+                      <div className="grid grid-cols-2 gap-3 md:gap-6">
+                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight/>} value={revenueVal + pendingVal} />
+                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight/>} value={expenseVal} />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                       <div className="lg:col-span-1 bg-slate-800/20 border border-slate-700/50 rounded-[32px] p-8 lg:p-10 flex flex-col">
