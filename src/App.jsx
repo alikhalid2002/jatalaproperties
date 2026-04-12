@@ -186,8 +186,8 @@ const App = () => {
             </div>
           </div>
           
-          <div className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-auto">
-            <h1 onClick={() => setActiveTab('Dashboard')} className="text-xl lg:text-3xl font-black italic uppercase tracking-[0.3em] cursor-pointer text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Jatala Properties</h1>
+          <div className="flex-1 flex justify-center">
+            {/* Title removed as requested */}
           </div>
           
           <div className="flex-1 flex justify-end items-center gap-4">
@@ -227,7 +227,7 @@ const App = () => {
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
                     <div className="mb-14">
-                      <h1 className="text-3xl lg:text-9xl font-black italic uppercase tracking-[0.45em] mb-14 text-white text-center drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">Jatala Properties</h1>
+                      {/* Removed oversized title to prevent header overlap */}
                       
                       <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-20">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight size={28}/>} value={revenueVal + pendingVal} />
