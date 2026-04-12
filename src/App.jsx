@@ -226,8 +226,8 @@ const App = () => {
               ) : activeTab === 'Dashboard' ? (
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
-                    <div className="mb-14 pt-10">
-                      <h1 className="text-4xl lg:text-9xl font-black italic uppercase tracking-[0.35em] mb-14 text-white text-center drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] animate-in fade-in duration-700">Jatala Properties</h1>
+                    <div className="mb-14 pt-6">
+                      <h1 className="text-2xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">Jatala Properties</h1>
                       
                       <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-20">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight size={28}/>} value={revenueVal + pendingVal} />
