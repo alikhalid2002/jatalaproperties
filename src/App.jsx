@@ -149,12 +149,12 @@ const App = () => {
   }, [entries]);
 
   const navHubItems = [
-    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, baseColor: 'emerald' },
-    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, baseColor: 'cyan' },
-    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, baseColor: 'rose' },
-    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, baseColor: 'amber' },
-    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, baseColor: 'purple' },
-    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, baseColor: 'slate', adminOnly: true }
+    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, baseColor: 'emerald', shadow: 'shadow-[0_0_20px_rgba(16,185,129,0.15)]' },
+    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, baseColor: 'cyan', shadow: 'shadow-[0_0_20px_rgba(6,182,212,0.15)]' },
+    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, baseColor: 'rose', shadow: 'shadow-[0_0_20px_rgba(244,63,94,0.15)]' },
+    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, baseColor: 'amber', shadow: 'shadow-[0_0_20px_rgba(245,158,11,0.15)]' },
+    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, baseColor: 'purple', shadow: 'shadow-[0_0_20px_rgba(168,85,247,0.15)]' },
+    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, baseColor: 'slate', shadow: 'shadow-[0_0_20px_rgba(100,116,139,0.15)]', adminOnly: true }
   ];
 
   if (!accountType) {
@@ -268,7 +268,7 @@ const App = () => {
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/20 to-${item.baseColor}-600/5 backdrop-blur-md border border-${item.baseColor}-500/30 rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl w-full sm:w-auto`}
+                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/30 sm:from-${item.baseColor}-500/20 to-${item.baseColor}-600/5 backdrop-blur-md border border-${item.baseColor}-500/50 sm:border-${item.baseColor}-500/30 ${item.shadow} rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden w-full sm:w-auto`}
                             >
                               <div className={`absolute inset-0 bg-gradient-to-br from-${item.baseColor}-500/10 to-${item.baseColor}-600/20 opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
                               <div className="relative z-10 flex flex-row sm:flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
