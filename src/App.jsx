@@ -256,9 +256,9 @@ const App = () => {
                     <div className="mb-14 pt-6">
                       <h1 className="text-2xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">Jatala Properties</h1>
                       
-                      <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-20">
-                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight size={28}/>} value={revenueVal + pendingVal} />
-                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight size={28}/>} value={expenseVal} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto mb-20">
+                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
+                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
@@ -339,10 +339,24 @@ const App = () => {
 };
 
 const FinanceCard = ({ label, color, icon, value }) => (
-  <div className="bg-slate-800/40 p-8 rounded-[32px] border border-slate-700/50 text-center flex flex-col items-center">
-    <div className={`p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl mb-4`}>{icon}</div>
-    <span className="text-[10px] font-black uppercase text-slate-500">{label}</span>
-    <p className="text-2xl font-black italic mt-1">Rs. {value.toLocaleString()}</p>
+  <div className="group relative bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 rounded-3xl sm:rounded-[36px] border border-white/5 flex flex-row items-center gap-6 sm:gap-8 transition-all duration-500 hover:bg-white/[0.06] hover:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden">
+    <div className={`absolute inset-0 bg-gradient-to-br from-${color}-500/5 to-transparent opacity-30 group-hover:opacity-60 transition-opacity duration-500`} />
+    
+    <div className={`relative p-5 sm:p-7 bg-${color}-500/10 text-${color}-400 rounded-2xl sm:rounded-3xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shrink-0`}>
+      {React.cloneElement(icon, { size: 40, className: "shrink-0" })}
+    </div>
+    
+    <div className="relative flex flex-col items-start min-w-0">
+      <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-1.5">{label}</span>
+      <p className="text-2xl sm:text-4xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] truncate w-full">
+        <span className="text-sm sm:text-lg mr-1 opacity-50 not-italic">Rs.</span>
+        {value.toLocaleString()}
+      </p>
+    </div>
+
+    {/* Progress Accent Line */}
+    <div className={`absolute bottom-0 left-0 w-full h-1 bg-${color}-500/30 group-hover:h-1.5 group-hover:bg-${color}-500/50 transition-all duration-500`} />
+    <div className={`absolute bottom-0 left-0 h-1 bg-${color}-500 shadow-[0_0_15px_rgba(var(--color),0.5)] transition-all duration-1000 w-[65%] group-hover:w-[75%]`} />
   </div>
 );
 
