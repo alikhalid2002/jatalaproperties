@@ -19,18 +19,15 @@ html, body, #root {
   background-color: #0f172a;
 }
 
+/* Typography System */
 body {
   font-family: 'Outfit', sans-serif;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.025em;
   word-spacing: 0.15rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   direction: ltr;
   text-align: left;
-}
-
-.font-urdu {
-  font-family: 'Outfit', sans-serif;
 }
 
 /* Premium Button Interactions */

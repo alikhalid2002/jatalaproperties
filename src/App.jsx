@@ -149,12 +149,12 @@ const App = () => {
   }, [entries]);
 
   const navHubItems = [
-    { id: 'Land', label: 'Land Assets', urdu: 'زمین کے اثاثے', icon: <Map size={48} />, color: 'from-blue-500/20 to-indigo-500/20' },
-    { id: 'Shops', label: 'Shops', urdu: 'دکانیں', icon: <Store size={48} />, color: 'from-emerald-500/20 to-teal-500/20' },
-    { id: 'Expenses', label: 'Expenses', urdu: 'اخراجات', icon: <Receipt size={48} />, color: 'from-rose-500/20 to-pink-500/20' },
-    { id: 'Sold', label: 'Sold', urdu: 'فروخت شدہ', icon: <CheckCircle size={48} />, color: 'from-amber-500/20 to-orange-500/20' },
-    { id: 'Reports', label: 'Reports', urdu: 'رپورٹیں', icon: <BarChart3 size={48} />, color: 'from-violet-500/20 to-purple-500/20' },
-    { id: 'Settings', label: 'Settings', urdu: 'سیٹنگز', icon: <Settings size={48} />, color: 'from-slate-500/20 to-slate-700/20', adminOnly: true }
+    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, color: 'from-blue-500/20 to-indigo-500/20' },
+    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, color: 'from-emerald-500/20 to-teal-500/20' },
+    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, color: 'from-rose-500/20 to-pink-500/20' },
+    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, color: 'from-amber-500/20 to-orange-500/20' },
+    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, color: 'from-violet-500/20 to-purple-500/20' },
+    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, color: 'from-slate-500/20 to-slate-700/20', adminOnly: true }
   ];
 
   if (!accountType) {
@@ -179,31 +179,34 @@ const App = () => {
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full">
-          <div onClick={() => setActiveTab('Dashboard')} className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:rotate-6 transition-all duration-300">
-              <Home size={22} />
+        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative">
+          <div className="flex-1 flex items-center">
+            <div onClick={() => setActiveTab('Dashboard')} className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer">
+              <Home size={22} className="text-white" />
             </div>
-            <h1 className="text-xl font-black italic uppercase tracking-[0.2em] hidden sm:block">Jatala Properties</h1>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="absolute left-1/2 -translate-x-1/2 text-center pointer-events-auto">
+            <h1 onClick={() => setActiveTab('Dashboard')} className="text-xl lg:text-3xl font-black italic uppercase tracking-[0.3em] cursor-pointer text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">Jatala Properties</h1>
+          </div>
+          
+          <div className="flex-1 flex justify-end items-center gap-4">
              {activeTab !== 'Dashboard' && (
                <div className="relative lg:flex hidden mr-4">
                  <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/>
-                 <input type="text" placeholder="Search..." className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/>
+                 <input type="text" placeholder="Search..." className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all text-white" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/>
                </div>
              )}
              
             <button onClick={() => setIsReminderDrawerOpen(true)} className="p-3.5 bg-white/5 border border-white/10 rounded-2xl relative hover:bg-white/10 transition-all group">
-              <Bell size={22} className="group-hover:rotate-12 transition-transform duration-300"/>
+              <Bell size={22} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
               {activeReminders.length > 0 && <span className="absolute top-2.5 right-2.5 w-3 h-3 bg-rose-600 rounded-full border-2 border-[#0f172a]" />}
             </button>
 
              <div className="relative">
                <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
-                 <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={22}/></div>
-                 <span className="text-xs font-black uppercase lg:block hidden tracking-widest">{accountType}</span>
+                 <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={22} className="text-white"/></div>
+                 <span className="text-xs font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
                </button>
                {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
                  <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
@@ -224,30 +227,29 @@ const App = () => {
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
                     <div className="mb-14">
-                      <h1 className="text-3xl lg:text-7xl font-black italic uppercase tracking-[0.3em] mb-12 bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent text-center">Jatala Properties</h1>
+                      <h1 className="text-3xl lg:text-9xl font-black italic uppercase tracking-[0.45em] mb-14 text-white text-center drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">Jatala Properties</h1>
                       
-                      <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-16">
+                      <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto mb-20">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight size={28}/>} value={revenueVal + pendingVal} />
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight size={28}/>} value={expenseVal} />
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr max-w-6xl mx-auto">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 auto-rows-fr max-w-6xl mx-auto">
                         {navHubItems.map((item) => {
                           if (item.adminOnly && !isAdmin) return null;
                           return (
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-col items-center justify-center p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[40px] hover:scale-105 hover:bg-indigo-600/10 hover:border-indigo-500/50 transition-all duration-500 relative overflow-hidden`}
+                              className={`group flex flex-col items-center justify-center p-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl`}
                             >
-                              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                              <div className="relative z-10 flex flex-col items-center gap-4">
-                                <div className="p-6 bg-white/5 rounded-3xl group-hover:rotate-6 transition-transform duration-500 border border-white/10 shadow-xl">
-                                  {React.cloneElement(item.icon, { size: 40, className: "text-white/90" })}
+                              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
+                              <div className="relative z-10 flex flex-col items-center gap-6">
+                                <div className="p-8 bg-white/5 rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-indigo-600/20">
+                                  {React.cloneElement(item.icon, { size: 48, className: "text-white" })}
                                 </div>
                                 <div className="text-center">
-                                  <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 group-hover:text-indigo-300 transition-colors uppercase">{item.id === 'Land' ? 'Land Assets' : item.label}</span>
-                                  <span className="block text-2xl font-black urdu-text leading-tight group-hover:scale-110 transition-transform duration-500">{item.urdu}</span>
+                                  <span className="block text-2xl font-black uppercase tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">{item.label}</span>
                                 </div>
                               </div>
                             </button>
