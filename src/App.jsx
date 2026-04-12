@@ -179,22 +179,22 @@ const App = () => {
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center px-6 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative">
-          <div className="flex-1 flex items-center">
+        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
+          <div className="flex-shrink-0 flex items-center">
             <div onClick={() => setActiveTab('Dashboard')} className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer">
-              <Home size={22} className="text-white" />
+              <Home size={20} className="text-white" />
             </div>
           </div>
           
-          <div className="flex-1 flex justify-center">
-            <div className="relative">
+          <div className="flex-grow flex justify-center min-w-0">
+            <div className="relative w-full flex justify-center">
               <button 
                 onClick={() => setShowYearMenu(!showYearMenu)} 
-                className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all font-black text-xs tracking-[0.15em] text-white uppercase italic shadow-lg"
+                className="flex items-center gap-1.5 lg:gap-3 px-3 lg:px-6 py-2 lg:py-3 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl hover:bg-white/10 transition-all font-black text-[10px] lg:text-xs tracking-wider lg:tracking-[0.15em] text-white uppercase italic shadow-lg whitespace-nowrap overflow-hidden"
               >
-                <Calendar size={18} className="text-indigo-400" />
-                FY {selectedYear}-{Number(selectedYear)-1}
-                <ChevronDown size={14} className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} />
+                <Calendar size={window.innerWidth < 768 ? 14 : 18} className="text-indigo-400 shrink-0" />
+                <span className="truncate">{selectedYear}-{Number(selectedYear)-1}</span>
+                <ChevronDown size={12} className={`text-slate-500 transition-transform duration-300 shrink-0 ${showYearMenu ? 'rotate-180' : ''}`} />
               </button>
               
               {showYearMenu && (
@@ -217,7 +217,7 @@ const App = () => {
             </div>
           </div>
           
-          <div className="flex-1 flex justify-end items-center gap-4">
+          <div className="flex-shrink-0 flex justify-end items-center gap-2 lg:gap-4">
              {activeTab !== 'Dashboard' && (
                <div className="relative lg:flex hidden mr-4">
                  <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/>
@@ -225,15 +225,15 @@ const App = () => {
                </div>
              )}
              
-            <button onClick={() => setIsReminderDrawerOpen(true)} className="p-3.5 bg-white/5 border border-white/10 rounded-2xl relative hover:bg-white/10 transition-all group">
-              <Bell size={22} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
-              {activeReminders.length > 0 && <span className="absolute top-2.5 right-2.5 w-3 h-3 bg-rose-600 rounded-full border-2 border-[#0f172a]" />}
+            <button onClick={() => setIsReminderDrawerOpen(true)} className="p-2.5 lg:p-3.5 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl relative hover:bg-white/10 transition-all group">
+              <Bell size={20} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
+              {activeReminders.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-600 rounded-full border-2 border-[#0f172a]" />}
             </button>
 
              <div className="relative">
-               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-3 p-1 pr-5 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
-                 <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={22} className="text-white"/></div>
-                 <span className="text-xs font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
+               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
+                 <div className="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={18} className="text-white"/></div>
+                 <span className="text-[10px] font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
                </button>
                {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
                  <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
