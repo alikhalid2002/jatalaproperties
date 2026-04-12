@@ -201,7 +201,7 @@ const App = () => {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
                   <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-slate-900 border border-white/10 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
-                    {["2026", "2025", "2024", "2023"].map(year => (
+                    {["2030", "2029", "2028", "2027", "2026", "2025", "2024", "2023"].map(year => (
                       <button 
                         key={year} 
                         onClick={() => { setSelectedYear(year); setShowYearMenu(false); }} 
