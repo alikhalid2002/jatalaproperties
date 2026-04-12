@@ -261,22 +261,24 @@ const App = () => {
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight size={28}/>} value={expenseVal} />
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 auto-rows-fr max-w-6xl mx-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
                         {navHubItems.map((item) => {
                           if (item.adminOnly && !isAdmin) return null;
                           return (
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-col items-center justify-center p-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl`}
+                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden shadow-2xl w-full sm:w-auto`}
                             >
                               <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
-                              <div className="relative z-10 flex flex-col items-center gap-6">
-                                <div className="p-8 bg-white/5 rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-indigo-600/20">
-                                  {React.cloneElement(item.icon, { size: 48, className: "text-white" })}
+                              <div className="relative z-10 flex flex-row sm:flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                                <div className="p-3.5 sm:p-8 bg-white/5 rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-indigo-600/20 shrink-0">
+                                  <div className="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center">
+                                    {React.cloneElement(item.icon, { size: '100%', className: "text-white" })}
+                                  </div>
                                 </div>
-                                <div className="text-center">
-                                  <span className="block text-2xl font-black uppercase tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">{item.label}</span>
+                                <div className="text-left sm:text-center flex-1 sm:flex-none">
+                                  <span className="block text-base sm:text-xl lg:text-2xl font-black uppercase tracking-wider lg:tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap truncate sm:overflow-visible">{item.label}</span>
                                 </div>
                               </div>
                             </button>
