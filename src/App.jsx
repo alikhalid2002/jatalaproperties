@@ -4,7 +4,7 @@ import {
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
   Plus, Trash2, Loader2, CheckCircle,
   ArrowUpRight, ArrowDownRight, Activity, 
-  Shield, User, X, Lock, Calendar, Home
+  Shield, User, X, Lock, Calendar, Home, ChevronRight
 } from 'lucide-react';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
@@ -149,12 +149,12 @@ const App = () => {
   }, [entries]);
 
   const navHubItems = [
-    { id: 'Land', label: 'Land Assets', icon: <Map size={48} />, baseColor: 'emerald', shadow: 'shadow-[0_0_20px_rgba(16,185,129,0.15)]' },
-    { id: 'Shops', label: 'Shops', icon: <Store size={48} />, baseColor: 'cyan', shadow: 'shadow-[0_0_20px_rgba(6,182,212,0.15)]' },
-    { id: 'Expenses', label: 'Expenses', icon: <Receipt size={48} />, baseColor: 'rose', shadow: 'shadow-[0_0_20px_rgba(244,63,94,0.15)]' },
-    { id: 'Sold', label: 'Sold', icon: <CheckCircle size={48} />, baseColor: 'amber', shadow: 'shadow-[0_0_20px_rgba(245,158,11,0.15)]' },
-    { id: 'Reports', label: 'Reports', icon: <BarChart3 size={48} />, baseColor: 'purple', shadow: 'shadow-[0_0_20px_rgba(168,85,247,0.15)]' },
-    { id: 'Settings', label: 'Settings', icon: <Settings size={48} />, baseColor: 'slate', shadow: 'shadow-[0_0_20px_rgba(100,116,139,0.15)]', adminOnly: true }
+    { id: 'Land', label: 'Land Assets', icon: <Map />, baseColor: 'emerald', shadow: 'shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)]' },
+    { id: 'Shops', label: 'Commercial Shops', icon: <Store />, baseColor: 'cyan', shadow: 'shadow-[0_15px_30px_-5px_rgba(6,182,212,0.35)]' },
+    { id: 'Expenses', label: 'Operational Expenses', icon: <Receipt />, baseColor: 'rose', shadow: 'shadow-[0_15px_30px_-5px_rgba(244,63,94,0.35)]' },
+    { id: 'Sold', label: 'Sold Properties', icon: <CheckCircle />, baseColor: 'amber', shadow: 'shadow-[0_15px_30px_-5px_rgba(245,158,11,0.35)]' },
+    { id: 'Reports', label: 'Financial Reports', icon: <BarChart3 />, baseColor: 'purple', shadow: 'shadow-[0_15px_30px_-5px_rgba(168,85,247,0.35)]' },
+    { id: 'Settings', label: 'System Settings', icon: <Settings />, baseColor: 'slate', shadow: 'shadow-[0_15px_30px_-5px_rgba(100,116,139,0.35)]', adminOnly: true }
   ];
 
   if (!accountType) {
@@ -261,26 +261,24 @@ const App = () => {
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
                         {navHubItems.map((item) => {
                           if (item.adminOnly && !isAdmin) return null;
                           return (
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-3.5 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/60 sm:from-${item.baseColor}-500/20 to-${item.baseColor}-600/20 backdrop-blur-xl border-2 border-${item.baseColor}-500 sm:border-${item.baseColor}-500/50 ${item.shadow} rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden w-full sm:w-auto`}
+                              className={`group flex items-center justify-between p-4 sm:p-6 bg-gradient-to-br from-${item.baseColor}-700/90 to-${item.baseColor}-900/90 backdrop-blur-md border border-${item.baseColor}-400/40 ${item.shadow} rounded-[32px] hover:scale-[1.03] active:scale-95 transition-all duration-300 relative overflow-hidden w-full`}
                             >
-                              <div className={`absolute inset-0 bg-gradient-to-br from-${item.baseColor}-400/20 to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
-                              <div className="relative z-10 flex flex-row sm:flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                                <div className={`p-3 sm:p-8 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/20 shadow-lg group-hover:bg-${item.baseColor}-600/30 shrink-0`}>
-                                  <div className="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center">
-                                    {React.cloneElement(item.icon, { size: '100%', className: "text-white" })}
+                              <div className="flex items-center gap-4 sm:gap-6">
+                                <div className="p-3.5 bg-white/10 rounded-2xl border border-white/20 shadow-lg backdrop-blur-md">
+                                  <div className="w-8 h-8 flex items-center justify-center text-white">
+                                    {React.cloneElement(item.icon, { size: 28, strokeWidth: 2.5 })}
                                   </div>
                                 </div>
-                                <div className="text-left sm:text-center flex-1 sm:flex-none">
-                                  <span className="block text-base sm:text-xl lg:text-2xl font-black uppercase tracking-wider lg:tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] whitespace-nowrap truncate sm:overflow-visible">{item.label}</span>
-                                </div>
+                                <span className="text-lg sm:text-xl font-black text-white tracking-wide text-left">{item.label}</span>
                               </div>
+                              <ChevronRight className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" size={24} />
                             </button>
                           )
                         })}
