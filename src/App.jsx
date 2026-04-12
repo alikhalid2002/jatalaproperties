@@ -268,17 +268,17 @@ const App = () => {
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-4 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/30 sm:from-${item.baseColor}-500/20 to-${item.baseColor}-600/5 backdrop-blur-md border border-${item.baseColor}-500/50 sm:border-${item.baseColor}-500/30 ${item.shadow} rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden w-full sm:w-auto`}
+                              className={`group flex flex-row sm:flex-col items-center justify-start sm:justify-center p-3.5 sm:p-10 lg:p-12 bg-gradient-to-br from-${item.baseColor}-500/60 sm:from-${item.baseColor}-500/20 to-${item.baseColor}-600/20 backdrop-blur-xl border-2 border-${item.baseColor}-500 sm:border-${item.baseColor}-500/50 ${item.shadow} rounded-2xl sm:rounded-[48px] hover:scale-105 hover:bg-white/10 hover:border-white/30 transition-all duration-500 relative overflow-hidden w-full sm:w-auto`}
                             >
-                              <div className={`absolute inset-0 bg-gradient-to-br from-${item.baseColor}-500/10 to-${item.baseColor}-600/20 opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
+                              <div className={`absolute inset-0 bg-gradient-to-br from-${item.baseColor}-400/20 to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
                               <div className="relative z-10 flex flex-row sm:flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                                <div className={`p-3.5 sm:p-8 bg-white/5 rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/10 shadow-inner group-hover:bg-${item.baseColor}-600/20 shrink-0`}>
+                                <div className={`p-3 sm:p-8 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-[36px] group-hover:rotate-12 transition-all duration-500 border border-white/20 shadow-lg group-hover:bg-${item.baseColor}-600/30 shrink-0`}>
                                   <div className="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center">
                                     {React.cloneElement(item.icon, { size: '100%', className: "text-white" })}
                                   </div>
                                 </div>
                                 <div className="text-left sm:text-center flex-1 sm:flex-none">
-                                  <span className="block text-base sm:text-xl lg:text-2xl font-black uppercase tracking-wider lg:tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap truncate sm:overflow-visible">{item.label}</span>
+                                  <span className="block text-base sm:text-xl lg:text-2xl font-black uppercase tracking-wider lg:tracking-[0.2em] text-white group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] whitespace-nowrap truncate sm:overflow-visible">{item.label}</span>
                                 </div>
                               </div>
                             </button>
