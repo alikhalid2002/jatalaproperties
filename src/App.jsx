@@ -193,7 +193,7 @@ const App = () => {
                 className="flex items-center gap-1.5 lg:gap-3 px-3 lg:px-6 py-2 lg:py-3 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl hover:bg-white/10 transition-all font-black text-[10px] lg:text-xs tracking-wider lg:tracking-[0.15em] text-white uppercase italic shadow-lg whitespace-nowrap overflow-hidden"
               >
                 <Calendar size={window.innerWidth < 768 ? 14 : 18} className="text-indigo-400 shrink-0" />
-                <span className="truncate">{Number(selectedYear)-1}-{selectedYear}</span>
+                <span className="truncate">{selectedYear}</span>
                 <ChevronDown size={12} className={`text-slate-500 transition-transform duration-300 shrink-0 ${showYearMenu ? 'rotate-180' : ''}`} />
               </button>
               
@@ -201,13 +201,13 @@ const App = () => {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
                   <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-slate-900 border border-white/10 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
-                    {["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"].map(year => (
+                    {["2024", "2025", "2026", "2027", "2028", "2029", "2030"].map(year => (
                       <button 
                         key={year} 
                         onClick={() => { setSelectedYear(year); setShowYearMenu(false); }} 
                         className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${selectedYear === year ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
                       >
-                        <span className="text-xs font-black uppercase tracking-widest">{Number(year)-1}-{year}</span>
+                        <span className="text-xs font-black uppercase tracking-widest">{year}</span>
                         {selectedYear === year && <CheckCircle size={16} />}
                       </button>
                     ))}
