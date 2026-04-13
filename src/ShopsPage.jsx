@@ -334,377 +334,379 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
       </div>
 
       {selectedShop && (
-        <div className="fixed inset-0 bg-[#0f172a]/70 backdrop-blur-xl z-[100] flex items-end lg:items-center justify-center p-0 lg:p-10 animate-in fade-in duration-500">
-          <div className="w-full max-w-4xl bg-[#0f172a] lg:bg-slate-900 border-t lg:border-x border-slate-800 lg:rounded-[32px] rounded-t-[32px] shadow-2xl relative flex flex-col h-[92vh] lg:h-auto lg:max-h-[85vh] overflow-hidden slide-in-from-bottom lg:slide-in-from-top">
-            
-            {/* Image Preview Overlay */}
-            {previewImage && (
-              <div 
-                className="absolute inset-0 z-[150] bg-[#0f172a]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 animate-in zoom-in-95 duration-300"
-                onClick={() => setPreviewImage(null)}
-              >
-                <button 
-                  onClick={() => setPreviewImage(null)}
-                  className="absolute top-6 right-6 p-4 bg-white/10 hover:bg-rose-500 text-white rounded-2xl transition-all"
-                >
-                  <X size={24} />
-                </button>
-                <img src={previewImage} className="max-w-[90%] max-h-[80%] rounded-2xl object-contain shadow-2xl" />
-              </div>
-            )}
-            
-            {/* Header - Centered & Sleek */}
-            <div className="p-10 border-b border-slate-800 bg-slate-900/40 relative flex flex-col items-center text-center">
-              <div className="absolute top-6 right-6 flex items-center gap-3">
-                 {isAdmin && (
-                   isEditing ? (
-                     <button onClick={handleUpdateShop} disabled={isSaving} className="p-3 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-2xl transition-all">
-                       {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
-                     </button>
-                   ) : (
-                     <button onClick={() => setIsEditing(true)} className="p-3 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-2xl transition-all">
-                       <Edit3 size={20} />
-                     </button>
-                   )
-                 )}
-                 <button onClick={() => setSelectedShop(null)} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-2xl transition-all group">
-                   <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-                 </button>
-              </div>
-              
-              {/* Shop Identity - Optimized for mobile */}
-              <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 mb-4 lg:mb-6">
-                <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-tight">{selectedShop.tenantEn || transliterateToEnglish(selectedShop.tenant)}</h2>
-                <div className="hidden lg:block w-2 h-2 rounded-full bg-slate-700"></div>
-                <p className="text-xl lg:text-2xl font-black italic text-slate-400 opacity-80">{selectedShop.area || '12x15'}</p>
-              </div>
-
-              {isEditing && (
-                <div className="flex flex-col gap-4 w-full max-w-md animate-in slide-in-from-top-4 pb-6 mt-4 border-t border-slate-700/30 pt-10">
-                   <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Updating Information</p>
-                   </div>
-                  <input 
-                    value={editData.tenant}
-                    onChange={(e) => setEditData({...editData, tenant: e.target.value})}
-                    className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-8 text-2xl font-black uppercase text-white text-center leading-[2.5] w-full italic"
-                    placeholder="Tenant Name"
-                  />
-                  <div className="flex gap-4">
-                    <input 
-                      value={editData.area}
-                      dir="ltr"
-                      onChange={(e) => setEditData({...editData, area: e.target.value})}
-                      className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-3 text-sm font-black text-white text-center flex-1"
-                      placeholder="Area (e.g. 10x12)"
-                    />
-                    <input 
-                      type="number"
-                      value={editData.rent}
-                      dir="ltr"
-                      onChange={(e) => setEditData({...editData, rent: e.target.value})}
-                      className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-3 text-sm font-black text-white text-center flex-1"
-                      placeholder="Monthly Rent"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className={`flex-1 overflow-y-auto no-scrollbar p-8 lg:p-12 ${isEditing ? 'space-y-0' : 'space-y-12'}`}>
-              
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold uppercase tracking-widest italic">
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-indigo-500/30 transition-all">
-                    <div className="flex items-center justify-center gap-2 text-indigo-400 opacity-60">
-                       <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
-                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Annual Dues</span>
-                    </div>
-                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Number((selectedShop.rent || 0) * 12).toLocaleString()}</p>
-                 </div>
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-emerald-500/30 transition-all">
-                    <div className="flex items-center justify-center gap-2 text-emerald-400 opacity-60">
-                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Received</span>
-                    </div>
-                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0).toLocaleString()}</p>
-                 </div>
-                 <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-orange-500/30 transition-all">
-                    <div className="flex items-center justify-center gap-2 text-orange-400 opacity-60">
-                       <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                       <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Balance</span>
-                    </div>
-                    <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Math.max(0, Number((selectedShop.rent || 0) * 12) - getShopTransactions(selectedShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
-                 </div>
-              </div>
-
-
-              {/* Document Vault for Shop Tenants */}
-              <div className="bg-slate-900 border-y border-slate-800 p-8 space-y-6">
-                <div className="flex items-center gap-2 mb-2">
-                   <Shield size={12} className="text-emerald-400/80" />
-                   <h4 className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/80 italic">Tenant Document Vault</h4>
-                </div>
+        (() => {
+          const currentShop = shops.find(s => s.id === selectedShop.id) || selectedShop;
+          return (
+            <div className="fixed inset-0 bg-[#0f172a]/70 backdrop-blur-xl z-[100] flex items-end lg:items-center justify-center p-0 lg:p-10 animate-in fade-in duration-500">
+              <div className="w-full max-w-4xl bg-[#0f172a] lg:bg-slate-900 border-t lg:border-x border-slate-800 lg:rounded-[32px] rounded-t-[32px] shadow-2xl relative flex flex-col h-[92vh] lg:h-auto lg:max-h-[85vh] overflow-hidden slide-in-from-bottom lg:slide-in-from-top">
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-3xl group">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 italic">
-                          <User size={12}/> ID Copy
-                        </p>
-                        {selectedShop.idCardUrl && (
-                          <button onClick={() => {
-                            if (selectedShop.idCardUrl.toLowerCase().includes('.pdf') || selectedShop.idCardUrl.includes('/idCardUrl%2F')) {
-                               window.open(selectedShop.idCardUrl, '_blank');
-                            } else {
-                               setPreviewImage(selectedShop.idCardUrl);
-                            }
-                          }} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all text-[7px] font-black uppercase tracking-widest">
-                             View
-                          </button>
-                        )}
-                      </div>
-                      {isAdmin ? (
-                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
-                           {isUploadingDoc.idCard ? (
-                               <Loader2 size={18} className="animate-spin text-indigo-500"/>
-                           ) : (
-                             <>
-                               <Upload size={14} className="text-slate-600 mb-1"/>
-                               <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload (PDF/IMG)</span>
-                             </>
-                           )}
-                           <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])}/>
-                        </label>
-                      ) : !selectedShop.idCardUrl && (
-                        <div className="flex flex-col items-center justify-center border border-slate-700/30 rounded-2xl p-2 bg-slate-900/20 min-h-[70px] opacity-40">
-                           <Shield size={14} className="text-slate-600 mb-1" />
-                           <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 italic text-center">No Identity Card<br/>on record</p>
-                        </div>
-                      )}
-                   </div>
-
-                   <div className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-3xl group">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 italic">
-                          <FileText size={12}/> Agreement
-                        </p>
-                        {selectedShop.agreementUrl && (
-                          <button onClick={() => {
-                            if (selectedShop.agreementUrl.toLowerCase().includes('.pdf') || selectedShop.agreementUrl.includes('/agreementUrl%2F')) {
-                               window.open(selectedShop.agreementUrl, '_blank');
-                            } else {
-                               setPreviewImage(selectedShop.agreementUrl);
-                            }
-                          }} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all text-[7px] font-black uppercase tracking-widest">
-                             View
-                          </button>
-                        )}
-                      </div>
-                      {isAdmin ? (
-                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
-                          {isUploadingDoc.agreement ? (
-                               <Loader2 size={18} className="animate-spin text-indigo-500"/>
-                           ) : (
-                             <>
-                               <Upload size={14} className="text-slate-600 mb-1"/>
-                               <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload Legal</span>
-                             </>
-                           )}
-                           <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])}/>
-                        </label>
-                      ) : !selectedShop.agreementUrl && (
-                        <div className="flex flex-col items-center justify-center border border-slate-700/30 rounded-2xl p-2 bg-slate-900/20 min-h-[70px] opacity-40">
-                           <FileText size={14} className="text-slate-600 mb-1" />
-                           <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 italic text-center">No Agreement<br/>on record</p>
-                        </div>
-                      )}
-                   </div>
-                </div>
-              </div>
-
-              {!isEditing && isAdmin && (
-                <>
-                  {/* Payment Form Area */}
-                  <div className="space-y-8 animate-in fade-in duration-500">
-                     <div className="flex items-center gap-3">
-                        <CreditCard size={18} className="text-indigo-500"/>
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Record New Payment</h4>
-                     </div>
-
-                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <div className="space-y-6">
-                           <div className="flex gap-4">
-                              <button 
-                                onClick={() => setEntryType('Rent')}
-                                className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${entryType === 'Rent' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 grow scale-105' : 'bg-slate-800/50 text-slate-500 hover:bg-slate-800'}`}
-                              >Cash</button>
-                              <button 
-                                onClick={() => setEntryType('Bank')}
-                                className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${entryType === 'Bank' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 grow scale-105' : 'bg-slate-800/50 text-slate-500 hover:bg-slate-800 border border-slate-700/50'}`}
-                              >Bank</button>
-                              <button 
-                                onClick={() => setEntryType('Expense')}
-                                className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${entryType === 'Expense' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 grow scale-105' : 'bg-slate-800/50 text-slate-500 hover:bg-slate-800 border border-slate-700/50'}`}
-                              >Expense</button>
-                           </div>
-                           <div className="relative group">
-                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-hover:text-indigo-500 transition-colors">
-                                 <CreditCard size={20}/>
-                              </div>
-                              <input 
-                                type="number" 
-                                required 
-                                placeholder="Enter amount..."
-                                value={entryAmount}
-                                onChange={(e) => setEntryAmount(e.target.value)}
-                                className="w-full bg-slate-900/50 border border-slate-700 p-6 pl-16 rounded-3xl font-black italic text-xl text-white outline-none focus:border-indigo-500 transition-all" 
-                              />
-                           </div>
-                        </div>
-
-                        <div className="relative">
-                           <div className="h-full border-2 border-dashed border-slate-700/50 rounded-3xl flex flex-col items-center justify-center p-8 bg-slate-900/20 group hover:border-indigo-500/50 transition-all cursor-pointer">
-                              <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                 <Plus className="text-slate-500 group-hover:text-indigo-500" size={24}/>
-                              </div>
-                              <p className="text-[11px] font-black uppercase tracking-widest text-white mb-1">Choose File</p>
-                              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">PNG, JPEG support</p>
-                           </div>
-                        </div>
-                     </div>
+                {/* Image Preview Overlay */}
+                {previewImage && (
+                  <div 
+                    className="absolute inset-0 z-[150] bg-[#0f172a]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 animate-in zoom-in-95 duration-300"
+                    onClick={() => setPreviewImage(null)}
+                  >
+                    <button 
+                      onClick={() => setPreviewImage(null)}
+                      className="absolute top-6 right-6 p-4 bg-white/10 hover:bg-rose-500 text-white rounded-2xl transition-all"
+                    >
+                      <X size={24} />
+                    </button>
+                    <img src={previewImage} className="max-w-[90%] max-h-[80%] rounded-2xl object-contain shadow-2xl" />
                   </div>
-                </>
-              )}
+                )}
+                
+                {/* Header - Centered & Sleek */}
+                <div className="p-10 border-b border-slate-800 bg-slate-900/40 relative flex flex-col items-center text-center">
+                  <div className="absolute top-6 right-6 flex items-center gap-3">
+                    {isAdmin && (
+                      isEditing ? (
+                        <button onClick={handleUpdateShop} disabled={isSaving} className="p-3 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-2xl transition-all">
+                          {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+                        </button>
+                      ) : (
+                        <button onClick={() => setIsEditing(true)} className="p-3 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-2xl transition-all">
+                          <Edit3 size={20} />
+                        </button>
+                      )
+                    )}
+                    <button onClick={() => setSelectedShop(null)} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-2xl transition-all group">
+                      <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                    </button>
+                  </div>
+                  
+                  {/* Shop Identity - Optimized for mobile */}
+                  <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 mb-4 lg:mb-6">
+                    <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-tight">{currentShop.tenantEn || transliterateToEnglish(currentShop.tenant)}</h2>
+                    <div className="hidden lg:block w-2 h-2 rounded-full bg-slate-700"></div>
+                    <p className="text-xl lg:text-2xl font-black italic text-slate-400 opacity-80">{currentShop.area || '12x15'}</p>
+                  </div>
 
-              {/* History List - Always Visible */}
-              <div className="space-y-8 pb-10 animate-in fade-in duration-700">
-                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 italic">Payment History</h4>
-                 <div className="space-y-4">
-                    {getShopTransactions(selectedShop.id).length > 0 ? getShopTransactions(selectedShop.id).map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center bg-slate-900/30 p-6 rounded-[32px] border border-slate-800/50 hover:bg-slate-900 transition-colors group">
-                        <div className="flex items-center gap-6 grow">
-                           {editingTransId === item.id ? (
-                             <input 
-                               type="date"
-                               disabled={!isAdmin}
-                               onChange={(e) => setEditTransData({...editTransData, date: e.target.value})}
-                               className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-transparent border-b border-indigo-500 outline-none cursor-pointer disabled:opacity-50"
-                             />
-                           ) : (
-                             <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-40">{item.date}</div>
-                           )}
-                           
-                           <div className="grow">
-                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Amount & Receipt</p>
+                  {isEditing && (
+                    <div className="flex flex-col gap-4 w-full max-w-md animate-in slide-in-from-top-4 pb-6 mt-4 border-t border-slate-700/30 pt-10">
+                      <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Updating Information</p>
+                      </div>
+                      <input 
+                        value={editData.tenant}
+                        onChange={(e) => setEditData({...editData, tenant: e.target.value})}
+                        className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-8 text-2xl font-black uppercase text-white text-center leading-[2.5] w-full italic"
+                        placeholder="Tenant Name"
+                      />
+                      <div className="flex gap-4">
+                        <input 
+                          value={editData.area}
+                          dir="ltr"
+                          onChange={(e) => setEditData({...editData, area: e.target.value})}
+                          className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-3 text-sm font-black text-white text-center flex-1"
+                          placeholder="Area (e.g. 10x12)"
+                        />
+                        <input 
+                          type="number"
+                          value={editData.rent}
+                          dir="ltr"
+                          onChange={(e) => setEditData({...editData, rent: e.target.value})}
+                          className="bg-slate-800 border border-slate-700/50 rounded-xl px-4 py-3 text-sm font-black text-white text-center flex-1"
+                          placeholder="Monthly Rent"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className={`flex-1 overflow-y-auto no-scrollbar p-8 lg:p-12 ${isEditing ? 'space-y-0' : 'space-y-12'}`}>
+                  
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-bold uppercase tracking-widest italic">
+                    <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-indigo-500/30 transition-all">
+                        <div className="flex items-center justify-center gap-2 text-indigo-400 opacity-60">
+                          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                          <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Annual Dues</span>
+                        </div>
+                        <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Number((currentShop.rent || 0) * 12).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-emerald-500/30 transition-all">
+                        <div className="flex items-center justify-center gap-2 text-emerald-400 opacity-60">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                          <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Received</span>
+                        </div>
+                        <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {getShopTransactions(currentShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-slate-900/50 border border-slate-700/50 p-4 lg:p-8 rounded-[28px] lg:rounded-[32px] text-center space-y-2 lg:space-y-4 hover:border-orange-500/30 transition-all">
+                        <div className="flex items-center justify-center gap-2 text-orange-400 opacity-60">
+                          <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                          <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest">Balance</span>
+                        </div>
+                        <p className="text-xl lg:text-2xl font-black italic text-white">Rs. {Math.max(0, Number((currentShop.rent || 0) * 12) - getShopTransactions(currentShop.id).filter(t => t.type === 'Rent').reduce((a, b) => a + Number(b.amount), 0)).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+
+                  {/* Document Vault for Shop Tenants */}
+                  <div className="bg-slate-900 border-y border-slate-800 p-8 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield size={12} className="text-emerald-400/80" />
+                      <h4 className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/80 italic">Tenant Document Vault</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-3xl group">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 italic">
+                              <User size={12}/> ID Copy
+                            </p>
+                            {currentShop.idCardUrl && (
+                              <button onClick={() => {
+                                if (currentShop.idCardUrl.toLowerCase().includes('.pdf') || currentShop.idCardUrl.includes('/idCardUrl%2F')) {
+                                  window.open(currentShop.idCardUrl, '_blank');
+                                } else {
+                                  setPreviewImage(currentShop.idCardUrl);
+                                }
+                              }} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all text-[7px] font-black uppercase tracking-widest">
+                                View
+                              </button>
+                            )}
+                          </div>
+                          {isAdmin ? (
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
+                              {isUploadingDoc.idCard ? (
+                                  <Loader2 size={18} className="animate-spin text-indigo-500"/>
+                              ) : (
+                                <>
+                                  <Upload size={14} className="text-slate-600 mb-1"/>
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload (PDF/IMG)</span>
+                                </>
+                              )}
+                              <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])}/>
+                            </label>
+                          ) : !currentShop.idCardUrl && (
+                            <div className="flex flex-col items-center justify-center border border-slate-700/30 rounded-2xl p-2 bg-slate-900/20 min-h-[70px] opacity-40">
+                              <Shield size={14} className="text-slate-600 mb-1" />
+                              <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 italic text-center">No Identity Card<br/>on record</p>
+                            </div>
+                          )}
+                      </div>
+
+                      <div className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-3xl group">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 italic">
+                              <FileText size={12}/> Agreement
+                            </p>
+                            {currentShop.agreementUrl && (
+                              <button onClick={() => {
+                                if (currentShop.agreementUrl.toLowerCase().includes('.pdf') || currentShop.agreementUrl.includes('/agreementUrl%2F')) {
+                                  window.open(currentShop.agreementUrl, '_blank');
+                                } else {
+                                  setPreviewImage(currentShop.agreementUrl);
+                                }
+                              }} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white transition-all text-[7px] font-black uppercase tracking-widest">
+                                View
+                              </button>
+                            )}
+                          </div>
+                          {isAdmin ? (
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
+                              {isUploadingDoc.agreement ? (
+                                  <Loader2 size={18} className="animate-spin text-indigo-500"/>
+                              ) : (
+                                <>
+                                  <Upload size={14} className="text-slate-600 mb-1"/>
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload Legal</span>
+                                </>
+                              )}
+                              <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])}/>
+                            </label>
+                          ) : !currentShop.agreementUrl && (
+                            <div className="flex flex-col items-center justify-center border border-slate-700/30 rounded-2xl p-2 bg-slate-900/20 min-h-[70px] opacity-40">
+                              <FileText size={14} className="text-slate-600 mb-1" />
+                              <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 italic text-center">No Agreement<br/>on record</p>
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {!isEditing && isAdmin && (
+                    <>
+                      {/* Payment Form Area */}
+                      <div className="space-y-8 animate-in fade-in duration-500">
+                        <div className="flex items-center gap-3">
+                            <CreditCard size={18} className="text-indigo-500"/>
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Record New Payment</h4>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                              <div className="flex gap-4">
+                                  {['Rent', 'Bank', 'Expense'].map((m) => (
+                                    <button 
+                                      key={m}
+                                      onClick={() => setEntryType(m)}
+                                      className={`flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${entryType === m ? (m === 'Expense' ? 'bg-rose-500 shadow-rose-500/30' : 'bg-indigo-600 shadow-indigo-600/30') + ' text-white shadow-lg grow scale-105' : 'bg-slate-800/50 text-slate-500 hover:bg-slate-800 border border-slate-700/50'}`}
+                                    >
+                                      {m === 'Rent' ? 'Cash' : m}
+                                    </button>
+                                  ))}
+                              </div>
+                              <div className="relative group">
+                                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-hover:text-indigo-500 transition-colors">
+                                    <CreditCard size={20}/>
+                                  </div>
+                                  <input 
+                                    type="number" 
+                                    required 
+                                    placeholder="Enter amount..."
+                                    value={entryAmount}
+                                    onChange={(e) => setEntryAmount(e.target.value)}
+                                    className="w-full bg-slate-900/50 border border-slate-700 p-6 pl-16 rounded-3xl font-black italic text-xl text-white outline-none focus:border-indigo-500 transition-all" 
+                                  />
+                              </div>
+                            </div>
+
+                            <div className="relative">
+                              <div className="h-full border-2 border-dashed border-slate-700/50 rounded-3xl flex flex-col items-center justify-center p-8 bg-slate-900/20 group hover:border-indigo-500/50 transition-all cursor-pointer">
+                                  <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <Plus className="text-slate-500 group-hover:text-indigo-500" size={24}/>
+                                  </div>
+                                  <p className="text-[11px] font-black uppercase tracking-widest text-white mb-1">Choose File</p>
+                                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">PNG, JPEG support</p>
+                              </div>
+                            </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* History List - Always Visible */}
+                  <div className="space-y-8 pb-10 animate-in fade-in duration-700">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 italic">Payment History</h4>
+                    <div className="space-y-4">
+                        {getShopTransactions(currentShop.id).length > 0 ? getShopTransactions(currentShop.id).map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center bg-slate-900/30 p-6 rounded-[32px] border border-slate-800/50 hover:bg-slate-900 transition-colors group">
+                            <div className="flex items-center gap-6 grow">
                               {editingTransId === item.id ? (
                                 <input 
-                                  type="number"
+                                  type="date"
                                   disabled={!isAdmin}
-                                  value={editTransData.amount}
-                                  onChange={(e) => setEditTransData({...editTransData, amount: e.target.value})}
-                                  className="bg-slate-800 border-b border-indigo-500 text-xl font-black italic text-white leading-none outline-none w-32 disabled:opacity-50"
+                                  onChange={(e) => setEditTransData({...editTransData, date: e.target.value})}
+                                  className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-transparent border-b border-indigo-500 outline-none cursor-pointer disabled:opacity-50"
                                 />
                               ) : (
-                                <p className="text-xl font-black italic text-white leading-none">Rs. {Number(item.amount).toLocaleString()}</p>
+                                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 opacity-40">{item.date}</div>
                               )}
-                           </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                           <div className="text-left">
-                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Method</p>
-                              {editingTransId === item.id ? (
-                                <select 
-                                  disabled={!isAdmin}
-                                  value={editTransData.type}
-                                  onChange={(e) => setEditTransData({...editTransData, type: e.target.value})}
-                                  className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-slate-800 border-none outline-none appearance-none cursor-pointer disabled:opacity-50"
-                                >
-                                  <option value="Rent">Cash</option>
-                                  <option value="Bank">Bank</option>
-                                </select>
-                              ) : (
-                                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{item.type === 'Bank' ? 'Bank' : 'Cash'}</p>
-                              )}
-                           </div>
-                           <div className="flex items-center gap-2">
-                              {editingTransId === item.id ? (
-                                <>
-                                  <button 
-                                    onClick={() => handleUpdateTransaction(item.id)}
-                                    className="p-3 bg-emerald-500 text-white rounded-xl transition-all shadow-lg shadow-emerald-500/20"
-                                  >
-                                    <Save size={14}/>
-                                  </button>
-                                  <button 
-                                    onClick={() => setEditingTransId(null)}
-                                    className="p-3 bg-slate-800 text-slate-400 rounded-xl"
-                                  >
-                                    <X size={14}/>
-                                  </button>
-                                </>
-                              ) : isEditing ? (
-                                <>
-                                  <button 
-                                    onClick={() => {
-                                      setEditingTransId(item.id);
-                                      setEditTransData({ 
-                                        amount: item.amount,
-                                        date: item.date || new Date().toISOString().split('T')[0],
-                                        type: item.type || 'Rent'
-                                      });
-                                    }}
-                                    className="p-3 bg-slate-800 text-slate-500 hover:text-white rounded-xl transition-all"
-                                  >
-                                    <Edit3 size={14}/>
-                                  </button>
-                                  <button 
-                                    onClick={() => handleDeleteTransaction(item.id)}
-                                    className="p-3 bg-slate-800 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
-                                  >
-                                    <Trash2 size={14}/>
-                                  </button>
-                                </>
-                              ) : null}
-                           </div>
-                        </div>
-                      </div>
-                    )) : (
-                      <div className="py-12 text-center">
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">No History Records Found</p>
-                      </div>
-                    )}
-                 </div>
+                              
+                              <div className="grow">
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Amount & Receipt</p>
+                                  {editingTransId === item.id ? (
+                                    <input 
+                                      type="number"
+                                      disabled={!isAdmin}
+                                      value={editTransData.amount}
+                                      onChange={(e) => setEditTransData({...editTransData, amount: e.target.value})}
+                                      className="bg-slate-800 border-b border-indigo-500 text-xl font-black italic text-white leading-none outline-none w-32 disabled:opacity-50"
+                                    />
+                                  ) : (
+                                    <p className="text-xl font-black italic text-white leading-none">Rs. {Number(item.amount).toLocaleString()}</p>
+                                  )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-6">
+                              <div className="text-left">
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Method</p>
+                                  {editingTransId === item.id ? (
+                                    <select 
+                                      disabled={!isAdmin}
+                                      value={editTransData.type}
+                                      onChange={(e) => setEditTransData({...editTransData, type: e.target.value})}
+                                      className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-slate-800 border-none outline-none appearance-none cursor-pointer disabled:opacity-50"
+                                    >
+                                      <option value="Rent">Cash</option>
+                                      <option value="Bank">Bank</option>
+                                    </select>
+                                  ) : (
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{item.type === 'Bank' ? 'Bank' : 'Cash'}</p>
+                                  )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                  {editingTransId === item.id ? (
+                                    <>
+                                      <button 
+                                        onClick={() => handleUpdateTransaction(item.id)}
+                                        className="p-3 bg-emerald-500 text-white rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+                                      >
+                                        <Save size={14}/>
+                                      </button>
+                                      <button 
+                                        onClick={() => setEditingTransId(null)}
+                                        className="p-3 bg-slate-800 text-slate-400 rounded-xl"
+                                      >
+                                        <X size={14}/>
+                                      </button>
+                                    </>
+                                  ) : isEditing ? (
+                                    <>
+                                      <button 
+                                        onClick={() => {
+                                          setEditingTransId(item.id);
+                                          setEditTransData({ 
+                                            amount: item.amount,
+                                            date: item.date || new Date().toISOString().split('T')[0],
+                                            type: item.type || 'Rent'
+                                          });
+                                        }}
+                                        className="p-3 bg-slate-800 text-slate-500 hover:text-white rounded-xl transition-all"
+                                      >
+                                        <Edit3 size={14}/>
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDeleteTransaction(item.id)}
+                                        className="p-3 bg-slate-800 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                                      >
+                                        <Trash2 size={14}/>
+                                      </button>
+                                    </>
+                                  ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        )) : (
+                          <div className="py-12 text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">No History Records Found</p>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions Optimized for all screens */}
+                <div className="p-6 lg:p-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-xl flex gap-3 lg:gap-6">
+                  <button 
+                    onClick={() => setSelectedShop(null)}
+                    className={`flex-1 h-14 lg:h-16 rounded-2xl border border-slate-700 text-[10px] lg:text-sm font-black uppercase tracking-widest text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'lg:order-1' : ''}`}
+                  >Close</button>
+                  {isAdmin && (
+                    <button 
+                      onClick={() => isEditing ? handleUpdateShop() : setIsEditing(true)}
+                      className={`flex-1 h-14 lg:h-16 rounded-2xl border text-[10px] lg:text-sm font-black uppercase tracking-widest transition-all order-3 lg:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                    >
+                      {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'Save' : 'Edit'}
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <button 
+                      disabled={isSaving || isEditing}
+                      onClick={handleSaveTransaction}
+                      className={`flex-[2] h-14 lg:h-16 rounded-2xl text-[10px] lg:text-[13px] font-black uppercase tracking-tighter lg:tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2 lg:gap-3 order-1 lg:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
+                    >
+                      {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Receipt size={18} className="hidden sm:block" /> Record Payment</>}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Actions Optimized for all screens */}
-            <div className="p-6 lg:p-10 border-t border-slate-800 bg-slate-950/50 backdrop-blur-xl flex gap-3 lg:gap-6">
-               <button 
-                onClick={() => setSelectedShop(null)}
-                className={`flex-1 h-14 lg:h-16 rounded-2xl border border-slate-700 text-[10px] lg:text-sm font-black uppercase tracking-widest text-slate-400 hover:bg-slate-800 hover:text-white transition-all order-2 ${isAdmin ? 'lg:order-1' : ''}`}
-              >Close</button>
-              {isAdmin && (
-                <button 
-                  onClick={() => isEditing ? handleUpdateShop() : setIsEditing(true)}
-                  className={`flex-1 h-14 lg:h-16 rounded-2xl border text-[10px] lg:text-sm font-black uppercase tracking-widest transition-all order-3 lg:order-2 ${isEditing ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20' : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white'}`}
-                >
-                  {isSaving && isEditing ? <Loader2 className="animate-spin" size={18}/> : isEditing ? 'Save' : 'Edit'}
-                </button>
-              )}
-              {isAdmin && (
-                <button 
-                  disabled={isSaving || isEditing}
-                  onClick={handleSaveTransaction}
-                  className={`flex-[2] h-14 lg:h-16 rounded-2xl text-[10px] lg:text-[13px] font-black uppercase tracking-tighter lg:tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2 lg:gap-3 order-1 lg:order-3 ${isEditing ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 shadow-indigo-600/30 hover:scale-[1.02] active:scale-95'}`}
-                >
-                  {isSaving && !isEditing ? <Loader2 className="animate-spin" size={18}/> : <><Receipt size={18} className="hidden sm:block" /> Record Payment</>}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+          );
+        })()
       )}
     </div>
   );

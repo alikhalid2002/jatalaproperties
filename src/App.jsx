@@ -154,7 +154,7 @@ const App = () => {
     { id: 'Expenses', label: 'Operational Expenses', icon: <Receipt />, baseColor: 'rose', shadow: 'shadow-[0_15px_30px_-5px_rgba(244,63,94,0.35)]' },
     { id: 'Sold', label: 'Sold Properties', icon: <CheckCircle />, baseColor: 'amber', shadow: 'shadow-[0_15px_30px_-5px_rgba(245,158,11,0.35)]' },
     { id: 'Reports', label: 'Financial Reports', icon: <BarChart3 />, baseColor: 'purple', shadow: 'shadow-[0_15px_30px_-5px_rgba(168,85,247,0.35)]' },
-    { id: 'Settings', label: 'System Settings', icon: <Settings />, baseColor: 'slate', shadow: 'shadow-[0_15px_30px_-5px_rgba(100,116,139,0.35)]', adminOnly: true }
+    { id: 'Settings', label: 'System Settings', icon: <Settings />, baseColor: 'slate', shadow: 'shadow-[0_15px_30px_-5px_rgba(100,116,139,0.35)]' }
   ];
 
   if (!accountType) {
@@ -298,7 +298,7 @@ const App = () => {
               ) : activeTab === 'Reports' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Settings' ? (
-                isAdmin ? <SettingsPage entries={entries} expandedSection={expandedSection} setExpandedSection={setExpandedSection} /> : <p>Access Denied</p>
+                <SettingsPage entries={entries} expandedSection={expandedSection} setExpandedSection={setExpandedSection} />
               ) : null}
             </div>
           </div>

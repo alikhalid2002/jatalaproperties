@@ -9,7 +9,7 @@ import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 
 const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => {
-  const { farmers, deleteFarmer, addNewFarmer } = useFarmers();
+  const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
   const [isSaving, setIsSaving] = useState(false);
   const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
@@ -109,12 +109,38 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
         {expandedSection === 'members' && <div className="p-8 border-t border-slate-700/50 grid grid-cols-1 lg:grid-cols-2 gap-8">
            <form onSubmit={handleAddMember} className="space-y-4">
              <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
-             <input type="number" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
-             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black">Register Member</button>
+             <div className="flex gap-2">
+               <input type="number" step="any" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
+               <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-400">
+                 <option value="Acres">Acres</option>
+                 <option value="Kanal">Kanal</option>
+               </select>
+             </div>
+             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black italic uppercase tracking-widest text-xs">Register Member</button>
            </form>
-           <div className="max-h-[300px] overflow-y-auto no-scrollbar divide-y divide-slate-800">
-             {farmers.map(f => <div key={f.id} className="py-4 flex justify-between"><div className="font-black text-sm uppercase">{f.nameEn || f.nameUr}</div><button onClick={() => deleteFarmer(f.id)}><Trash2 size={16} className="text-slate-600"/></button></div>)}
-           </div>
+            <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-slate-800/50">
+              {farmers.length > 0 ? (
+                farmers.map(f => (
+                  <div key={f.id} className="py-2.5 flex justify-between items-center group/item hover:bg-slate-800/10 px-2 -mx-2 rounded-xl transition-colors">
+                    <div className="flex flex-col">
+                      <div className="font-black text-xs uppercase text-white tracking-wider">{f.nameEn || f.nameUr}</div>
+                      <div className="text-[9px] font-bold text-slate-500 uppercase">{f.landSize} {f.landUnit}</div>
+                    </div>
+                    <button 
+                      onClick={() => deleteFarmer(f.id)}
+                      className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                      title="Remove Member"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="py-20 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+                  No Members Found
+                </div>
+              )}
+            </div>
         </div>}
       </section>
 
@@ -133,7 +159,7 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setIsBackupOpen(!isBackupOpen)} className="w-full flex justify-between p-8 font-black uppercase">System Tools <ChevronDown/></button>
         {isBackupOpen && (
-          <div className="p-4 lg:p-8 border-t border-slate-700/50 grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-6">
+          <div className="p-4 lg:p-8 border-t border-slate-700/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
             <button 
               onClick={handleDownloadExcel} 
               className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-emerald-400 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
@@ -150,6 +176,24 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
               Restore Data 
               <input type="file" className="hidden" onChange={handleRestore} />
             </label>
+            <button 
+              onClick={() => {
+                if (window.confirm("Delete all local data and refresh? This fixes stuck names.")) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }} 
+              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
+            >
+              Wipe Mobile Cache
+            </button>
+            <button 
+              onClick={purgeAllFarmers}
+              className="col-span-full mt-4 flex items-center justify-center p-8 bg-rose-600/20 rounded-2xl lg:rounded-[32px] font-black uppercase text-xs text-rose-500 border-2 border-dashed border-rose-500/50 hover:bg-rose-600 hover:text-white transition-all text-center gap-4 group"
+            >
+              <Trash2 size={24} className="group-hover:animate-bounce" />
+              NUKE ALL MEMBERS (Permanent Delete)
+            </button>
           </div>
         )}
       </section>

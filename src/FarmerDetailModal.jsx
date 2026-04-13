@@ -1,9 +1,9 @@
 import React, { useState, useEffect, memo } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar, DollarSign, Map, Scale, Save, Calculator, ImageIcon, Upload, Loader2, ExternalLink, CheckCircle, AlertCircle, FileText, Shield, User, Receipt, CreditCard, Plus, Edit3 } from 'lucide-react';
+import { X, Calendar, DollarSign, Map, Scale, Save, Calculator, ImageIcon, Upload, Loader2, ExternalLink, CheckCircle, AlertCircle, FileText, Shield, User, Receipt, CreditCard, Plus, Edit3, Trash2 } from 'lucide-react';
 import { transliterateToUrdu } from './urduTransliterator';
 
-const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUpdateFarmer, onUpdateHistory, onDeleteHistory, onUpdateDocuments, isAdmin }) => {
+const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUpdateFarmer, onUpdateHistory, onDeleteHistory, onUpdateDocuments, onDeleteFarmer, isAdmin }) => {
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('Cash');
   const [file, setFile] = useState(null);
@@ -175,9 +175,23 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                  </button>
                ) : (
-                 <button onClick={() => setIsEditing(true)} className="p-3 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-2xl transition-all">
-                   <Edit3 size={20} />
-                 </button>
+                 <div className="flex gap-2">
+                   <button 
+                     onClick={async () => {
+                       if (window.confirm(`Are you sure you want to delete ${farmer.nameEn || farmer.nameUr}?`)) {
+                         await onDeleteFarmer(farmer.id);
+                         onClose();
+                       }
+                     }} 
+                     className="p-3 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-2xl transition-all"
+                     title="Delete Member"
+                   >
+                     <Trash2 size={20} />
+                   </button>
+                   <button onClick={() => setIsEditing(true)} className="p-3 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-2xl transition-all">
+                     <Edit3 size={20} />
+                   </button>
+                 </div>
                )
              )}
              <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-2xl transition-all group">

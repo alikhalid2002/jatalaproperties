@@ -16,6 +16,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
     updateHistory,
     deleteHistory,
     updateFarmerDocuments,
+    deleteFarmer,
     bulkRecalculateFarmers
   } = useFarmers();
   const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
@@ -37,15 +38,22 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
     );
   }
 
+  const normalizeToAcres = (size, unit) => {
+    const s = Number(size) || 0;
+    if (unit === 'Kanal') return s / 8;
+    if (unit === 'Marla') return s / 160;
+    return s;
+  };
+
   const filteredFarmers = [...farmers]
-    .sort((a, b) => (Number(b.landSize) || 0) - (Number(a.landSize) || 0))
+    .sort((a, b) => normalizeToAcres(b.landSize, b.landUnit) - normalizeToAcres(a.landSize, a.landUnit))
     .filter(f => 
       (f.nameUr || "").includes(searchTerm) || 
       (f.nameEn || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const totalLandArea = farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0);
-  const totalExIncome = totalLandArea * 60000;
+  const totalLandArea = farmers.reduce((sum, f) => sum + normalizeToAcres(f.landSize, f.landUnit), 0);
+  const totalExIncome = Math.round(totalLandArea * 60000);
   const totalRemainingAmount = totalExIncome - revenueVal;
   const receivedPrv = totalExIncome > 0 ? (revenueVal / totalExIncome) * 100 : 0;
   const remainingPrv = totalExIncome > 0 ? (totalRemainingAmount / totalExIncome) * 100 : 0;
@@ -125,7 +133,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                  <div className="text-left">
                     <h4 className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
                     <p className="text-xl font-black text-white italic tracking-tighter leading-none">
-                       {farmers.reduce((sum, f) => sum + (Number(f.landSize) || 0), 0).toLocaleString()} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
+                       {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
                     </p>
                  </div>
               </div>
@@ -194,7 +202,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
       </div>
 
       <FarmerDetailModal 
-        farmer={selectedFarmer} 
+        farmer={farmers.find(f => f.id === selectedFarmer?.id) || selectedFarmer} 
         isOpen={!!selectedFarmer} 
         onClose={() => setSelectedFarmer(null)}
         onRecordPayment={recordPayment}
@@ -202,6 +210,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         onUpdateHistory={updateHistory}
         onDeleteHistory={deleteHistory}
         onUpdateDocuments={updateFarmerDocuments}
+        onDeleteFarmer={deleteFarmer}
         isAdmin={isAdmin}
       />
     </div>

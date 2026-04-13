@@ -95,9 +95,6 @@ export const useFarmers = () => {
         setLoading(false);
       }, (error) => {
         console.error("Firestore Error in useFarmers:", error);
-        console.log("Falling back to local data due to Firebase error.");
-        const fallbackData = initialFarmers.map((f, i) => ({ id: `fallback_${i}`, ...f }));
-        setFarmers(fallbackData);
         setLoading(false); 
       });
     } catch (error) {
@@ -367,13 +364,37 @@ const updateFarmerFields = async (farmerId, fields) => {
   };
 
   const deleteFarmer = async (farmerId) => {
-    if (!window.confirm("Delete this member and all their records?")) return;
+    // ⚡ OPTIMISTIC UPDATE: Remove from local state immediately
+    let prevData = [];
+    setFarmers(prev => {
+      prevData = [...prev];
+      const updated = prev.filter(f => f.id !== farmerId);
+      localStorage.setItem('jatala_farmers_cache', JSON.stringify(updated));
+      return updated;
+    });
+
     try {
-      await withTimeout(deleteDoc(doc(db, getDataPath('farmers'), farmerId)));
+      if (!farmerId.startsWith('fallback_')) {
+        await withTimeout(deleteDoc(doc(db, getDataPath('farmers'), farmerId)));
+      }
     } catch (error) {
       console.error("Delete Farmer Error:", error);
-      alert(`Delete failed: ${error.message}`);
+      alert(`Delete failed on server: ${error.message}. Please refresh.`);
+      setFarmers(prevData); // Rollback on failure
     }
+  };
+
+  const purgeAllFarmers = async () => {
+    if (!window.confirm("ARE YOU SURE? This will permanently delete EVERY SINGLE MEMBER. There is no undo.")) return;
+    try {
+      const batch = writeBatch(db);
+      const snap = await getDocs(collection(db, getDataPath('farmers')));
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      localStorage.removeItem('jatala_farmers_cache');
+      setFarmers([]);
+      alert("Database Purged Successfully!");
+    } catch (err) { alert("Purge Failed: " + err.message); }
   };
 
   return { 
@@ -386,6 +407,7 @@ const updateFarmerFields = async (farmerId, fields) => {
     deleteHistory, 
     addNewFarmer, 
     deleteFarmer,
+    purgeAllFarmers,
     updateFarmerDocuments 
   };
 };
