@@ -302,7 +302,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                            <span className="text-[10px] font-black text-slate-500 mt-2">Upload File</span>
                          </>
                        )}
-                       <input type="file" className="hidden" accept="image/*" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])} />
+                       <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.idCardUrl && (
                     <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
@@ -328,7 +328,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                            <span className="text-[10px] font-black text-slate-500 mt-2">Upload Legal</span>
                          </>
                        )}
-                       <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])} />
+                       <input type="file" className="hidden" accept="image/*,application/pdf,.doc,.docx" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.agreementUrl && (
                     <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
@@ -357,9 +357,9 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                            </div>
                            <div className="text-center">
                               <p className="text-[14px] font-black text-slate-300">Choose Receipt</p>
-                              <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic">PNG, JPEG SUPPORT</p>
+                              <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic">PDF, PNG, JPEG SUPPORT</p>
                            </div>
-                           <input type="file" className="hidden" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+                           <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files[0])} />
                         </label>
                      </div>
 
