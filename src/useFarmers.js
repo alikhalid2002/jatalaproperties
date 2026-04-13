@@ -12,7 +12,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 
 const compressImage = async (file) => {
   if (!file || !file.type.startsWith('image/')) return file;
@@ -51,10 +51,10 @@ const compressImage = async (file) => {
   });
 };
 
-const withTimeout = (promise, message = "Connection Timeout. Please check your internet or Firebase config.") => {
+const withTimeout = (promise, message = "Connection Timeout. Please check your internet or Firebase config.", ms = 15000) => {
   return Promise.race([
     promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))
+    new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
   ]);
 };
 
@@ -72,6 +72,7 @@ export const useFarmers = () => {
   });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState({}); // { agreement: 50, idCard: 10 }
 
   const refreshFarmers = () => {
     localStorage.removeItem('jatala_farmers_cache');
@@ -206,23 +207,46 @@ const updateFarmerFields = async (farmerId, fields) => {
     const farmer = farmers.find(f => f.id === farmerId);
     if (!farmer) return;
 
+    const progressKey = docType === 'idCardUrl' ? 'idCard' : 'agreement';
+    
     try {
       const compressedFile = await compressImage(file);
       const storageRef = ref(storage, `${docType}/${Date.now()}_${compressedFile.name}`);
-      const uploadTask = uploadBytes(storageRef, compressedFile);
-      const snapshot = await withTimeout(uploadTask);
-      const url = await getDownloadURL(snapshot.ref);
+      
+      const uploadTask = uploadBytesResumable(storageRef, compressedFile);
 
-      const farmerRef = doc(db, getDataPath('farmers'), farmerId);
-      await withTimeout(updateDoc(farmerRef, {
-        [docType]: url // docType will be 'idCardUrl' or 'agreementUrl'
-      }));
+      return new Promise((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(prev => ({ ...prev, [progressKey]: Math.round(progress) }));
+          }, 
+          (error) => {
+            console.error("Upload Error:", error);
+            setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
+            reject(error);
+          }, 
+          async () => {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            const farmerRef = doc(db, getDataPath('farmers'), farmerId);
+            
+            await updateDoc(farmerRef, { [docType]: url });
 
-      console.log(`${docType} uploaded successfully:`, url);
-      return url;
+            // ⚡ OPTIMISTIC UPDATE
+            setFarmers(prev => {
+              const updated = prev.map(f => f.id === farmerId ? { ...f, [docType]: url } : f);
+              localStorage.setItem('jatala_farmers_cache', JSON.stringify(updated));
+              return updated;
+            });
+            
+            setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
+            resolve(url);
+          }
+        );
+      });
     } catch (error) {
-      console.error(`Error uploading ${docType}:`, error);
-      alert(`Failed to upload ${docType}: ${error.message}`);
+      console.error(`Error initiating upload:`, error);
+      alert(`Failed to start upload: ${error.message}`);
       throw error;
     }
   };
@@ -409,6 +433,7 @@ const updateFarmerFields = async (farmerId, fields) => {
     addNewFarmer, 
     deleteFarmer,
     purgeAllFarmers,
-    updateFarmerDocuments 
+    updateFarmerDocuments, 
+    uploadProgress
   };
 };

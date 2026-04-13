@@ -17,7 +17,8 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
     deleteHistory,
     updateFarmerDocuments,
     deleteFarmer,
-    bulkRecalculateFarmers
+    bulkRecalculateFarmers,
+    uploadProgress
   } = useFarmers();
   const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
@@ -212,6 +213,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         onUpdateDocuments={updateFarmerDocuments}
         onDeleteFarmer={deleteFarmer}
         isAdmin={isAdmin}
+        uploadProgress={uploadProgress}
       />
     </div>
   );

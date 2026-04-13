@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Calendar, DollarSign, Map, Scale, Save, Calculator, ImageIcon, Upload, Loader2, ExternalLink, CheckCircle, AlertCircle, FileText, Shield, User, Receipt, CreditCard, Plus, Edit3, Trash2 } from 'lucide-react';
 import { transliterateToUrdu } from './urduTransliterator';
 
-const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUpdateFarmer, onUpdateHistory, onDeleteHistory, onUpdateDocuments, onDeleteFarmer, isAdmin }) => {
+const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUpdateFarmer, onUpdateHistory, onDeleteHistory, onUpdateDocuments, onDeleteFarmer, isAdmin, uploadProgress }) => {
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('Cash');
   const [file, setFile] = useState(null);
@@ -296,7 +296,12 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   
                   {isAdmin ? (
                     <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[80px] hover:border-indigo-500/50 transition-all cursor-pointer">
-                       {isUploadingDoc.idCard ? <Loader2 size={18} className="animate-spin text-indigo-500" /> : (
+                       {isUploadingDoc.idCard ? (
+                         <div className="flex flex-col items-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-indigo-500" />
+                            <span className="text-[10px] font-black text-indigo-400">{uploadProgress?.idCard || 0}%</span>
+                         </div>
+                       ) : (
                          <>
                            <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
                            <span className="text-[10px] font-black text-slate-500 mt-2">Upload File</span>
@@ -322,7 +327,12 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   
                   {isAdmin ? (
                     <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[80px] hover:border-indigo-500/50 transition-all cursor-pointer">
-                       {isUploadingDoc.agreement ? <Loader2 size={18} className="animate-spin text-indigo-500" /> : (
+                       {isUploadingDoc.agreement ? (
+                         <div className="flex flex-col items-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-indigo-500" />
+                            <span className="text-[10px] font-black text-indigo-400">{uploadProgress?.agreement || 0}%</span>
+                         </div>
+                       ) : (
                          <>
                            <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
                            <span className="text-[10px] font-black text-slate-500 mt-2">Upload Legal</span>
