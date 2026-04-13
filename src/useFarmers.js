@@ -82,13 +82,14 @@ export const useFarmers = () => {
     let unsubscribe;
     setLoading(true);
     try {
-      const q = query(collection(db, getDataPath('farmers')), orderBy('landSize', 'desc'));
+      const q = query(collection(db, getDataPath('farmers')));
       
       unsubscribe = onSnapshot(q, (snapshot) => {
         const farmersData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })).sort((a, b) => (Number(b.landSize) || 0) - (Number(a.landSize) || 0));
+        
         setFarmers(farmersData);
         // Save to cache
         localStorage.setItem('jatala_farmers_cache', JSON.stringify(farmersData));

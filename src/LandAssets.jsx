@@ -40,8 +40,9 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
 
   const normalizeToAcres = (size, unit) => {
     const s = Number(size) || 0;
-    if (unit === 'Kanal') return s / 8;
-    if (unit === 'Marla') return s / 160;
+    const u = (unit || 'Acres').toLowerCase();
+    if (u.includes('kanal')) return s / 8;
+    if (u.includes('marla')) return s / 160;
     return s;
   };
 
