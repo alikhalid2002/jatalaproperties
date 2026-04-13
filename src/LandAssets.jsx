@@ -114,32 +114,31 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         </div>
       </div>
 
-        {isAdmin && (
-          <div className="flex justify-center gap-4 mb-12">
-            {farmers.length === 0 && (
-              <button 
-                onClick={seedFarmersData}
-                className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
-              >
-                <Database size={20} />
-                SEED INITIAL DATA
-              </button>
-            )}
-            {farmers.length > 0 && (
-              <div className="bg-emerald-500/10 border border-emerald-500/30 px-6 py-3 rounded-2xl flex items-center gap-4 shadow-lg shadow-emerald-500/5">
-                 <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
-                    <Map size={18} />
-                 </div>
-                 <div className="text-left">
-                    <h4 className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
-                    <p className="text-xl font-black text-white italic tracking-tighter leading-none">
-                       {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
-                    </p>
-                 </div>
-              </div>
-            )}
-          </div>
-        )}
+        <div className="flex flex-col items-center gap-6 mb-12">
+          {isAdmin && farmers.length === 0 && (
+            <button 
+              onClick={seedFarmersData}
+              className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+            >
+              <Database size={20} />
+              SEED INITIAL DATA
+            </button>
+          )}
+          
+          {farmers.length > 0 && (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 px-6 py-3 rounded-2xl flex items-center gap-4 shadow-lg shadow-emerald-500/5 animate-in slide-in-from-bottom-2 duration-700">
+               <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                  <Map size={18} />
+               </div>
+               <div className="text-left">
+                  <h4 className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
+                  <p className="text-xl font-black text-white italic tracking-tighter leading-none">
+                     {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
+                  </p>
+               </div>
+            </div>
+          )}
+        </div>
 
       {/* Farmers Grid - Responsive 1/2/3 cols */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-20">
