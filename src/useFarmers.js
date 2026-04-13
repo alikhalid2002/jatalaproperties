@@ -210,23 +210,47 @@ const updateFarmerFields = async (farmerId, fields) => {
     const progressKey = docType === 'idCardUrl' ? 'idCard' : 'agreement';
     
     try {
-      const compressedFile = await compressImage(file);
+      const bucket = storage.app.options.storageBucket;
+      console.log("Using bucket:", bucket);
+      
+      if (!bucket || bucket.includes('undefined')) {
+         alert(`CONFIG MISSING: VITE_FIREBASE_STORAGE_BUCKET is not set. Currently: ${bucket}`);
+         return;
+      }
+
+      // ⏱️ Step 1: Skip compression for now to isolate the hang
+      const compressedFile = file; 
+      
+      // ⏱️ Step 2: Create reference
       const storageRef = ref(storage, `${docType}/${Date.now()}_${compressedFile.name}`);
+      console.log("Ref created:", storageRef.fullPath);
       
       const uploadTask = uploadBytesResumable(storageRef, compressedFile);
 
       return new Promise((resolve, reject) => {
+        // Set a 30s timeout for INITIAL connection
+        const connectionTimeout = setTimeout(() => {
+          if (uploadTask.snapshot.bytesTransferred === 0) {
+            alert("Connection timed out at 0%. This usually means your network is blocking the upload or the bucket permissions are wrong.");
+            reject(new Error("Initial connection timeout"));
+          }
+        }, 30000);
+
         uploadTask.on('state_changed', 
           (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(`Upload progress: ${progress}%`);
             setUploadProgress(prev => ({ ...prev, [progressKey]: Math.round(progress) }));
           }, 
           (error) => {
-            console.error("Upload Error:", error);
+            clearTimeout(connectionTimeout);
+            console.error("Firebase Details:", error);
             setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
+            alert(`UPLOADER ERROR\nCode: ${error.code}\nMessage: ${error.message}`);
             reject(error);
           }, 
           async () => {
+            clearTimeout(connectionTimeout);
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             const farmerRef = doc(db, getDataPath('farmers'), farmerId);
             
@@ -245,8 +269,8 @@ const updateFarmerFields = async (farmerId, fields) => {
         );
       });
     } catch (error) {
-      console.error(`Error initiating upload:`, error);
-      alert(`Failed to start upload: ${error.message}`);
+      console.error(`GLOBAL UPLOAD CATCH:`, error);
+      alert(`SYSTEM ERROR: ${error.message}`);
       throw error;
     }
   };
