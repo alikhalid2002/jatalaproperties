@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { initialFarmers } from './seedFarmers';
-import { db, storage, getDataPath } from './firebase';
+import { db, storage, auth, getDataPath } from './firebase';
+import { signInAnonymously } from 'firebase/auth';
 import { 
   collection, 
   onSnapshot, 
@@ -10,7 +11,9 @@ import {
   updateDoc,
   addDoc, 
   deleteDoc,
-  serverTimestamp 
+  serverTimestamp,
+  writeBatch,
+  getDocs
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 
@@ -190,14 +193,54 @@ const updateFarmerFields = async (farmerId, fields) => {
   const uploadReceipt = async (file) => {
     if (!file) return null;
     try {
-      const compressedFile = await compressImage(file);
-      const storageRef = ref(storage, `receipts/${Date.now()}_${compressedFile.name}`);
+      // 🔐 Auth Reinforcement: Strictly wait for ready state and uid
+      await auth.authStateReady();
+      let user = auth.currentUser;
+      if (!user) {
+        const userCred = await signInAnonymously(auth);
+        user = userCred.user;
+      }
 
-      const uploadTask = uploadBytes(storageRef, compressedFile);
-      const snapshot = await withTimeout(uploadTask, "Upload timed out. Image might be too large or connection is slow.");
-      return await getDownloadURL(snapshot.ref);
+      if (!user?.uid) {
+        throw new Error("Authentication failed: No valid UID found.");
+      }
+
+      const compressedFile = await compressImage(file);
+      
+      // 📍 Refined Storage Path: Using literal bucket string
+      const bucketPath = `receipts/${Date.now()}_${compressedFile.name}`;
+      const storageRef = ref(storage, bucketPath);
+      
+      const uploadTask = uploadBytesResumable(storageRef, compressedFile);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            
+            // 🐞 Progress Observer: Force debug log if stuck at 0
+            if (snapshot.bytesTransferred === 0) {
+              console.log("Upload Initiated (0 bytes) - Snapshot Debug:", snapshot);
+            }
+            
+            console.log(`Receipt Upload Progress: ${Math.round(progress)}%`);
+            setUploadProgress(prev => ({ ...prev, receipt: Math.round(progress) }));
+          },
+          (error) => {
+            console.error("Receipt Upload Error [Firebase Code]:", error.code);
+            console.error("Receipt Upload Error [Full]:", error);
+            setUploadProgress(prev => ({ ...prev, receipt: 0 }));
+            reject(error);
+          },
+          async () => {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            setUploadProgress(prev => ({ ...prev, receipt: 0 }));
+            resolve(url);
+          }
+        );
+      });
     } catch (error) {
-      console.error("Storage Error:", error);
+      console.error("Global Storage Catch (Receipt):", error);
       throw error;
     }
   };
@@ -210,47 +253,47 @@ const updateFarmerFields = async (farmerId, fields) => {
     const progressKey = docType === 'idCardUrl' ? 'idCard' : 'agreement';
     
     try {
-      const bucket = storage.app.options.storageBucket;
-      console.log("Using bucket:", bucket);
-      
-      if (!bucket || bucket.includes('undefined')) {
-         alert(`CONFIG MISSING: VITE_FIREBASE_STORAGE_BUCKET is not set. Currently: ${bucket}`);
-         return;
+      // 🔐 Auth Reinforcement: Strictly wait for ready state and uid
+      await auth.authStateReady();
+      let user = auth.currentUser;
+      if (!user) {
+        const userCred = await signInAnonymously(auth);
+        user = userCred.user;
       }
 
-      // ⏱️ Step 1: Skip compression for now to isolate the hang
-      const compressedFile = file; 
+      if (!user?.uid) {
+        throw new Error("Authentication failed: No valid UID found.");
+      }
+
+      // ⏱️ Compress image if it is one, otherwise use original (PDF etc)
+      const processedFile = await compressImage(file);
       
-      // ⏱️ Step 2: Create reference
-      const storageRef = ref(storage, `${docType}/${Date.now()}_${compressedFile.name}`);
-      console.log("Ref created:", storageRef.fullPath);
+      // 📍 Refined Storage Path: Using literal bucket string
+      const bucketPath = `gs://jatala-properties.firebasestorage.app/${docType}/${Date.now()}_${processedFile.name}`;
+      const storageRef = ref(storage, bucketPath);
       
-      const uploadTask = uploadBytesResumable(storageRef, compressedFile);
+      const uploadTask = uploadBytesResumable(storageRef, processedFile);
 
       return new Promise((resolve, reject) => {
-        // Set a 30s timeout for INITIAL connection
-        const connectionTimeout = setTimeout(() => {
-          if (uploadTask.snapshot.bytesTransferred === 0) {
-            alert("Connection timed out at 0%. This usually means your network is blocking the upload or the bucket permissions are wrong.");
-            reject(new Error("Initial connection timeout"));
-          }
-        }, 30000);
-
         uploadTask.on('state_changed', 
           (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(`Upload progress: ${progress}%`);
+            
+            // 🐞 Progress Observer: Force debug log if stuck at 0
+            if (snapshot.bytesTransferred === 0) {
+              console.log(`Doc Upload (${docType}) Initiated (0 bytes) - Snapshot:`, snapshot);
+            }
+
+            console.log(`Doc Upload (${docType}) Progress: ${Math.round(progress)}%`);
             setUploadProgress(prev => ({ ...prev, [progressKey]: Math.round(progress) }));
           }, 
           (error) => {
-            clearTimeout(connectionTimeout);
-            console.error("Firebase Details:", error);
+            console.error("Document Upload Error [Firebase Code]:", error.code);
+            console.error("Document Upload Error [Full]:", error);
             setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
-            alert(`UPLOADER ERROR\nCode: ${error.code}\nMessage: ${error.message}`);
             reject(error);
           }, 
           async () => {
-            clearTimeout(connectionTimeout);
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             const farmerRef = doc(db, getDataPath('farmers'), farmerId);
             
@@ -269,8 +312,7 @@ const updateFarmerFields = async (farmerId, fields) => {
         );
       });
     } catch (error) {
-      console.error(`GLOBAL UPLOAD CATCH:`, error);
-      alert(`SYSTEM ERROR: ${error.message}`);
+      console.error(`GLOBAL UPLOAD CATCH (${docType}):`, error);
       throw error;
     }
   };

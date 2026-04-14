@@ -27,6 +27,7 @@ export const useFinanceData = (selectedYear) => {
         let unsubExpenses;
         let unsubShopExpenses;
         let unsubFarmers;
+        let unsubGlobalTransactions;
 
         setLoading(true);
         try {
@@ -34,8 +35,9 @@ export const useFinanceData = (selectedYear) => {
             const qExpenses = query(collection(db, getDataPath("expenses")), orderBy("createdAt", "desc"));
             const qShopTrans = query(collection(db, getDataPath("shop_transactions")), orderBy("createdAt", "desc"));
             const qFarmers = query(collection(db, getDataPath("farmers")));
+            const qGlobalTrans = query(collection(db, getDataPath("transactions")), orderBy("createdAt", "desc"));
 
-            const syncFinance = (revDocs, expDocs, shopDocs, farmerDocs) => {
+            const syncFinance = (revDocs, expDocs, shopDocs, farmerDocs, globalDocs) => {
                 let totalRev = 0;
                 let totalPending = 0;
                 let totalExp = 0;
@@ -105,6 +107,21 @@ export const useFinanceData = (selectedYear) => {
                     totalPending += Number(f.totalRemaining) || 0;
                 });
 
+                // 5. Process Global Transactions (FAB Entries)
+                globalDocs.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate() || (data.date ? new Date(data.date) : new Date());
+                    if (date.getFullYear().toString() === selectedYear) {
+                        if (data.type === 'income') {
+                            totalRev += Number(data.amount) || 0;
+                            allEntries.push({ id: doc.id, type: 'revenue', ...data, label: `Extra Income: ${data.description || ''}` });
+                        } else {
+                            totalExp += Number(data.amount) || 0;
+                            allEntries.push({ id: doc.id, type: 'expense', ...data });
+                        }
+                    }
+                });
+
                 setRevenue(totalRev);
                 setExpenses(totalExp);
                 setPending(totalPending);
@@ -120,11 +137,13 @@ export const useFinanceData = (selectedYear) => {
             let lastExp = [];
             let lastShop = [];
             let lastFarmer = [];
+            let lastGlobal = [];
 
-            unsubRevenue = onSnapshot(qRevenue, (s) => { lastRev = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
-            unsubExpenses = onSnapshot(qExpenses, (s) => { lastExp = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
-            unsubShopExpenses = onSnapshot(qShopTrans, (s) => { lastShop = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
-            unsubFarmers = onSnapshot(qFarmers, (s) => { lastFarmer = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer); });
+            unsubRevenue = onSnapshot(qRevenue, (s) => { lastRev = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer, lastGlobal); });
+            unsubExpenses = onSnapshot(qExpenses, (s) => { lastExp = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer, lastGlobal); });
+            unsubShopExpenses = onSnapshot(qShopTrans, (s) => { lastShop = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer, lastGlobal); });
+            unsubFarmers = onSnapshot(qFarmers, (s) => { lastFarmer = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer, lastGlobal); });
+            unsubGlobalTransactions = onSnapshot(qGlobalTrans, (s) => { lastGlobal = s.docs; syncFinance(lastRev, lastExp, lastShop, lastFarmer, lastGlobal); });
 
         } catch (error) {
             console.error("Finance Sync Error:", error);
@@ -136,6 +155,7 @@ export const useFinanceData = (selectedYear) => {
             if (unsubExpenses) unsubExpenses();
             if (unsubShopExpenses) unsubShopExpenses();
             if (unsubFarmers) unsubFarmers();
+            if (unsubGlobalTransactions) unsubGlobalTransactions();
         };
     }, [selectedYear, refreshKey]);
 

@@ -295,16 +295,21 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   </div>
                   
                   {isAdmin ? (
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[80px] hover:border-indigo-500/50 transition-all cursor-pointer">
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[100px] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer group/upload">
                        {isUploadingDoc.idCard ? (
                          <div className="flex flex-col items-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-indigo-500" />
-                            <span className="text-[10px] font-black text-indigo-400">{uploadProgress?.idCard || 0}%</span>
+                            <div className="relative w-12 h-12 flex items-center justify-center">
+                              <Loader2 size={24} className="animate-spin text-indigo-500" />
+                              <span className="absolute text-[8px] font-black text-white">{uploadProgress?.idCard || 0}%</span>
+                            </div>
+                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
                          </div>
                        ) : (
                          <>
-                           <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
-                           <span className="text-[10px] font-black text-slate-500 mt-2">Upload File</span>
+                           <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
+                              <Upload size={18} className="text-slate-400 group-hover/upload:text-indigo-400" />
+                           </div>
+                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select ID Card</span>
                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])} />
@@ -326,16 +331,21 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   </div>
                   
                   {isAdmin ? (
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[80px] hover:border-indigo-500/50 transition-all cursor-pointer">
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[100px] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer group/upload">
                        {isUploadingDoc.agreement ? (
                          <div className="flex flex-col items-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-indigo-500" />
-                            <span className="text-[10px] font-black text-indigo-400">{uploadProgress?.agreement || 0}%</span>
+                            <div className="relative w-12 h-12 flex items-center justify-center">
+                              <Loader2 size={24} className="animate-spin text-indigo-500" />
+                              <span className="absolute text-[8px] font-black text-white">{uploadProgress?.agreement || 0}%</span>
+                            </div>
+                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
                          </div>
                        ) : (
                          <>
-                           <Upload size={18} className="text-slate-600 group-hover:translate-y--1 transition-transform" />
-                           <span className="text-[10px] font-black text-slate-500 mt-2">Upload Legal</span>
+                           <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
+                              <Upload size={18} className="text-slate-400 group-hover/upload:text-indigo-400" />
+                           </div>
+                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Agreement</span>
                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*,application/pdf,.doc,.docx" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])} />
@@ -361,12 +371,23 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                      {/* Left: Image Upload Zone */}
                      <div className="relative group/upload h-full">
-                        <label className="flex flex-col items-center justify-center w-full h-44 bg-slate-900/50 border-2 border-dashed border-slate-700 hover:border-indigo-500/50 cursor-pointer rounded-[32px] p-6 transition-all group-active/upload:scale-95">
-                           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors mb-4">
-                              {file ? <CheckCircle size={32} className="text-emerald-500" /> : <Plus size={32} strokeWidth={1} />}
+                        <label className="flex flex-col items-center justify-center w-full h-44 bg-slate-900/50 border-2 border-dashed border-slate-700 hover:border-indigo-500/50 cursor-pointer rounded-[32px] p-6 transition-all group-active/upload:scale-95 group/upload">
+                           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-600 group-hover/upload:text-indigo-400 transition-colors mb-4 relative overflow-hidden">
+                              {uploadProgress?.receipt > 0 ? (
+                                <div className="flex flex-col items-center">
+                                  <Loader2 size={24} className="animate-spin text-indigo-500" />
+                                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">{uploadProgress.receipt}%</span>
+                                </div>
+                              ) : file ? (
+                                <CheckCircle size={32} className="text-emerald-500" />
+                              ) : (
+                                <Plus size={32} strokeWidth={1} />
+                              )}
                            </div>
                            <div className="text-center">
-                              <p className="text-[14px] font-black text-slate-300">Choose Receipt</p>
+                              <p className="text-[14px] font-black text-slate-300">
+                                {uploadProgress?.receipt > 0 ? "Uploading Receipt..." : file ? "Receipt Selected" : "Choose Receipt"}
+                              </p>
                               <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic">PDF, PNG, JPEG SUPPORT</p>
                            </div>
                            <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files[0])} />
@@ -415,20 +436,32 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Payment Details</span>
             </div>
             
-            <div className="space-y-4">
-               {farmer.history?.map((entry, idx) => (
-                 <HistoryRow 
-                   key={idx} 
-                   entry={entry} 
-                   globalIsEditing={isEditing}
-                   setPreviewImage={setPreviewImage}
-                   isAdmin={isAdmin}
-                   onUpdate={(updated) => onUpdateHistory(farmer.id, idx, updated)}
-                   onDelete={() => {
-                     if (window.confirm("Are you sure?")) onDeleteHistory(farmer.id, idx);
-                   }}
-                 />
-               ))}
+            <div className="overflow-x-auto no-scrollbar">
+               <table className="w-full text-left border-collapse">
+                 <thead>
+                   <tr className="border-b border-slate-700/50">
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Date</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Amount & Receipt</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Method</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic text-center">Preview</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y divide-slate-800/20">
+                    {farmer.history?.map((entry, idx) => (
+                      <HistoryRow 
+                        key={idx} 
+                        entry={entry} 
+                        globalIsEditing={isEditing}
+                        setPreviewImage={setPreviewImage}
+                        isAdmin={isAdmin}
+                        onUpdate={(updated) => onUpdateHistory(farmer.id, idx, updated)}
+                        onDelete={() => {
+                          if (window.confirm("Are you sure?")) onDeleteHistory(farmer.id, idx);
+                        }}
+                      />
+                    ))}
+                 </tbody>
+               </table>
                {!farmer.history?.length && (
                  <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
                     <Receipt size={48} className="text-slate-400" />

@@ -4,8 +4,12 @@ import {
   UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
   Plus, Trash2, Loader2, CheckCircle,
   ArrowUpRight, ArrowDownRight, Activity, 
-  Shield, User, X, Lock, Calendar, Home, ChevronRight
+  Shield, User, X, Lock, Calendar, Home, ChevronRight,
+  TrendingUp, TrendingDown, Wrench, FileText, Users, Zap, Car, Layers, Save, DollarSign
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { db, getDataPath, auth } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
@@ -56,7 +60,7 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
-  useEffect(() => { seedShops(); }, []);
+    useEffect(() => { seedShops(); }, []);
 
   useEffect(() => {
     if (accountType) localStorage.setItem('jatala_auth', accountType);
@@ -72,6 +76,11 @@ const App = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
+
+  // FAB States
+  const [isFabOpen, setIsFabOpen] = useState(false);
+  const [fabMenuMode, setFabMenuMode] = useState('root'); // 'root', 'expenses'
+  const [quickEntryModal, setQuickEntryModal] = useState({ isOpen: false, type: '', category: '' });
   
   // 🔊 PREMIUM AUDIO FEEDBACK: Subtle click sound for interactions
   useEffect(() => {
@@ -152,10 +161,26 @@ const App = () => {
     { id: 'Land', label: 'Land Assets', icon: <Map />, baseColor: 'emerald', shadow: 'shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)]' },
     { id: 'Shops', label: 'Commercial Shops', icon: <Store />, baseColor: 'cyan', shadow: 'shadow-[0_15px_30px_-5px_rgba(6,182,212,0.35)]' },
     { id: 'Expenses', label: 'Operational Expenses', icon: <Receipt />, baseColor: 'rose', shadow: 'shadow-[0_15px_30px_-5px_rgba(244,63,94,0.35)]' },
-    { id: 'Sold', label: 'Sold Properties', icon: <CheckCircle />, baseColor: 'amber', shadow: 'shadow-[0_15px_30px_-5px_rgba(245,158,11,0.35)]' },
+    { id: 'Sold', label: 'Sold Properties', icon: <CheckCircle />, baseColor: 'amber', shadow: 'shadow-[0_15px_30_30px_-5px_rgba(245,158,11,0.35)]' },
     { id: 'Reports', label: 'Financial Reports', icon: <BarChart3 />, baseColor: 'purple', shadow: 'shadow-[0_15px_30px_-5px_rgba(168,85,247,0.35)]' },
     { id: 'Settings', label: 'System Settings', icon: <Settings />, baseColor: 'slate', shadow: 'shadow-[0_15px_30px_-5px_rgba(100,116,139,0.35)]' }
   ];
+
+  const handleSaveQuickTransaction = async (data) => {
+    try {
+      await addDoc(collection(db, getDataPath('transactions')), {
+        ...data,
+        createdAt: serverTimestamp(),
+        amount: Number(data.amount)
+      });
+      setQuickEntryModal({ isOpen: false, type: '', category: '' });
+      setIsFabOpen(false);
+      setFabMenuMode('root');
+    } catch (error) {
+      console.error("Quick Entry Error:", error);
+      alert("Failed to save transaction.");
+    }
+  };
 
   if (!accountType) {
     return (
@@ -218,12 +243,12 @@ const App = () => {
           </div>
           
           <div className="flex-shrink-0 flex justify-end items-center gap-2 lg:gap-4">
-             {activeTab !== 'Dashboard' && (
-               <div className="relative lg:flex hidden mr-4">
-                 <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/>
-                 <input type="text" placeholder="Search..." className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all text-white" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/>
-               </div>
-             )}
+            {activeTab !== 'Dashboard' && (
+              <div className="relative lg:flex hidden mr-4">
+                <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"/>
+                <input type="text" placeholder="Search..." className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-14 pr-6 text-sm outline-none focus:border-indigo-500 transition-all text-white" value={globalSearch} onChange={e => setGlobalSearch(e.target.value)}/>
+              </div>
+            )}
              
             <button onClick={() => setIsReminderDrawerOpen(true)} className="p-2.5 lg:p-3.5 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl relative hover:bg-white/10 transition-all group">
               <Bell size={20} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
@@ -247,7 +272,7 @@ const App = () => {
 
         <PullToRefresh onRefresh={handleGlobalRefresh}>
           <div className="lg:px-12 px-4 lg:py-12 py-6 overflow-y-auto no-scrollbar pb-32">
-            <div className="max-w-[1600px] mx-auto min-h-full">
+            <div className="max-w-[1600px] mx-auto min-h-full font-sans">
               {globalSearch ? (
                 <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); setActiveTab(tab); }} />
               ) : activeTab === 'Dashboard' ? (
@@ -331,7 +356,209 @@ const App = () => {
         )}
       </main>
 
+      {/* DRAGGABLE FAB INTEGRATION - Visible for both to ensure discovery on mobile */}
+      <div className="fixed bottom-10 right-6 lg:bottom-12 lg:right-12 z-[5000] pointer-events-none">
+         <div className="pointer-events-auto relative">
+           <AnimatePresence>
+              {isFabOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                  className="absolute bottom-20 right-0 flex flex-col items-end gap-3 min-w-[200px]"
+                >
+                   {fabMenuMode === 'root' ? (
+                     <>
+                        <FabMenuItem 
+                          label="Extra Income" 
+                          icon={<TrendingUp size={18}/>} 
+                          color="emerald" 
+                          onClick={() => setQuickEntryModal({ isOpen: true, type: 'income', category: 'Extra Income' })} 
+                        />
+                        <FabMenuItem 
+                          label="Add Expense" 
+                          icon={<TrendingDown size={18}/>} 
+                          color="rose" 
+                          onClick={() => setFabMenuMode('expenses')} 
+                        />
+                     </>
+                   ) : (
+                     <div className="bg-slate-900/95 backdrop-blur-2xl border border-white/10 p-4 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 translate-y-[-10px] sm:translate-y-0">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 mb-1">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Expense Type</span>
+                           <button onClick={() => setFabMenuMode('root')} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><X size={14}/></button>
+                        </div>
+                        <FabCategoryItem label="Maintenance" icon={<Wrench size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Maintenance' })} />
+                        <FabCategoryItem label="Tax" icon={<FileText size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Tax' })} />
+                        <FabCategoryItem label="Staff" icon={<Users size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Staff' })} />
+                        <FabCategoryItem label="Utilities" icon={<Zap size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Utilities' })} />
+                        <FabCategoryItem label="Travel" icon={<Car size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Travel' })} />
+                        <FabCategoryItem label="Misc" icon={<Layers size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Misc' })} />
+                     </div>
+                   )}
+                </motion.div>
+              )}
+           </AnimatePresence>
+
+           <motion.button 
+             drag
+             dragMomentum={false}
+             dragConstraints={{ left: -300, right: 0, top: -600, bottom: 0 }}
+             whileHover={{ scale: 1.05 }}
+             whileTap={{ scale: 0.95 }}
+             onClick={() => { setIsFabOpen(!isFabOpen); if (isFabOpen) setFabMenuMode('root'); }}
+             className={`w-16 h-16 rounded-full flex items-center justify-center shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all duration-300 border border-white/10 cursor-pointer ${isFabOpen ? 'bg-rose-600 rotate-45' : 'bg-indigo-600 shadow-indigo-600/30'}`}
+             style={{ touchAction: 'none' }}
+           >
+              <Plus size={32} strokeWidth={3} />
+           </motion.button>
+         </div>
+      </div>
+
+
+      {/* QUICK ENTRY MODAL INTEGRATION */}
+      <AnimatePresence>
+        {quickEntryModal.isOpen && (
+          <QuickEntryModal 
+            modal={quickEntryModal} 
+            onClose={() => setQuickEntryModal({ isOpen: false, type: '', category: '' })} 
+            onSave={handleSaveQuickTransaction}
+          />
+        )}
+      </AnimatePresence>
+
       <AddEntryModal isOpen={isAddEntryModalOpen} onClose={() => setIsAddEntryModalOpen(false)} onAdd={addEntry} isAdmin={isAdmin} />
+    </div>
+  );
+};
+
+const FabMenuItem = ({ label, icon, color, onClick }) => (
+  <button 
+    onClick={onClick}
+    className={`flex items-center gap-4 bg-slate-900/90 backdrop-blur-xl border border-white/10 px-6 py-4 rounded-2xl shadow-xl hover:bg-${color}-600 group transition-all duration-300`}
+  >
+    <span className="text-xs font-black uppercase tracking-widest text-white">{label}</span>
+    <div className={`p-2 bg-${color}-500/20 text-${color}-400 group-hover:bg-white/10 group-hover:text-white rounded-xl transition-colors`}>
+      {icon}
+    </div>
+  </button>
+);
+
+const FabCategoryItem = ({ label, icon, onClick }) => (
+  <button 
+    onClick={onClick}
+    className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-600 rounded-2xl transition-all group w-full text-left"
+  >
+    <div className="p-2 bg-white/5 group-hover:bg-white/10 rounded-xl">
+      {React.cloneElement(icon, { size: 16, className: "text-slate-400 group-hover:text-white" })}
+    </div>
+    <span className="text-[11px] font-black uppercase tracking-widest text-slate-300 group-hover:text-white">{label}</span>
+  </button>
+);
+
+const QuickEntryModal = ({ modal, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    amount: '',
+    description: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.amount || Number(formData.amount) <= 0) return;
+    setIsSaving(true);
+    await onSave({
+      ...formData,
+      type: modal.type,
+      category: modal.category,
+      label: modal.category === 'Extra Income' ? 'Extra Income' : `Expense: ${modal.category}`
+    });
+    setIsSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-[#0f172a]/80 backdrop-blur-md animate-in fade-in duration-300">
+       <motion.div 
+         initial={{ scale: 0.9, opacity: 0 }}
+         animate={{ scale: 1, opacity: 1 }}
+         exit={{ scale: 0.9, opacity: 0 }}
+         className="w-full max-w-md bg-[#1e293b] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden relative"
+       >
+          <div className="p-8 pb-4 flex items-center justify-between">
+             <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${modal.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                   {modal.type === 'income' ? <TrendingUp size={20}/> : <TrendingDown size={20}/>}
+                </div>
+                <div>
+                   <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">Quick Entry</h3>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{modal.category}</p>
+                </div>
+             </div>
+             <button onClick={onClose} className="p-3 bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-2xl transition-all">
+                <X size={20}/>
+             </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-8 space-y-6">
+             <div className="space-y-4">
+                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Transaction Date</label>
+                   <div className="flex items-center gap-3 px-2">
+                      <Calendar size={18} className="text-indigo-400"/>
+                      <input 
+                        type="date" 
+                        required
+                        value={formData.date}
+                        onChange={(e) => setFormData({...formData, date: e.target.value})}
+                        className="bg-transparent border-none outline-none font-black text-white w-full uppercase"
+                      />
+                   </div>
+                </div>
+
+                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Amount (Rs.)</label>
+                   <div className="flex items-center gap-3 px-2">
+                      <DollarSign size={18} className="text-emerald-400"/>
+                      <input 
+                        type="number" 
+                        required
+                        placeholder="0.00"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                        className="bg-transparent border-none outline-none font-black text-white text-2xl w-full italic"
+                      />
+                   </div>
+                </div>
+
+                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Description</label>
+                   <div className="flex items-start gap-3 px-2">
+                      <Layers size={18} className="text-slate-500 mt-1"/>
+                      <textarea 
+                        rows="3"
+                        placeholder="Enter details..."
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        className="bg-transparent border-none outline-none font-medium text-sm text-slate-300 w-full resize-none no-scrollbar"
+                      />
+                   </div>
+                </div>
+             </div>
+
+             <button 
+               type="submit" 
+               disabled={isSaving}
+               className={`w-full h-16 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl flex items-center justify-center gap-3 ${
+                 modal.type === 'income' 
+                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20' 
+                 : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/20'
+               }`}
+             >
+                {isSaving ? <Loader2 size={24} className="animate-spin" /> : <><Save size={20}/> Save Transaction</>}
+             </button>
+          </form>
+       </motion.div>
     </div>
   );
 };

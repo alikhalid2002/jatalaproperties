@@ -5,12 +5,13 @@ import {
   Calendar, Wrench, X, CreditCard, Save, 
   CheckCircle, Trash2, Edit3, Clock, Shield, FileText, Upload, ImageIcon, Loader2
 } from 'lucide-react';
-import { db, storage, getDataPath } from './firebase';
+import { db, storage, auth, getDataPath } from './firebase';
+import { signInAnonymously } from 'firebase/auth';
 import { 
   collection, doc, addDoc, updateDoc, deleteDoc,
   onSnapshot, query, serverTimestamp 
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { transliterateToEnglish } from './urduTransliterator';
 import { transliterateToUrdu } from './urduTransliterator';
 
@@ -46,6 +47,8 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
   const [editTransData, setEditTransData] = useState({ amount: '', date: '', type: 'Rent' });
   const [isUploadingDoc, setIsUploadingDoc] = useState({ idCard: false, agreement: false });
   const [previewImage, setPreviewImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState({ idCard: 0, agreement: 0, receipt: 0 });
+  const [entryFile, setEntryFile] = useState(null);
 
   const shopStats = useMemo(() => {
     const activeYear = (selectedYear || new Date().getFullYear()).toString();
@@ -104,19 +107,69 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
     if (!selectedShop || !entryAmount) return;
 
     setIsSaving(true);
+    let receiptUrl = null;
     try {
+      // 🔐 Auth Check: Ensure user is signed in before starting upload
+      if (!auth.currentUser) {
+        console.log("No user session found, signing in anonymously...");
+        await signInAnonymously(auth);
+      }
+
+      if (entryFile) {
+        // 🔐 Auth Check: Strictly wait for ready state and uid
+        await auth.authStateReady();
+        let user = auth.currentUser;
+        if (!user) {
+          const userCred = await signInAnonymously(auth);
+          user = userCred.user;
+        }
+
+        if (!user?.uid) {
+           throw new Error("Authentication failed: No valid UID found.");
+        }
+
+        // 📍 Refined Storage Path: Using literal bucket string
+        const bucketPath = `gs://jatala-properties.firebasestorage.app/shop_receipts/${Date.now()}_${entryFile.name}`;
+        const storageRef = ref(storage, bucketPath);
+        
+        const uploadTask = uploadBytesResumable(storageRef, entryFile);
+
+        receiptUrl = await new Promise((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              
+              // 🐞 Progress Observer: Debug if stuck
+              if (snapshot.bytesTransferred === 0) {
+                 console.log("Shop Receipt Upload Initiated (0 bytes) - Snapshot:", snapshot);
+              }
+
+              setUploadProgress(prev => ({ ...prev, receipt: Math.round(progress) }));
+            },
+            (error) => {
+              console.error("Shop Receipt Upload Error:", error);
+              reject(error);
+            },
+            async () => {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            }
+          );
+        });
+      }
+
       const amountNum = parseFloat(entryAmount);
-      // Determine transaction type: if entryType is Rent/Bank it's 'Rent', else 'Expense'
       const transType = entryType === 'Expense' ? 'Expense' : 'Rent';
       const paymentMethod = entryType === 'Expense' ? 'Cash' : entryType;
 
       const newTransaction = {
         shopId: selectedShop.id,
-        shopName: selectedShop.tenant, // Capturing for global Expenses report
+        shopName: selectedShop.tenant,
         type: transType,
-        method: paymentMethod, // Store specific method for later use
+        method: paymentMethod,
         amount: amountNum,
         note: entryNote || (transType === 'Rent' ? 'Rent Collection' : 'Repair/Expense'),
+        receiptUrl: receiptUrl,
         date: new Date().toISOString().split('T')[0],
         createdAt: serverTimestamp()
       };
@@ -129,6 +182,8 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
 
       setEntryAmount('');
       setEntryNote('');
+      setEntryFile(null);
+      setUploadProgress(prev => ({ ...prev, receipt: 0 }));
       setShowEntryForm(null);
     } catch (error) {
       console.error("Save Transaction Error:", error);
@@ -194,24 +249,62 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
 
   const handleDocUpload = async (docType, file) => {
     if (!file || !selectedShop) return;
-    setIsUploadingDoc(prev => ({ ...prev, [docType === 'idCardUrl' ? 'idCard' : 'agreement']: true }));
+    const progressKey = docType === 'idCardUrl' ? 'idCard' : 'agreement';
+    setIsUploadingDoc(prev => ({ ...prev, [progressKey]: true }));
+    
     try {
-      const storageRef = ref(storage, `shops/${selectedShop.id}/${docType}/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytes(storageRef, file);
-      const snapshot = await withTimeout(uploadTask, "Document upload timed out.");
-      const url = await getDownloadURL(snapshot.ref);
+      // 🔐 Auth Reinforcement: Strictly wait for ready state and uid
+      await auth.authStateReady();
+      let user = auth.currentUser;
+      if (!user) {
+        const userCred = await signInAnonymously(auth);
+        user = userCred.user;
+      }
 
-      const shopRef = doc(db, getDataPath('shops'), selectedShop.id);
-      await withTimeout(updateDoc(shopRef, {
-          [docType]: url
-      }));
+      if (!user?.uid) {
+        throw new Error("Authentication failed: No valid UID found.");
+      }
 
-      alert(`${docType === 'idCardUrl' ? 'ID Card' : 'Agreement'} uploaded successfully!`);
+      // 📍 Refined Storage Path: Using literal bucket string
+      const bucketPath = `gs://jatala-properties.firebasestorage.app/shops/${selectedShop.id}/${docType}/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, bucketPath);
+      
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      await new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            
+            // 🐞 Progress Observer: Debug if stuck
+            if (snapshot.bytesTransferred === 0) {
+               console.log(`Shop Doc (${docType}) Upload Initiated (0 bytes) - Snapshot:`, snapshot);
+            }
+
+            console.log(`Shop Doc Upload Progress: ${Math.round(progress)}%`);
+            setUploadProgress(prev => ({ ...prev, [progressKey]: Math.round(progress) }));
+          },
+          (error) => {
+            console.error("Shop Doc Upload Error [Firebase Code]:", error.code);
+            console.error("Shop Doc Upload Error [Full]:", error);
+            setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
+            reject(error);
+          },
+          async () => {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            const shopRef = doc(db, getDataPath('shops'), selectedShop.id);
+            await updateDoc(shopRef, { [docType]: url });
+            setUploadProgress(prev => ({ ...prev, [progressKey]: 0 }));
+            resolve();
+          }
+        );
+      });
+
     } catch (error) {
       console.error("Document Upload Error:", error);
       alert(`Upload failed: ${error.message}`);
     } finally {
-      setIsUploadingDoc(prev => ({ ...prev, [docType === 'idCardUrl' ? 'idCard' : 'agreement']: false }));
+      setIsUploadingDoc(prev => ({ ...prev, [progressKey]: false }));
     }
   };
 
@@ -469,12 +562,18 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                             )}
                           </div>
                           {isAdmin ? (
-                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px] group/upload">
                               {isUploadingDoc.idCard ? (
-                                  <Loader2 size={18} className="animate-spin text-indigo-500"/>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <Loader2 size={16} className="animate-spin text-indigo-500"/>
+                                      <span className="absolute text-[6px] font-black text-white">{uploadProgress.idCard}%</span>
+                                    </div>
+                                    <span className="text-[7px] font-black uppercase text-indigo-400">Uploading...</span>
+                                  </div>
                               ) : (
                                 <>
-                                  <Upload size={14} className="text-slate-600 mb-1"/>
+                                  <Upload size={14} className="text-slate-600 mb-1 group-hover/upload:text-indigo-400"/>
                                   <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload (PDF/IMG)</span>
                                 </>
                               )}
@@ -506,12 +605,18 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                             )}
                           </div>
                           {isAdmin ? (
-                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px]">
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 hover:border-indigo-500/50 rounded-2xl p-2 transition-all cursor-pointer bg-slate-950/20 min-h-[70px] group/upload">
                               {isUploadingDoc.agreement ? (
-                                  <Loader2 size={18} className="animate-spin text-indigo-500"/>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <div className="relative w-8 h-8 flex items-center justify-center">
+                                      <Loader2 size={16} className="animate-spin text-indigo-500"/>
+                                      <span className="absolute text-[6px] font-black text-white">{uploadProgress.agreement}%</span>
+                                    </div>
+                                    <span className="text-[7px] font-black uppercase text-indigo-400">Uploading...</span>
+                                  </div>
                               ) : (
                                 <>
-                                  <Upload size={14} className="text-slate-600 mb-1"/>
+                                  <Upload size={14} className="text-slate-600 mb-1 group-hover/upload:text-indigo-400"/>
                                   <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Upload Legal</span>
                                 </>
                               )}
@@ -565,13 +670,30 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                             </div>
 
                             <div className="relative">
-                              <div className="h-full border-2 border-dashed border-slate-700/50 rounded-3xl flex flex-col items-center justify-center p-8 bg-slate-900/20 group hover:border-indigo-500/50 transition-all cursor-pointer">
-                                  <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <Plus className="text-slate-500 group-hover:text-indigo-500" size={24}/>
+                              <label className="h-full border-2 border-dashed border-slate-700/50 rounded-3xl flex flex-col items-center justify-center p-8 bg-slate-900/20 group hover:border-indigo-500/50 transition-all cursor-pointer">
+                                  <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform relative">
+                                    {uploadProgress.receipt > 0 ? (
+                                      <div className="flex flex-col items-center">
+                                        <Loader2 size={24} className="animate-spin text-indigo-500"/>
+                                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">{uploadProgress.receipt}%</span>
+                                      </div>
+                                    ) : entryFile ? (
+                                      <CheckCircle className="text-emerald-500" size={24}/>
+                                    ) : (
+                                      <Plus className="text-slate-500 group-hover:text-indigo-500" size={24}/>
+                                    )}
                                   </div>
-                                  <p className="text-[11px] font-black uppercase tracking-widest text-white mb-1">Choose File</p>
+                                  <p className="text-[11px] font-black uppercase tracking-widest text-white mb-1">
+                                    {entryFile ? entryFile.name : 'Choose Receipt'}
+                                  </p>
                                   <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">PNG, JPEG support</p>
-                              </div>
+                                  <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*,application/pdf" 
+                                    onChange={(e) => setEntryFile(e.target.files[0])}
+                                  />
+                              </label>
                             </div>
                         </div>
                       </div>
