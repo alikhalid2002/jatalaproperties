@@ -16,6 +16,12 @@ const SoldProperties = ({ isAdmin }) => {
     setIsModalOpen(true);
   };
 
+  const currentYear = new Date().getFullYear().toString();
+  const totalYearlyRevenue = filteredProperties.reduce((total, prop) => {
+    const yearlyInstallments = (prop.installments || []).filter(inst => inst.date && inst.date.startsWith(currentYear));
+    return total + yearlyInstallments.reduce((sum, inst) => sum + (Number(inst.amount) || 0), 0);
+  }, 0);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-20 animate-pulse text-slate-500">
@@ -28,8 +34,18 @@ const SoldProperties = ({ isAdmin }) => {
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
-      {/* Grid Header or Spacer */}
-      <div className="mb-4"></div>
+      {/* Revenue Card at Top */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 rounded-[32px] p-8 text-center relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500 blur-[100px] opacity-10"></div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 mb-2">Total Sold Revenue ({currentYear})</p>
+          <h2 className="text-4xl lg:text-5xl font-black text-white italic drop-shadow-xl">
+            <span className="text-xl mr-2 opacity-50 not-italic">Rs.</span>
+            {totalYearlyRevenue.toLocaleString()}
+          </h2>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/50 to-transparent"></div>
+        </div>
+      </div>
 
       {/* Properties Grid - Responsive 1/2/3 cols */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-24">
