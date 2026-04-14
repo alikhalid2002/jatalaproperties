@@ -5,16 +5,20 @@ import {
 } from 'lucide-react';
 import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
+import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 
-const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => {
+const SettingsPage = ({ entries = [], isAdmin, expandedSection, setExpandedSection }) => {
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
+  const { properties: soldProperties, addProperty, deleteProperty, updateProperty } = useSoldProperties();
   const [isSaving, setIsSaving] = useState(false);
   const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
   const [shops, setShops] = useState([]);
   const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
+  const [newSoldProperty, setNewSoldProperty] = useState({ nameEn: '', buyerName: '', totalPrice: '' });
+  const [editingSoldPropertyId, setEditingSoldPropertyId] = useState(null);
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -50,9 +54,43 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
     setIsSaving(true);
     try { await addDoc(collection(db, getDataPath('shops')), { ...newShop, rent: Number(newShop.rent), status: 'Pending', createdAt: new Date().toISOString() }); setNewShop({ tenant: '', name: '', rent: '', area: '' }); alert("Shop Registered!"); } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
   };
+  
+  const handleAddSoldProperty = async (e) => {
+    e.preventDefault();
+    if (!newSoldProperty.nameEn || !newSoldProperty.buyerName || !newSoldProperty.totalPrice) return;
+    setIsSaving(true);
+    try { 
+      if (editingSoldPropertyId) {
+        await updateProperty(editingSoldPropertyId, {
+          ...newSoldProperty,
+          totalPrice: Number(newSoldProperty.totalPrice)
+        });
+        setEditingSoldPropertyId(null);
+        alert("Property Updated!");
+      } else {
+        await addProperty({ ...newSoldProperty, totalPrice: Number(newSoldProperty.totalPrice) }); 
+        alert("Property Registered!"); 
+      }
+      setNewSoldProperty({ nameEn: '', buyerName: '', totalPrice: '' }); 
+    } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
+  };
 
   const handleDeleteShop = async (id) => { 
-    if (window.confirm('Delete Shop?')) await deleteDoc(doc(db, getDataPath('shops'), id));
+    if (!window.confirm('Delete this shop permanently?')) return;
+    
+    // Optimistic UI Update
+    const prevShops = [...shops];
+    setShops(shops.filter(s => s.id !== id));
+    
+    try {
+      console.log("Attempting to delete shop with ID:", id);
+      await deleteDoc(doc(db, getDataPath('shops'), id));
+      console.log("Successfully deleted shop:", id);
+    } catch (err) {
+      console.error("Delete Shop Error:", err);
+      alert(`Delete failed: ${err.message}`);
+      setShops(prevShops); // Rollback
+    }
   };
 
   const handleDownloadExcel = async () => {
@@ -153,6 +191,63 @@ const SettingsPage = ({ entries = [], expandedSection, setExpandedSection }) => 
              <button className="col-span-2 bg-blue-600 py-4 rounded-xl font-black">Add Shop</button>
            </form>
            <div className="divide-y divide-slate-800">{shops.map(s => <div key={s.id} className="py-4 flex justify-between font-black uppercase text-xs"><span>{s.tenant} - {s.name}</span><button onClick={() => handleDeleteShop(s.id)}><Trash2 size={16}/></button></div>)}</div>
+        </div>}
+      </section>
+
+      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
+        <button onClick={() => setExpandedSection(expandedSection === 'sold' ? null : 'sold')} className="w-full flex justify-between p-8 font-black uppercase">Sold Properties <ChevronDown className={expandedSection === 'sold' ? 'rotate-180' : ''} /></button>
+        {expandedSection === 'sold' && <div className="p-8 border-t border-slate-700/50">
+           <form onSubmit={handleAddSoldProperty} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+             <input value={newSoldProperty.nameEn} onChange={e => setNewSoldProperty({...newSoldProperty, nameEn: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Property Name" />
+             <input value={newSoldProperty.buyerName} onChange={e => setNewSoldProperty({...newSoldProperty, buyerName: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Buyer Name" />
+             <input type="number" value={newSoldProperty.totalPrice} onChange={e => setNewSoldProperty({...newSoldProperty, totalPrice: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Total Price (Rs.)" />
+             <div className="flex gap-2 md:col-span-1">
+               <button className="flex-1 bg-amber-600 py-4 rounded-xl font-black uppercase text-xs">
+                 {editingSoldPropertyId ? 'Update Property' : 'Register Sale'}
+               </button>
+               {editingSoldPropertyId && (
+                 <button type="button" onClick={() => { setEditingSoldPropertyId(null); setNewSoldProperty({ nameEn: '', buyerName: '', totalPrice: '' }); }} className="px-6 bg-slate-700 py-4 rounded-xl font-black uppercase text-xs">Cancel</button>
+               )}
+             </div>
+           </form>
+           
+           <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-slate-800/50">
+             {soldProperties.length > 0 ? (
+               soldProperties.map(p => (
+                 <div key={p.id} className="py-2.5 flex justify-between items-center group/item hover:bg-slate-800/10 px-2 -mx-2 rounded-xl transition-colors">
+                   <div className="flex flex-col">
+                     <div className="font-black text-xs uppercase text-white tracking-wider">{p.nameEn || p.nameUr}</div>
+                     <div className="text-[9px] font-bold text-slate-500 uppercase">Buyer: {p.buyerName} | Rs. {Number(p.totalPrice || 0).toLocaleString()}</div>
+                   </div>
+                   <div className="flex gap-2">
+                    <button 
+                       onClick={() => {
+                         setEditingSoldPropertyId(p.id);
+                         setNewSoldProperty({ nameEn: p.nameEn || p.nameUr || '', buyerName: p.buyerName || '', totalPrice: p.totalPrice || '' });
+                         setExpandedSection('sold'); // Ensure same section is open
+                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                       }}
+                       className="p-3 bg-slate-900 hover:bg-indigo-500/20 text-slate-600 hover:text-indigo-400 rounded-xl transition-all active:scale-90"
+                       title="Edit Property"
+                     >
+                       <Settings size={16} />
+                     </button>
+                     <button 
+                       onClick={() => { if(window.confirm('Delete this sold property?')) deleteProperty(p.id) }}
+                       className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                       title="Remove Property"
+                     >
+                       <Trash2 size={16} />
+                     </button>
+                   </div>
+                 </div>
+               ))
+             ) : (
+               <div className="py-20 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+                 No Sold Properties Found
+               </div>
+             )}
+           </div>
         </div>}
       </section>
 

@@ -323,7 +323,7 @@ const App = () => {
               ) : activeTab === 'Reports' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Settings' ? (
-                <SettingsPage entries={entries} expandedSection={expandedSection} setExpandedSection={setExpandedSection} />
+                <SettingsPage entries={entries} isAdmin={isAdmin} expandedSection={expandedSection} setExpandedSection={setExpandedSection} />
               ) : null}
             </div>
           </div>

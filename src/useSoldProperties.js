@@ -65,5 +65,9 @@ export const useSoldProperties = () => {
         await deleteDoc(doc(db, getDataPath("sold_properties"), id));
     };
 
-    return { properties, loading, addProperty, recordInstallment, deleteProperty };
+    const updateProperty = async (id, data) => {
+        await updateDoc(doc(db, getDataPath("sold_properties"), id), data);
+    };
+
+    return { properties, loading, addProperty, recordInstallment, deleteProperty, updateProperty };
 };
