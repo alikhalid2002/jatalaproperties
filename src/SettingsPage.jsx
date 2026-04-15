@@ -143,7 +143,6 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   const handleNukeExpenses = async () => {
     console.log('Total Transactions:', entries.length);
     
-    // Using robust uppercase/lowercase matching and startsWith as requested
     const itemsToDelete = entries.filter(t => 
       (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
       String(t.date).startsWith('2026')
@@ -152,26 +151,28 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
     console.log('Nuking items:', itemsToDelete);
     
     if (itemsToDelete.length === 0) {
-      alert("No 2026 expenses found. Please check the Console (F12) to see all loaded transactions.");
+      alert("No 2026 expenses found.");
       return;
     }
 
     if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
     setIsSaving(true);
-    try {
-      for (const item of itemsToDelete) {
-        if (item.sourceCollection && item.id) {
-          await deleteDoc(doc(db, getDataPath(item.sourceCollection), item.id));
-        }
+    for (const item of itemsToDelete) {
+      try {
+        // Using exact requested deletion path
+        await deleteDoc(doc(db, 'transactions', item.id));
+        console.log('Successfully deleted:', item.id);
+      } catch (error) {
+        console.error('DELETE ERROR:', error.message);
+        alert('Firebase Error: ' + error.message);
+        setIsSaving(false);
+        return; // Stop on first error to investigate
       }
-      alert(`Deleted ${itemsToDelete.length} items. Dashboard reset to zero.`);
-    } catch (err) {
-      console.error("Nuke Error:", err);
-      alert(`Failed: ${err.message}`);
-    } finally {
-      setIsSaving(false);
     }
+    
+    alert(`Deletion Process Complete. Checked ${itemsToDelete.length} items.`);
+    setIsSaving(false);
   };
 
   return (
