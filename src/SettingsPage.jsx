@@ -141,24 +141,31 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   };
   
   const handleNukeExpenses = async () => {
+    console.log('Total Transactions:', entries.length);
+    
+    // Using robust uppercase/lowercase matching and startsWith as requested
     const itemsToDelete = entries.filter(t => 
-      (t.type === 'expense' || t.type === 'shop_expense') && 
-      (t.date ? t.date.split('-')[0] === '2026' : false)
+      (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
+      String(t.date).startsWith('2026')
     );
     
     console.log('Nuking items:', itemsToDelete);
     
-    if (!window.confirm("WARNING: Delete all expenses for this year? This covers general expenses and shop repairs.")) return;
+    if (itemsToDelete.length === 0) {
+      alert("No 2026 expenses found. Please check the Console (F12) to see all loaded transactions.");
+      return;
+    }
+
+    if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
     setIsSaving(true);
     try {
       for (const item of itemsToDelete) {
         if (item.sourceCollection && item.id) {
-          // Dynamically delete from whichever collection the record actually belongs to
           await deleteDoc(doc(db, getDataPath(item.sourceCollection), item.id));
         }
       }
-      alert(`Deleted ${itemsToDelete.length} items. Dashboard is now reset to zero.`);
+      alert(`Deleted ${itemsToDelete.length} items. Dashboard reset to zero.`);
     } catch (err) {
       console.error("Nuke Error:", err);
       alert(`Failed: ${err.message}`);
