@@ -147,9 +147,8 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
     }
     
     console.log('--- NUKE PROCESS STARTED ---');
-    alert('Nuke Click Detected!'); // This must pop up
+    alert('Nuke Click Detected!'); 
     
-    // Explicit Database Step
     const db = getFirestore();
     
     const toDelete = entries.filter(t => 
@@ -167,12 +166,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
     if (window.confirm(`WARNING: Delete ${toDelete.length} records?`)) {
       for (const item of toDelete) {
         try {
-          await deleteDoc(doc(db, 'transactions', item.id));
+          const docRef = doc(db, 'transactions', item.id);
+          await deleteDoc(docRef);
+          console.log('Deleted ID:', item.id);
         } catch (err) {
-          console.error("Delete error:", err);
+          console.error('Firebase Delete Error:', err);
+          alert('Error: ' + err.message);
         }
       }
-      window.location.reload(); // Force a fresh state
+      window.location.reload(); 
     }
   };
 
