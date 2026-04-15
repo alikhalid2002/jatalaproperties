@@ -7,7 +7,7 @@ import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
 import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
-import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp, query, where } from 'firebase/firestore';
 
 const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
@@ -24,7 +24,6 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   const [isExporting, setIsExporting] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
-  const [nukeConfirm, setNukeConfirm] = useState(false);
 
   const handleCreateReminder = async (e) => {
     e.preventDefault();
@@ -142,43 +141,37 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   };
   
   const handleNukeExpenses = async () => {
-    const expenseRecords = entries.filter(e => e.type === 'expense' || e.type === 'shop_expense');
-    if (expenseRecords.length === 0) {
-      alert("No expense records found for this year to delete.");
-      return;
-    }
-
-    if (!nukeConfirm) {
-      setNukeConfirm(true);
-      setTimeout(() => setNukeConfirm(false), 5000); // Reset after 5 seconds
-      return;
-    }
-    
-    setNukeConfirm(false);
-    setIsSaving(true);
-    try {
-      // Chunk into batches of 500 for Firestore limits
-      const chunks = [];
-      for (let i = 0; i < expenseRecords.length; i += 500) {
-        chunks.push(expenseRecords.slice(i, i + 500));
-      }
-      
-      for (const chunk of chunks) {
-        const batch = writeBatch(db);
-        chunk.forEach(e => {
-          if (e.sourceCollection && e.id) {
-            batch.delete(doc(db, getDataPath(e.sourceCollection), e.id));
-          }
+    if (window.confirm('Are you ABSOLUTELY sure? This will delete ALL 2026 expenses forever.')) {
+      setIsSaving(true);
+      try {
+        const q = query(
+          collection(db, getDataPath('transactions')),
+          where('type', '!=', 'income')
+        );
+        const snapshot = await getDocs(q);
+        const toDelete = snapshot.docs.filter(doc => {
+          const d = doc.data();
+          const year = d.date ? d.date.split('-')[0] : (d.createdAt?.toDate?.() || new Date()).getFullYear().toString();
+          return year === '2026';
         });
+
+        if (toDelete.length === 0) {
+          alert("No 2026 expenses found to delete.");
+          setIsSaving(false);
+          return;
+        }
+
+        const batch = writeBatch(db);
+        toDelete.forEach(d => batch.delete(d.ref));
         await batch.commit();
+        
+        alert(`Successfully deleted ${toDelete.length} records. Dashboard reset to zero.`);
+      } catch (err) {
+        console.error("Nuke Error:", err);
+        alert(`Failed: ${err.message}`);
+      } finally {
+        setIsSaving(false);
       }
-      
-      alert(`SUCCESS: All ${expenseRecords.length} records deleted. Dashboard will now show 0.`);
-    } catch (err) {
-      console.error("Nuke Error:", err);
-      alert(`Failed to delete records: ${err.message}`);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -327,14 +320,10 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
             <button 
               disabled={isSaving}
               onClick={handleNukeExpenses}
-              className={`flex flex-col items-center justify-center p-6 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] border transition-all text-center leading-tight gap-2 disabled:opacity-50 ${
-                nukeConfirm 
-                  ? "bg-rose-500 text-white border-rose-600 scale-105" 
-                  : "bg-rose-500/10 text-rose-500 border-rose-500/30 hover:bg-rose-500/20"
-              }`}
+              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2 disabled:opacity-50"
             >
-              <Trash2 size={13} className={nukeConfirm ? "animate-bounce" : "mb-1"} />
-              {nukeConfirm ? "ARE YOU SURE? CLICK AGAIN" : `NUKE ${selectedYear} EXPENSES`}
+              <Trash2 size={13} className="mb-1" />
+              NUKE {selectedYear} EXPENSES
             </button>
             <button 
               onClick={purgeAllFarmers}
