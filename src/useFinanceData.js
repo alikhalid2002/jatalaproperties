@@ -37,6 +37,13 @@ export const useFinanceData = (selectedYear) => {
             const qFarmers = query(collection(db, getDataPath("farmers")));
             const qGlobalTrans = query(collection(db, getDataPath("transactions")), orderBy("createdAt", "desc"));
 
+            const getYear = (data) => {
+                if (data.date) return data.date.split('-')[0];
+                const created = data.createdAt?.toDate ? data.createdAt.toDate() : 
+                               (data.createdAt?.seconds ? new Date(data.createdAt.seconds * 1000) : new Date());
+                return created.getFullYear().toString();
+            };
+
             const syncFinance = (revDocs, expDocs, shopDocs, farmerDocs, globalDocs) => {
                 let totalRev = 0;
                 let totalPending = 0;
@@ -46,8 +53,7 @@ export const useFinanceData = (selectedYear) => {
                 // 1. Process Revenue Collection
                 revDocs.forEach(doc => {
                     const data = doc.data();
-                    const date = data.createdAt?.toDate() || new Date();
-                    if (date.getFullYear().toString() === selectedYear) {
+                    if (getYear(data) === selectedYear) {
                         if (data.status === 'received') totalRev += Number(data.amount) || 0;
                         else totalPending += Number(data.amount) || 0;
                         allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'revenue', ...data });
@@ -57,8 +63,7 @@ export const useFinanceData = (selectedYear) => {
                 // 2. Process Expenses Collection
                 expDocs.forEach(doc => {
                     const data = doc.data();
-                    const date = data.createdAt?.toDate() || new Date();
-                    if (date.getFullYear().toString() === selectedYear) {
+                    if (getYear(data) === selectedYear) {
                         totalExp += Number(data.amount) || 0;
                         allEntries.push({ id: doc.id, type: 'expense', sourceCollection: 'expenses', ...data });
                     }
@@ -67,11 +72,7 @@ export const useFinanceData = (selectedYear) => {
                 // 3. Process Shop Transactions (Rent & Expenses)
                 shopDocs.forEach(doc => {
                     const data = doc.data();
-                    let itemYear = null;
-                    if (data.date) itemYear = data.date.split('-')[0];
-                    else if (data.createdAt?.seconds) itemYear = new Date(data.createdAt.seconds * 1000).getFullYear().toString();
-                    
-                    if (itemYear === selectedYear) {
+                    if (getYear(data) === selectedYear) {
                         if (data.type === 'Rent') {
                             totalRev += Number(data.amount) || 0;
                             allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'shop_transactions', ...data, label: `Shop Rent (${data.shopName || ''})` });
@@ -85,11 +86,9 @@ export const useFinanceData = (selectedYear) => {
                 // 4. Process Farmers (Payments from History)
                 farmerDocs.forEach(doc => {
                     const f = doc.data();
-                    // Process history for revenue (actual payments)
                     if (f.history && Array.isArray(f.history)) {
                         f.history.forEach((h, idx) => {
-                            const hYear = h.date?.split('-')[0];
-                            if (hYear === selectedYear) {
+                            if (h.date?.split('-')[0] === selectedYear) {
                                 totalRev += Number(h.amount) || 0;
                                 allEntries.push({ 
                                     id: `${doc.id}_h_${idx}`, 
@@ -106,16 +105,13 @@ export const useFinanceData = (selectedYear) => {
                             }
                         });
                     }
-                    // Process remaining balance for pending (weighted by current state)
-                    // Note: This shows current global pending, fitting the dashboard's "Outstanding" intent
                     totalPending += Number(f.totalRemaining) || 0;
                 });
 
                 // 5. Process Global Transactions (FAB Entries)
                 globalDocs.forEach(doc => {
                     const data = doc.data();
-                    const date = data.createdAt?.toDate() || (data.date ? new Date(data.date) : new Date());
-                    if (date.getFullYear().toString() === selectedYear) {
+                    if (getYear(data) === selectedYear) {
                         if (data.type === 'income') {
                             totalRev += Number(data.amount) || 0;
                             allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'transactions', ...data, label: `Extra Income: ${data.description || ''}` });
