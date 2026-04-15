@@ -148,16 +148,17 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
     
     console.log('Nuking items:', itemsToDelete);
     
-    if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
+    if (!window.confirm("WARNING: Delete all expenses for this year? This covers general expenses and shop repairs.")) return;
 
     setIsSaving(true);
     try {
       for (const item of itemsToDelete) {
         if (item.sourceCollection && item.id) {
+          // Dynamically delete from whichever collection the record actually belongs to
           await deleteDoc(doc(db, getDataPath(item.sourceCollection), item.id));
         }
       }
-      alert(`Deleted ${itemsToDelete.length} items. Dashboard reset to zero.`);
+      alert(`Deleted ${itemsToDelete.length} items. Dashboard is now reset to zero.`);
     } catch (err) {
       console.error("Nuke Error:", err);
       alert(`Failed: ${err.message}`);
