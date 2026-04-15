@@ -7,7 +7,7 @@ import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
 import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
-import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp, query, where } from 'firebase/firestore';
+import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp, query, where, getFirestore } from 'firebase/firestore';
 
 const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
@@ -141,22 +141,25 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
   };
   
   const handleNukeExpenses = async () => {
-    // 1. Identify
+    console.log('NUKE BUTTON CLICKED');
+    
+    // Direct Database Initialization as requested
+    const db = getFirestore();
+    
     const itemsToNuke = entries.filter(t => 
       (t.type === 'Expense' || t.type === 'expense') && 
       String(t.date).includes('2026')
     );
     
+    console.log('Items identified to nuke:', itemsToNuke.length);
+    
     if (itemsToNuke.length === 0) {
-      alert("No 2026 expenses found.");
+      alert("No 2026 expenses found in state.");
       return;
     }
 
     if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
-    setIsSaving(true);
-    
-    // 2. Delete Loop
     for (const item of itemsToNuke) {
       try {
         await deleteDoc(doc(db, 'transactions', item.id));
@@ -164,19 +167,12 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
       } catch (e) {
         console.error('DELETE ERROR:', e.message);
         alert('Firebase Error: ' + e.message);
-        setIsSaving(false);
         return;
       }
     }
     
-    // 3. Force UI Update (CRITICAL)
-    if (setTransactions) {
-      setTransactions(prev => prev.filter(t => !itemsToNuke.find(nuke => nuke.id === t.id)));
-    }
-    
-    // 4. Success Message
-    alert('UI Purged: ' + itemsToNuke.length + ' expenses removed from view.');
-    setIsSaving(false);
+    alert('UI Purged: ' + itemsToNuke.length + ' expenses removed. Reloading...');
+    window.location.reload(); // Emergency UI Reset
   };
 
   return (
@@ -322,9 +318,8 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
               Wipe Mobile Cache
             </button>
             <button 
-              disabled={isSaving}
               onClick={handleNukeExpenses}
-              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2 disabled:opacity-50"
+              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
             >
               <Trash2 size={13} className="mb-1" />
               NUKE {selectedYear} EXPENSES
