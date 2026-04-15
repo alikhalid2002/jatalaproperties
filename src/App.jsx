@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, getDataPath, auth } from './firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
@@ -199,6 +199,38 @@ const App = () => {
     }
   };
 
+  const handleNukeExpenses = async () => {
+    const expenseRecords = entries.filter(e => e.type === 'expense' || e.type === 'shop_expense');
+    if (expenseRecords.length === 0) {
+      alert("No expense records found for this year to delete.");
+      return;
+    }
+    
+    if (!window.confirm(`⚠️ DANGER: THIS WILL PERMANENTLY DELETE ALL ${expenseRecords.length} EXPENSE RECORDS FOR ${selectedYear} AND RESET TOTALS TO ZERO. CONTINUE?`)) return;
+    
+    try {
+      const chunks = [];
+      for (let i = 0; i < expenseRecords.length; i += 500) {
+        chunks.push(expenseRecords.slice(i, i + 500));
+      }
+      
+      for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(e => {
+          if (e.sourceCollection && e.id) {
+            batch.delete(doc(db, getDataPath(e.sourceCollection), e.id));
+          }
+        });
+        await batch.commit();
+      }
+      
+      alert(`SUCCESS: All ${expenseRecords.length} records deleted. Total reset to 0.`);
+    } catch (err) {
+      console.error("Nuke Error:", err);
+      alert(`Failed to delete records: ${err.message}`);
+    }
+  };
+
   if (!accountType) {
     return (
       <div className="fixed inset-0 bg-[#0f172a] flex items-center justify-center p-6 lg:p-10 z-[1000] overflow-hidden">
@@ -300,7 +332,7 @@ const App = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto mb-20">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
-                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
+                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} onReset={handleNukeExpenses} />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
@@ -596,7 +628,7 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
   );
 };
 
-const FinanceCard = ({ label, color, icon, value }) => (
+const FinanceCard = ({ label, color, icon, value, onReset }) => (
   <div className="group relative bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 rounded-3xl sm:rounded-[36px] border border-white/5 flex flex-row items-center gap-6 sm:gap-8 transition-all duration-500 hover:bg-white/[0.06] hover:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden">
     <div className={`absolute inset-0 bg-gradient-to-br from-${color}-500/5 to-transparent opacity-30 group-hover:opacity-60 transition-opacity duration-500`} />
     
@@ -604,8 +636,19 @@ const FinanceCard = ({ label, color, icon, value }) => (
       {React.cloneElement(icon, { size: 40, className: "shrink-0" })}
     </div>
     
-    <div className="relative flex flex-col items-start min-w-0">
-      <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-1.5">{label}</span>
+    <div className="relative flex-1 flex flex-col items-start min-w-0">
+      <div className="flex items-center justify-between w-full">
+        <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-1.5">{label}</span>
+        {onReset && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); onReset(); }}
+            className="p-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-lg transition-all mb-1 opacity-0 group-hover:opacity-100"
+            title="Reset Total to Zero"
+          >
+            <Trash2 size={12} />
+          </button>
+        )}
+      </div>
       <p className="text-2xl sm:text-4xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] truncate w-full">
         <span className="text-sm sm:text-lg mr-1 opacity-50 not-italic">Rs.</span>
         {value.toLocaleString()}
