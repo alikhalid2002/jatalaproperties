@@ -326,6 +326,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
               Wipe Mobile Cache
             </button>
             <button 
+              type="button"
               onClick={handleNuke}
               style={{ position: 'relative', zIndex: 9999 }}
               className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
