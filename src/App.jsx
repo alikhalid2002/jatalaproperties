@@ -134,6 +134,7 @@ const App = () => {
     pending: pendingVal = 0, 
     expenses: expenseVal = 0, 
     entries = [], 
+    setEntries,
     loading: financeLoading, 
     refreshFinance,
     addEntry 
