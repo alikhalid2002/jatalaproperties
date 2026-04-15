@@ -141,37 +141,28 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   };
   
   const handleNukeExpenses = async () => {
-    if (window.confirm('Are you ABSOLUTELY sure? This will delete ALL 2026 expenses forever.')) {
-      setIsSaving(true);
-      try {
-        const q = query(
-          collection(db, getDataPath('transactions')),
-          where('type', '!=', 'income')
-        );
-        const snapshot = await getDocs(q);
-        const toDelete = snapshot.docs.filter(doc => {
-          const d = doc.data();
-          const year = d.date ? d.date.split('-')[0] : (d.createdAt?.toDate?.() || new Date()).getFullYear().toString();
-          return year === '2026';
-        });
+    const itemsToDelete = entries.filter(t => 
+      (t.type === 'expense' || t.type === 'shop_expense') && 
+      (t.date ? t.date.split('-')[0] === '2026' : false)
+    );
+    
+    console.log('Nuking items:', itemsToDelete);
+    
+    if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
-        if (toDelete.length === 0) {
-          alert("No 2026 expenses found to delete.");
-          setIsSaving(false);
-          return;
+    setIsSaving(true);
+    try {
+      for (const item of itemsToDelete) {
+        if (item.sourceCollection && item.id) {
+          await deleteDoc(doc(db, getDataPath(item.sourceCollection), item.id));
         }
-
-        const batch = writeBatch(db);
-        toDelete.forEach(d => batch.delete(d.ref));
-        await batch.commit();
-        
-        alert(`Successfully deleted ${toDelete.length} records. Dashboard reset to zero.`);
-      } catch (err) {
-        console.error("Nuke Error:", err);
-        alert(`Failed: ${err.message}`);
-      } finally {
-        setIsSaving(false);
       }
+      alert(`Deleted ${itemsToDelete.length} items. Dashboard reset to zero.`);
+    } catch (err) {
+      console.error("Nuke Error:", err);
+      alert(`Failed: ${err.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
