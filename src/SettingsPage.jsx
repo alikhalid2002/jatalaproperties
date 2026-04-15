@@ -146,36 +146,41 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
       e.stopPropagation();
     }
     
-    console.log('--- NUKE PROCESS STARTED ---');
-    alert('Nuke Click Detected!'); 
-    
-    const db = getFirestore();
-    
+    // 1. Identification
     const toDelete = entries.filter(t => 
-      (t.type === 'Expense' || t.type === 'expense') && 
+      (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
       String(t.date).includes('2026')
     );
     
-    console.log('Items found:', toDelete.length);
-
     if (toDelete.length === 0) {
-      alert("No 2026 expenses found in transactions state.");
+      alert("No 2026 expenses found in the loaded transactions.");
       return;
     }
 
-    if (window.confirm(`WARNING: Delete ${toDelete.length} records?`)) {
-      for (const item of toDelete) {
-        try {
-          const docRef = doc(db, 'transactions', item.id);
-          await deleteDoc(docRef);
-          console.log('Deleted ID:', item.id);
-        } catch (err) {
-          console.error('Firebase Delete Error:', err);
-          alert('Error: ' + err.message);
-        }
+    if (!window.confirm(`WARNING: This will delete ${toDelete.length} items. Continue?`)) return;
+    
+    console.log('--- NUKE PROCESS STARTED ---');
+    setIsSaving(true);
+
+    // 2. Surgical Deletion Loop
+    for (const item of toDelete) {
+      try {
+        const docRef = doc(db, 'transactions', item.id);
+        await deleteDoc(docRef);
+        console.log('Successfully Deleted ID:', item.id);
+      } catch (err) {
+        console.error('Firebase Delete Error:', err);
       }
-      window.location.reload(); 
     }
+    
+    // 3. Manual State Purge (INSTEAD of reload)
+    if (setTransactions) {
+      setTransactions(prev => prev.filter(t => !toDelete.some(item => item.id === t.id)));
+    }
+    
+    console.log('Nuke Finalized');
+    alert('Nuke Complete: ' + toDelete.length + ' records purged.');
+    setIsSaving(false);
   };
 
   return (
