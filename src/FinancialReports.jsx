@@ -96,7 +96,15 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
   const filtered = useMemo(() => {
     let rows = normalised;
-    if (typeFilter !== 'All') rows = rows.filter(r => r._type === typeMap[typeFilter]);
+    if (typeFilter !== 'All') {
+      const target = typeMap[typeFilter];
+      if (target === 'expense') {
+        // Include both operational and shop expenses in the "Expense" view
+        rows = rows.filter(r => r._type === 'expense' || r._type === 'shop_expense');
+      } else {
+        rows = rows.filter(r => r._type === target);
+      }
+    }
     if (categoryFilter !== 'All') rows = rows.filter(r => r._category === categoryFilter);
     if (dateFrom) rows = rows.filter(r => r._date >= dateFrom);
     if (dateTo)   rows = rows.filter(r => r._date <= dateTo);
