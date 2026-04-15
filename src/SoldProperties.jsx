@@ -72,20 +72,13 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
       {/* Properties Grid - Responsive 1/2/3 cols */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-24">
         {displayProperties.map((prop) => {
-          const targetYearStr = String(selectedYear);
-          
-          // DYNAMIC INTERNAL CALCULATION: Filter installments ONLY from the selected year
-          const yearlyInstallments = (prop.installments || []).filter(inst => {
-            if (!inst.date) return false;
-            return String(new Date(inst.date).getFullYear()) === targetYearStr;
-          });
-          
-          const yearPaid = yearlyInstallments.reduce((sum, inst) => sum + Number(inst.amount || 0), 0);
+          // LIFETIME CALCULATION (Per strict instructions for card history)
+          const lifetimePaid = (prop.installments || []).reduce((sum, i) => sum + Number(i.amount || 0), 0);
           const totalPrice = Number(prop.totalPrice || 1);
           
-          // Year-Specific Progress & Remaining (Per strict instructions)
-          const progress = Math.min(100, (yearPaid / totalPrice) * 100);
-          const yearRemaining = totalPrice - yearPaid;
+          // Lifetime Progress & Remaining
+          const progress = Math.min(100, (lifetimePaid / totalPrice) * 100);
+          const remaining = totalPrice - lifetimePaid;
           
           const isPaid = prop.status === 'Fully Paid';
 
@@ -114,11 +107,11 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-95">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span suppressHydrationWarning={true}>Received: {yearPaid.toLocaleString()}</span>
+                        <span suppressHydrationWarning={true}>Received: {lifetimePaid.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
-                        <span suppressHydrationWarning={true}>Remaining: {yearRemaining.toLocaleString()}</span>
+                        <span suppressHydrationWarning={true}>Remaining: {remaining.toLocaleString()}</span>
                       </div>
                   </div>
                   
