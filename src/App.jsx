@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, getDataPath, auth } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
@@ -80,7 +80,15 @@ const App = () => {
   // FAB States
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [fabMenuMode, setFabMenuMode] = useState('root'); // 'root', 'expenses'
-  const [quickEntryModal, setQuickEntryModal] = useState({ isOpen: false, type: '', category: '' });
+  const [quickEntryModal, setQuickEntryModal] = useState({ 
+    isOpen: false, 
+    type: '', 
+    category: '', 
+    isEdit: false, 
+    editId: null, 
+    sourceCollection: null,
+    initialData: null 
+  });
   
   // 🔊 PREMIUM AUDIO FEEDBACK: Subtle click sound for interactions
   useEffect(() => {
@@ -168,12 +176,21 @@ const App = () => {
 
   const handleSaveQuickTransaction = async (data) => {
     try {
-      await addDoc(collection(db, getDataPath('transactions')), {
-        ...data,
-        createdAt: serverTimestamp(),
-        amount: Number(data.amount)
-      });
-      setQuickEntryModal({ isOpen: false, type: '', category: '' });
+      if (quickEntryModal.isEdit && quickEntryModal.editId) {
+        const collectionName = quickEntryModal.sourceCollection || 'transactions';
+        const docRef = doc(db, getDataPath(collectionName), quickEntryModal.editId);
+        await updateDoc(docRef, {
+          ...data,
+          amount: Number(data.amount)
+        });
+      } else {
+        await addDoc(collection(db, getDataPath('transactions')), {
+          ...data,
+          createdAt: serverTimestamp(),
+          amount: Number(data.amount)
+        });
+      }
+      setQuickEntryModal({ isOpen: false, type: '', category: '', isEdit: false, editId: null, sourceCollection: null, initialData: null });
       setIsFabOpen(false);
       setFabMenuMode('root');
     } catch (error) {
@@ -319,9 +336,9 @@ const App = () => {
               ) : activeTab === 'Sold' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Expenses' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" /></Suspense>
+                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry._description || entry.note || entry.description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
               ) : activeTab === 'Reports' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} /></Suspense>
+                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry._description || entry.note || entry.description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
               ) : activeTab === 'Settings' ? (
                 <SettingsPage entries={entries} isAdmin={isAdmin} expandedSection={expandedSection} setExpandedSection={setExpandedSection} />
               ) : null}
@@ -421,7 +438,7 @@ const App = () => {
         {quickEntryModal.isOpen && (
           <QuickEntryModal 
             modal={quickEntryModal} 
-            onClose={() => setQuickEntryModal({ isOpen: false, type: '', category: '' })} 
+            onClose={() => setQuickEntryModal({ isOpen: false, type: '', category: '', isEdit: false, editId: null, sourceCollection: null, initialData: null })} 
             onSave={handleSaveQuickTransaction}
           />
         )}
@@ -458,10 +475,20 @@ const FabCategoryItem = ({ label, icon, onClick }) => (
 
 const QuickEntryModal = ({ modal, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    amount: '',
-    description: ''
+    date: modal.initialData?.date || new Date().toISOString().split('T')[0],
+    amount: modal.initialData?.amount || '',
+    description: modal.initialData?.description || ''
   });
+
+  useEffect(() => {
+    if (modal.initialData) {
+      setFormData({
+        date: modal.initialData.date,
+        amount: modal.initialData.amount,
+        description: modal.initialData.description
+      });
+    }
+  }, [modal.initialData]);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async (e) => {

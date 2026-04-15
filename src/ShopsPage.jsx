@@ -322,7 +322,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
 
   const calculateAnnualProgress = (shop) => {
     if (!shop) return { paid: 0, total: 0, percent: 0 };
-    const currentYear = new Date().getFullYear();
+    const currentActiveYear = (selectedYear || new Date().getFullYear()).toString();
     const annualTotal = (Number(shop.rent) || 0) * 12;
     
     const annualPaid = transactions
@@ -334,7 +334,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
         if (t.date) itemYear = t.date.split('-')[0];
         else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
         
-        return itemYear === currentYear.toString();
+        return itemYear === currentActiveYear;
       })
       .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
       

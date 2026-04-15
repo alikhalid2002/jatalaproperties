@@ -50,7 +50,7 @@ export const useFinanceData = (selectedYear) => {
                     if (date.getFullYear().toString() === selectedYear) {
                         if (data.status === 'received') totalRev += Number(data.amount) || 0;
                         else totalPending += Number(data.amount) || 0;
-                        allEntries.push({ id: doc.id, type: 'revenue', ...data });
+                        allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'revenue', ...data });
                     }
                 });
 
@@ -60,7 +60,7 @@ export const useFinanceData = (selectedYear) => {
                     const date = data.createdAt?.toDate() || new Date();
                     if (date.getFullYear().toString() === selectedYear) {
                         totalExp += Number(data.amount) || 0;
-                        allEntries.push({ id: doc.id, type: 'expense', ...data });
+                        allEntries.push({ id: doc.id, type: 'expense', sourceCollection: 'expenses', ...data });
                     }
                 });
 
@@ -74,10 +74,10 @@ export const useFinanceData = (selectedYear) => {
                     if (itemYear === selectedYear) {
                         if (data.type === 'Rent') {
                             totalRev += Number(data.amount) || 0;
-                            allEntries.push({ id: doc.id, type: 'revenue', ...data, label: `Shop Rent (${data.shopName || ''})` });
+                            allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'shop_transactions', ...data, label: `Shop Rent (${data.shopName || ''})` });
                         } else {
                             totalExp += Number(data.amount) || 0;
-                            allEntries.push({ id: doc.id, type: 'shop_expense', ...data });
+                            allEntries.push({ id: doc.id, type: 'shop_expense', sourceCollection: 'shop_transactions', ...data });
                         }
                     }
                 });
@@ -94,6 +94,10 @@ export const useFinanceData = (selectedYear) => {
                                 allEntries.push({ 
                                     id: `${doc.id}_h_${idx}`, 
                                     type: 'revenue', 
+                                    sourceCollection: 'farmers',
+                                    isHistory: true,
+                                    farmerId: doc.id,
+                                    historyIdx: idx,
                                     amount: h.amount, 
                                     date: h.date, 
                                     label: `Payment: ${f.nameEn || f.nameUr}`,
@@ -114,10 +118,10 @@ export const useFinanceData = (selectedYear) => {
                     if (date.getFullYear().toString() === selectedYear) {
                         if (data.type === 'income') {
                             totalRev += Number(data.amount) || 0;
-                            allEntries.push({ id: doc.id, type: 'revenue', ...data, label: `Extra Income: ${data.description || ''}` });
+                            allEntries.push({ id: doc.id, type: 'revenue', sourceCollection: 'transactions', ...data, label: `Extra Income: ${data.description || ''}` });
                         } else {
                             totalExp += Number(data.amount) || 0;
-                            allEntries.push({ id: doc.id, type: 'expense', ...data });
+                            allEntries.push({ id: doc.id, type: 'expense', sourceCollection: 'transactions', ...data });
                         }
                     }
                 });
