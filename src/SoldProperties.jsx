@@ -1,28 +1,64 @@
 import React, { useState } from 'react';
 import { useSoldProperties } from './useSoldProperties';
-import { Home, User, CreditCard, ChevronRight, CheckCircle, Clock } from 'lucide-react';
+import { Home, User, CreditCard, ChevronRight, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
 import SoldPropertyDetailModal from './SoldPropertyDetailModal';
 import { seedSoldProperties } from './seedSoldProperties';
 import { transliterateToEnglish, transliterateToUrdu } from './urduTransliterator';
 
-const SoldProperties = ({ isAdmin }) => {
+const SoldProperties = ({ isAdmin, selectedYear }) => {
   const { properties, loading, recordInstallment, addProperty, deleteProperty } = useSoldProperties();
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const filteredProperties = properties;
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // Debug Alert (Temporary)
+  console.log('Current Filter Year:', selectedYear);
+
+  const transactions = properties;
+
+  // 1. STATE SYNC & DATA FILTERING: Use useMemo with STRICT String comparison
+  const filteredProperties = React.useMemo(() => {
+    if (!hasMounted) return [];
+    const targetYearStr = String(selectedYear);
+    return transactions.filter(prop => {
+      if (!prop.createdAt) return false;
+      
+      // Robust date parsing (Handles Firestore Timestamps & JS Dates)
+      const date = prop.createdAt?.toDate ? prop.createdAt.toDate() : (prop.createdAt?.seconds ? new Date(prop.createdAt.seconds * 1000) : new Date(prop.createdAt));
+      
+      // STRICT LOGIC: Compare String with String
+      return String(date.getFullYear()) === targetYearStr;
+    });
+  }, [transactions, selectedYear, hasMounted]);
+
+  // 2. REVENUE CALCULATION: Sum up transactions where year matches selectedYear (STRICT ORDER)
+  const totalSoldRevenue = React.useMemo(() => {
+    if (!hasMounted) return 0;
+    const targetYearStr = String(selectedYear);
+    return transactions.reduce((sum, prop) => {
+      const installments = prop.installments || [];
+      const yearSum = installments
+        .filter(inst => {
+          if (!inst.date) return false;
+          // STRICT LOGIC: Compare String with String per user example
+          const instYearStr = String(new Date(inst.date).getFullYear());
+          return instYearStr === targetYearStr;
+        })
+        .reduce((s, i) => s + Number(i.amount || 0), 0);
+      return sum + yearSum;
+    }, 0);
+  }, [transactions, selectedYear, hasMounted]);
 
   const handlePropertyClick = (property) => {
     setSelectedProperty(property);
     setIsModalOpen(true);
   };
 
-  const currentYear = new Date().getFullYear().toString();
-  const totalYearlyRevenue = filteredProperties.reduce((total, prop) => {
-    const yearlyInstallments = (prop.installments || []).filter(inst => inst.date && inst.date.startsWith(currentYear));
-    return total + yearlyInstallments.reduce((sum, inst) => sum + (Number(inst.amount) || 0), 0);
-  }, 0);
-
-  if (loading) {
+  if (loading || !hasMounted) {
     return (
       <div className="flex flex-col items-center justify-center p-20 animate-pulse text-slate-500">
         <div className="w-16 h-16 border-4 border-slate-700 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
@@ -34,17 +70,15 @@ const SoldProperties = ({ isAdmin }) => {
   return (
     <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
       
-      {/* Revenue Card at Top */}
-      <div className="mb-8">
-        <div className="bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 rounded-[32px] p-8 text-center relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500 blur-[100px] opacity-10"></div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 mb-2">Total Sold Revenue ({currentYear})</p>
-          <h2 className="text-4xl lg:text-5xl font-black text-white italic drop-shadow-xl">
-            <span className="text-xl mr-2 opacity-50 not-italic">Rs.</span>
-            {totalYearlyRevenue.toLocaleString()}
-          </h2>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/50 to-transparent"></div>
-        </div>
+      {/* 3. AUTO-UPDATE HEADER: Revenue Card with Dynamic Year Label */}
+      <div className="mb-10 flex justify-center px-2">
+        <FinanceCard 
+          key={selectedYear}
+          label={`TOTAL SOLD REVENUE (${selectedYear})`}
+          value={totalSoldRevenue}
+          color="emerald"
+          icon={<ArrowUpRight className="text-emerald-400" />}
+        />
       </div>
 
       {/* Properties Grid - Responsive 1/2/3 cols */}
@@ -118,5 +152,24 @@ const SoldProperties = ({ isAdmin }) => {
     </div>
   );
 };
+
+// UI COMPONENT FOR REVENUE CARD
+const FinanceCard = ({ label, value, color, icon }) => (
+  <div className="bg-slate-800/60 p-6 md:p-8 rounded-[32px] border border-slate-700/50 hover:bg-indigo-600/10 transition-all flex flex-col items-center justify-center w-full max-w-lg relative overflow-hidden group shadow-2xl backdrop-blur-xl">
+    <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}-500 blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity`}></div>
+    
+    <div className={`mb-4 p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl transition-transform group-hover:scale-110 relative z-10 border border-${color}-500/20`}>
+      {icon}
+    </div>
+
+    <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full">
+      <span className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em] mb-2" suppressHydrationWarning={true}>{label}</span>
+      <p className="text-2xl md:text-4xl font-black italic text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+        <span className="text-sm md:text-lg mr-2 opacity-50 not-italic">Rs.</span>
+        <span suppressHydrationWarning={true}>{value.toLocaleString()}</span>
+      </p>
+    </div>
+  </div>
+);
 
 export default SoldProperties;

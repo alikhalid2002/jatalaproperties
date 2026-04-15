@@ -58,7 +58,7 @@ const App = () => {
 
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedYear, setSelectedYear] = useState("2026");
 
     useEffect(() => { seedShops(); }, []);
 
@@ -317,7 +317,7 @@ const App = () => {
               ) : activeTab === 'Shops' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Sold' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><SoldProperties isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
+                <Suspense fallback={<DashboardSkeleton/>}><SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Expenses' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" /></Suspense>
               ) : activeTab === 'Reports' ? (
