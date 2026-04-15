@@ -24,6 +24,7 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   const [isExporting, setIsExporting] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [newReminder, setNewReminder] = useState({ title: '', description: '', targetDate: '', type: 'Reminder' });
+  const [nukeConfirm, setNukeConfirm] = useState(false);
 
   const handleCreateReminder = async (e) => {
     e.preventDefault();
@@ -146,9 +147,14 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
       alert("No expense records found for this year to delete.");
       return;
     }
+
+    if (!nukeConfirm) {
+      setNukeConfirm(true);
+      setTimeout(() => setNukeConfirm(false), 5000); // Reset after 5 seconds
+      return;
+    }
     
-    if (!window.confirm(`⚠️ DANGER: THIS WILL PERMANENTLY DELETE ALL ${expenseRecords.length} EXPENSE RECORDS FOR ${selectedYear} AND RESET TOTALS TO ZERO. CONTINUE?`)) return;
-    
+    setNukeConfirm(false);
     setIsSaving(true);
     try {
       // Chunk into batches of 500 for Firestore limits
@@ -321,10 +327,14 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
             <button 
               disabled={isSaving}
               onClick={handleNukeExpenses}
-              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2 disabled:opacity-50"
+              className={`flex flex-col items-center justify-center p-6 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] border transition-all text-center leading-tight gap-2 disabled:opacity-50 ${
+                nukeConfirm 
+                  ? "bg-rose-500 text-white border-rose-600 scale-105" 
+                  : "bg-rose-500/10 text-rose-500 border-rose-500/30 hover:bg-rose-500/20"
+              }`}
             >
-              <Trash2 size={13} className="mb-1" />
-              NUKE {selectedYear} EXPENSES
+              <Trash2 size={13} className={nukeConfirm ? "animate-bounce" : "mb-1"} />
+              {nukeConfirm ? "ARE YOU SURE? CLICK AGAIN" : `NUKE ${selectedYear} EXPENSES`}
             </button>
             <button 
               onClick={purgeAllFarmers}
