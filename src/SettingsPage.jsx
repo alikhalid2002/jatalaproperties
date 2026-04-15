@@ -9,7 +9,7 @@ import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 
-const SettingsPage = ({ entries = [], isAdmin, expandedSection, setExpandedSection }) => {
+const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
   const { properties: soldProperties, addProperty, deleteProperty, updateProperty } = useSoldProperties();
@@ -138,6 +138,42 @@ const SettingsPage = ({ entries = [], isAdmin, expandedSection, setExpandedSecti
       } catch (err) { alert("Restore Failed"); } finally { setIsRestoring(false); }
     };
     reader.readAsText(file);
+  };
+  
+  const handleNukeExpenses = async () => {
+    const expenseRecords = entries.filter(e => e.type === 'expense' || e.type === 'shop_expense');
+    if (expenseRecords.length === 0) {
+      alert("No expense records found for this year to delete.");
+      return;
+    }
+    
+    if (!window.confirm(`⚠️ DANGER: THIS WILL PERMANENTLY DELETE ALL ${expenseRecords.length} EXPENSE RECORDS FOR ${selectedYear} AND RESET TOTALS TO ZERO. CONTINUE?`)) return;
+    
+    setIsSaving(true);
+    try {
+      // Chunk into batches of 500 for Firestore limits
+      const chunks = [];
+      for (let i = 0; i < expenseRecords.length; i += 500) {
+        chunks.push(expenseRecords.slice(i, i + 500));
+      }
+      
+      for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(e => {
+          if (e.sourceCollection && e.id) {
+            batch.delete(doc(db, getDataPath(e.sourceCollection), e.id));
+          }
+        });
+        await batch.commit();
+      }
+      
+      alert(`SUCCESS: All ${expenseRecords.length} records deleted. Dashboard will now show 0.`);
+    } catch (err) {
+      console.error("Nuke Error:", err);
+      alert(`Failed to delete records: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -278,9 +314,17 @@ const SettingsPage = ({ entries = [], isAdmin, expandedSection, setExpandedSecti
                   window.location.reload();
                 }
               }} 
-              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
+              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-slate-400 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
             >
               Wipe Mobile Cache
+            </button>
+            <button 
+              disabled={isSaving}
+              onClick={handleNukeExpenses}
+              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2 disabled:opacity-50"
+            >
+              <Trash2 size={13} className="mb-1" />
+              NUKE {selectedYear} EXPENSES
             </button>
             <button 
               onClick={purgeAllFarmers}

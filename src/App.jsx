@@ -340,7 +340,13 @@ const App = () => {
               ) : activeTab === 'Reports' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry._description || entry.note || entry.description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
               ) : activeTab === 'Settings' ? (
-                <SettingsPage entries={entries} isAdmin={isAdmin} expandedSection={expandedSection} setExpandedSection={setExpandedSection} />
+                <SettingsPage 
+                  entries={entries} 
+                  selectedYear={selectedYear}
+                  isAdmin={isAdmin} 
+                  expandedSection={expandedSection} 
+                  setExpandedSection={setExpandedSection} 
+                />
               ) : null}
             </div>
           </div>
