@@ -143,10 +143,9 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
   const handleNukeExpenses = async () => {
     console.log('Total Transactions:', entries.length);
     
-    // Using exactly requested case-sensitive and robust logic
     const itemsToDelete = entries.filter(t => 
       (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
-      String(t.date).startsWith('2026')
+      String(t.date).includes('2026')
     );
     
     console.log('Nuking items:', itemsToDelete);
@@ -161,28 +160,27 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
     alert('Starting to delete ' + itemsToDelete.length + ' items');
 
     setIsSaving(true);
-    let successCount = 0;
-
     for (const item of itemsToDelete) {
       try {
-        // Direct attempt with explicit path
         await deleteDoc(doc(db, 'transactions', item.id));
-        successCount++;
         console.log('Successfully deleted:', item.id);
       } catch (e) {
         console.error('DELETE ERROR:', e.message);
         alert('Firebase Error: ' + e.message);
         setIsSaving(false);
-        return; // Stop on first error as requested
+        return;
       }
     }
     
-    // Post-Delete UI Refresh as requested
+    // STRICT ORDER: Manual Purge
     if (setTransactions) {
-      setTransactions(prev => prev.filter(t => !itemsToDelete.some(it => it.id === t.id)));
+      setTransactions(prev => prev.filter(t => !(
+        (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
+        String(t.date).includes('2026')
+      )));
     }
     
-    alert(`Success! Deleted ${successCount} items.`);
+    alert('Nuke Complete: UI Cleared.');
     setIsSaving(false);
   };
 
