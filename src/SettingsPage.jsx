@@ -141,26 +141,23 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
   };
   
   const handleNukeExpenses = async () => {
-    console.log('Total Transactions:', entries.length);
-    
-    const itemsToDelete = entries.filter(t => 
-      (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
+    // 1. Identify
+    const itemsToNuke = entries.filter(t => 
+      (t.type === 'Expense' || t.type === 'expense') && 
       String(t.date).includes('2026')
     );
     
-    console.log('Nuking items:', itemsToDelete);
-    
-    if (itemsToDelete.length === 0) {
+    if (itemsToNuke.length === 0) {
       alert("No 2026 expenses found.");
       return;
     }
 
     if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
-    alert('Starting to delete ' + itemsToDelete.length + ' items');
-
     setIsSaving(true);
-    for (const item of itemsToDelete) {
+    
+    // 2. Delete Loop
+    for (const item of itemsToNuke) {
       try {
         await deleteDoc(doc(db, 'transactions', item.id));
         console.log('Successfully deleted:', item.id);
@@ -172,15 +169,13 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
       }
     }
     
-    // STRICT ORDER: Manual Purge
+    // 3. Force UI Update (CRITICAL)
     if (setTransactions) {
-      setTransactions(prev => prev.filter(t => !(
-        (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
-        String(t.date).includes('2026')
-      )));
+      setTransactions(prev => prev.filter(t => !itemsToNuke.find(nuke => nuke.id === t.id)));
     }
     
-    alert('Nuke Complete: UI Cleared.');
+    // 4. Success Message
+    alert('UI Purged: ' + itemsToNuke.length + ' expenses removed from view.');
     setIsSaving(false);
   };
 
