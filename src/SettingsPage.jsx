@@ -140,39 +140,40 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
     reader.readAsText(file);
   };
   
-  const handleNukeExpenses = async () => {
-    console.log('NUKE BUTTON CLICKED');
+  const handleNuke = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     
-    // Direct Database Initialization as requested
+    console.log('--- NUKE PROCESS STARTED ---');
+    alert('Nuke Click Detected!'); // This must pop up
+    
+    // Explicit Database Step
     const db = getFirestore();
     
-    const itemsToNuke = entries.filter(t => 
+    const toDelete = entries.filter(t => 
       (t.type === 'Expense' || t.type === 'expense') && 
       String(t.date).includes('2026')
     );
     
-    console.log('Items identified to nuke:', itemsToNuke.length);
-    
-    if (itemsToNuke.length === 0) {
-      alert("No 2026 expenses found in state.");
+    console.log('Items found:', toDelete.length);
+
+    if (toDelete.length === 0) {
+      alert("No 2026 expenses found in transactions state.");
       return;
     }
 
-    if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
-
-    for (const item of itemsToNuke) {
-      try {
-        await deleteDoc(doc(db, 'transactions', item.id));
-        console.log('Successfully deleted:', item.id);
-      } catch (e) {
-        console.error('DELETE ERROR:', e.message);
-        alert('Firebase Error: ' + e.message);
-        return;
+    if (window.confirm(`WARNING: Delete ${toDelete.length} records?`)) {
+      for (const item of toDelete) {
+        try {
+          await deleteDoc(doc(db, 'transactions', item.id));
+        } catch (err) {
+          console.error("Delete error:", err);
+        }
       }
+      window.location.reload(); // Force a fresh state
     }
-    
-    alert('UI Purged: ' + itemsToNuke.length + ' expenses removed. Reloading...');
-    window.location.reload(); // Emergency UI Reset
   };
 
   return (
@@ -318,7 +319,8 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
               Wipe Mobile Cache
             </button>
             <button 
-              onClick={handleNukeExpenses}
+              onClick={handleNuke}
+              style={{ position: 'relative', zIndex: 9999 }}
               className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
             >
               <Trash2 size={13} className="mb-1" />
