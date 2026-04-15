@@ -9,7 +9,7 @@ import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp, query, where } from 'firebase/firestore';
 
-const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
+const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
   const { properties: soldProperties, addProperty, deleteProperty, updateProperty } = useSoldProperties();
@@ -143,6 +143,7 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
   const handleNukeExpenses = async () => {
     console.log('Total Transactions:', entries.length);
     
+    // Using exactly requested case-sensitive and robust logic
     const itemsToDelete = entries.filter(t => 
       (t.type === 'Expense' || t.type === 'expense' || t.type === 'shop_expense') && 
       String(t.date).startsWith('2026')
@@ -157,21 +158,31 @@ const SettingsPage = ({ entries = [], selectedYear, isAdmin, expandedSection, se
 
     if (!window.confirm("WARNING: Delete all expenses for this year?")) return;
 
+    alert('Starting to delete ' + itemsToDelete.length + ' items');
+
     setIsSaving(true);
+    let successCount = 0;
+
     for (const item of itemsToDelete) {
       try {
-        // Using exact requested deletion path
+        // Direct attempt with explicit path
         await deleteDoc(doc(db, 'transactions', item.id));
+        successCount++;
         console.log('Successfully deleted:', item.id);
-      } catch (error) {
-        console.error('DELETE ERROR:', error.message);
-        alert('Firebase Error: ' + error.message);
+      } catch (e) {
+        console.error('DELETE ERROR:', e.message);
+        alert('Firebase Error: ' + e.message);
         setIsSaving(false);
-        return; // Stop on first error to investigate
+        return; // Stop on first error as requested
       }
     }
     
-    alert(`Deletion Process Complete. Checked ${itemsToDelete.length} items.`);
+    // Post-Delete UI Refresh as requested
+    if (setTransactions) {
+      setTransactions(prev => prev.filter(t => !itemsToDelete.some(it => it.id === t.id)));
+    }
+    
+    alert(`Success! Deleted ${successCount} items.`);
     setIsSaving(false);
   };
 

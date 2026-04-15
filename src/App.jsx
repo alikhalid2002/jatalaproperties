@@ -374,6 +374,7 @@ const App = () => {
               ) : activeTab === 'Settings' ? (
                 <SettingsPage 
                   entries={entries} 
+                  setTransactions={setEntries}
                   selectedYear={selectedYear}
                   isAdmin={isAdmin} 
                   expandedSection={expandedSection} 

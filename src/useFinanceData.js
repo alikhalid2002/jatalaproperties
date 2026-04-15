@@ -204,5 +204,5 @@ export const useFinanceData = (selectedYear) => {
         }
     };
 
-    return { revenue, pending, expenses, entries, loading, refreshFinance, addEntry, updateEntry, deleteEntry };
+    return { revenue, pending, expenses, entries, loading, refreshFinance, addEntry, updateEntry, deleteEntry, setEntries };
 };
