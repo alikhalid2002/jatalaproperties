@@ -369,9 +369,9 @@ const App = () => {
               ) : activeTab === 'Sold' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
               ) : activeTab === 'Expenses' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry._description || entry.note || entry.description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
+                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
               ) : activeTab === 'Reports' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry._description || entry.note || entry.description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
+                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
               ) : activeTab === 'Settings' ? (
                 <SettingsPage 
                   entries={entries} 
@@ -539,7 +539,7 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
       ...formData,
       type: modal.type,
       category: modal.category,
-      label: modal.category === 'Extra Income' ? 'Extra Income' : `Expense: ${modal.category}`
+      label: modal.category
     });
     setIsSaving(false);
   };

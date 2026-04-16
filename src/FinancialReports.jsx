@@ -84,7 +84,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
       ...e,
       _type: rowType,
       _date: date,
-      _description: e.label || e.note || e.description || e.tenant || '—',
+      _description: e.description || e.note || e.tenant || (e.label && !e.label.startsWith('Expense:') ? e.label : '') || '—',
       _asset: e.shopName || e.farmerName || e.target || '—',
       _category: CATEGORY_MAP(e),
     };
@@ -171,7 +171,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
         r._date || '—',
         (TYPE_CONFIG[r._type] || TYPE_CONFIG.expense).label,
         r._category,
-        r.nameEn || r.tenant || r.note || r.description || r._description,
+        r.description || r.note || r.tenant || (r.label && !r.label.startsWith('Expense:') ? r.label : '') || '—',
         r._asset && r._asset !== '—' ? r._asset : '—',
         r.amount
       ]);
