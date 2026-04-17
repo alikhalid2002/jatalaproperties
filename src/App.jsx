@@ -154,7 +154,11 @@ const App = () => {
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [selectedYear, setSelectedYear] = useState("2026");
 
-  const handleNavigate = (target) => {
+  const handleNavigate = (target, e = null) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     console.log('Navigating to:', target);
     setView(target);
   };
@@ -361,13 +365,15 @@ const App = () => {
     );
   }
 
-  return (
-    <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <DynamicNav 
-          view={view}
-          handleNavigate={handleNavigate}
-          selectedYear={selectedYear}
+    console.log("Current State:", view);
+    
+    return (
+      <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden relative">
+          <DynamicNav 
+            view={view}
+            handleNavigate={handleNavigate}
+            selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
           showYearMenu={showYearMenu}
           setShowYearMenu={setShowYearMenu}
@@ -404,7 +410,7 @@ const App = () => {
                             <button
                               key={item.id}
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate(item.id); }}
+                              onClick={(e) => handleNavigate(item.id, e)}
                               className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
                               <div className="flex items-center gap-5">
