@@ -31,6 +31,13 @@ import { DashboardSkeleton } from './Skeleton';
 
 import { seedShops } from './seedShops';
 
+const formatCompact = (val) => {
+  return Intl.NumberFormat('en-US', {
+    notation: "compact",
+    maximumFractionDigits: 1
+  }).format(val);
+};
+
 const App = () => {
   // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
   useEffect(() => {
@@ -234,7 +241,7 @@ const App = () => {
 
   if (!accountType) {
     return (
-      <div className="fixed inset-0 bg-[#0f172a] flex items-center justify-center p-6 lg:p-10 z-[1000] overflow-hidden">
+      <div className="fixed inset-0 bg-[#06090f] flex items-center justify-center p-6 lg:p-10 z-[1000] overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
         <div className="w-full max-w-2xl text-center space-y-12 relative z-10">
           <h1 className="text-5xl lg:text-7xl font-black text-white uppercase">Jatala Properties</h1>
@@ -252,9 +259,9 @@ const App = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#0f172a]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
+        <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#06090f]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
           <div className="flex-shrink-0 flex items-center">
             <div onClick={() => setActiveTab('Dashboard')} className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer">
               <Home size={20} className="text-white" />
@@ -265,7 +272,7 @@ const App = () => {
             <div className="relative w-full flex justify-center">
               <button 
                 onClick={() => setShowYearMenu(!showYearMenu)} 
-                className="flex items-center gap-1.5 lg:gap-3 px-3 lg:px-6 py-2 lg:py-3 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl hover:bg-white/10 transition-all font-black text-[10px] lg:text-xs tracking-wider lg:tracking-[0.15em] text-white uppercase italic shadow-lg whitespace-nowrap overflow-hidden"
+                className="flex items-center gap-1.5 lg:gap-3 px-3 lg:px-6 py-2 lg:py-3 bg-white/[0.02] border border-white/5 rounded-xl lg:rounded-2xl hover:bg-white/5 transition-all font-black text-[10px] lg:text-xs tracking-wider lg:tracking-[0.15em] text-white uppercase italic shadow-lg whitespace-nowrap overflow-hidden"
               >
                 <Calendar size={window.innerWidth < 768 ? 14 : 18} className="text-indigo-400 shrink-0" />
                 <span className="truncate">{selectedYear}</span>
@@ -275,7 +282,7 @@ const App = () => {
               {showYearMenu && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
-                  <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-slate-900 border border-white/10 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
+                  <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-[#06090f] border border-white/5 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
                     {["2024", "2025", "2026", "2027", "2028", "2029", "2030"].map(year => (
                       <button 
                         key={year} 
@@ -306,11 +313,11 @@ const App = () => {
             </button>
 
              <div className="relative">
-               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
+               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 transition-all">
                  <div className="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={18} className="text-white"/></div>
                  <span className="text-[10px] font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
                </button>
-               {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-slate-900 border border-slate-800 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
+               {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-[#06090f] border border-white/5 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
                  <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
                    <Lock size={16} className="group-hover:rotate-12 transition-transform" />
                    <span className="text-xs font-black uppercase tracking-widest">Switch Account</span>
@@ -329,7 +336,9 @@ const App = () => {
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
                     <div className="mb-14 pt-6">
-                      <h1 className="text-2xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">Jatala Properties</h1>
+                      <h1 className="text-2xl md:text-5xl lg:text-7xl font-light italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">
+                        Jatala <span className="font-black">Properties</span>
+                      </h1>
                       
                       <div className="flex flex-row gap-3 max-w-5xl mx-auto mb-10">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
@@ -343,15 +352,15 @@ const App = () => {
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className="group flex items-center justify-between p-4 bg-[#1e293b]/40 backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
+                              className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
                               <div className="flex items-center gap-5">
-                                <div className={`p-2 bg-white/5 rounded-xl text-slate-400 group-hover:text-${item.baseColor}-400 transition-colors`}>
-                                  {React.cloneElement(item.icon, { size: 20 })}
+                                <div className="text-slate-500 group-hover:text-white transition-colors">
+                                  {React.cloneElement(item.icon, { size: 18 })}
                                 </div>
-                                <span className="text-sm font-black text-slate-300 group-hover:text-white uppercase tracking-[0.15em]">{item.label}</span>
+                                <span className="text-sm font-black text-slate-400 group-hover:text-white uppercase tracking-[0.15em] transition-colors">{item.label}</span>
                               </div>
-                              <ChevronRight className="text-slate-600 group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" size={18} />
+                              <ChevronRight className="text-slate-700 group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" size={16} />
                             </button>
                           )
                         })}
@@ -629,20 +638,20 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
 };
 
 const FinanceCard = ({ label, color, icon, value }) => (
-  <div className="group relative bg-[#1e293b]/40 backdrop-blur-md p-4 rounded-2xl border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
-    <div className={`relative w-10 h-10 flex items-center justify-center bg-${color}-500/10 text-${color}-400 rounded-xl shrink-0`}>
-      {React.cloneElement(icon, { size: 18, className: "shrink-0" })}
+  <div className="group relative bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
+    <div className={`relative text-${color}-400/80 group-hover:text-${color}-400 transition-colors shrink-0`}>
+      {React.cloneElement(icon, { size: 20, className: "shrink-0" })}
     </div>
     
     <div className="relative flex flex-col items-start min-w-0 flex-1">
       <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 truncate w-full">{label}</span>
       <p className="text-sm font-black italic text-white truncate w-full">
         <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
-        {value.toLocaleString()}
+        {formatCompact(value)}
       </p>
     </div>
-    <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-${color}-500/20`} />
-    <div className={`absolute bottom-0 left-0 h-[2px] bg-${color}-500 w-[50%]`} />
+    <div className={`absolute bottom-0 left-0 w-full h-[1px] bg-white/5`} />
+    <div className={`absolute bottom-0 left-0 h-[1px] bg-${color}-500/50 w-[40%] group-hover:w-[60%] transition-all duration-1000`} />
   </div>
 );
 
