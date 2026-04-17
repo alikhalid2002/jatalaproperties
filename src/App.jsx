@@ -331,29 +331,27 @@ const App = () => {
                     <div className="mb-14 pt-6">
                       <h1 className="text-2xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">Jatala Properties</h1>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 max-w-5xl mx-auto mb-20">
+                      <div className="flex flex-row gap-3 max-w-5xl mx-auto mb-10">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
+                      <div className="flex flex-col gap-3 max-w-5xl mx-auto">
                         {navHubItems.map((item) => {
                           if (item.adminOnly && !isAdmin) return null;
                           return (
                             <button
                               key={item.id}
                               onClick={() => setActiveTab(item.id)}
-                              className={`group flex items-center justify-between p-4 sm:p-6 bg-gradient-to-br from-${item.baseColor}-700/90 to-${item.baseColor}-900/90 backdrop-blur-md border border-${item.baseColor}-400/40 ${item.shadow} rounded-[32px] hover:scale-[1.03] active:scale-95 transition-all duration-300 relative overflow-hidden w-full`}
+                              className="group flex items-center justify-between p-4 bg-[#1e293b]/40 backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
-                              <div className="flex items-center gap-4 sm:gap-6">
-                                <div className="p-3.5 bg-white/10 rounded-2xl border border-white/20 shadow-lg backdrop-blur-md">
-                                  <div className="w-8 h-8 flex items-center justify-center text-white">
-                                    {React.cloneElement(item.icon, { size: 28, strokeWidth: 2.5 })}
-                                  </div>
+                              <div className="flex items-center gap-5">
+                                <div className={`p-2 bg-white/5 rounded-xl text-slate-400 group-hover:text-${item.baseColor}-400 transition-colors`}>
+                                  {React.cloneElement(item.icon, { size: 20 })}
                                 </div>
-                                <span className="text-lg sm:text-xl font-black text-white tracking-wide text-left">{item.label}</span>
+                                <span className="text-sm font-black text-slate-300 group-hover:text-white uppercase tracking-[0.15em]">{item.label}</span>
                               </div>
-                              <ChevronRight className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" size={24} />
+                              <ChevronRight className="text-slate-600 group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" size={18} />
                             </button>
                           )
                         })}
@@ -631,24 +629,20 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
 };
 
 const FinanceCard = ({ label, color, icon, value }) => (
-  <div className="group relative bg-white/[0.03] backdrop-blur-xl p-4 sm:p-8 rounded-[24px] sm:rounded-[36px] border border-white/5 flex flex-row items-center gap-3 sm:gap-8 transition-all duration-500 hover:bg-white/[0.06] hover:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden min-w-0">
-    <div className={`absolute inset-0 bg-gradient-to-br from-${color}-500/5 to-transparent opacity-30 group-hover:opacity-60 transition-opacity duration-500`} />
-    
-    <div className={`relative w-10 h-10 sm:w-20 sm:h-20 flex items-center justify-center bg-${color}-500/10 text-${color}-400 rounded-xl sm:rounded-3xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shrink-0`}>
-      {React.cloneElement(icon, { size: window.innerWidth < 640 ? 18 : 36, className: "shrink-0" })}
+  <div className="group relative bg-[#1e293b]/40 backdrop-blur-md p-4 rounded-2xl border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
+    <div className={`relative w-10 h-10 flex items-center justify-center bg-${color}-500/10 text-${color}-400 rounded-xl shrink-0`}>
+      {React.cloneElement(icon, { size: 18, className: "shrink-0" })}
     </div>
     
     <div className="relative flex flex-col items-start min-w-0 flex-1">
-      <span className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 truncate w-full">{label}</span>
-      <p className="text-base sm:text-xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] truncate w-full">
-        <span className="text-[10px] sm:text-sm mr-1 opacity-50 not-italic">Rs.</span>
+      <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 truncate w-full">{label}</span>
+      <p className="text-sm font-black italic text-white truncate w-full">
+        <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
         {value.toLocaleString()}
       </p>
     </div>
-
-    {/* Progress Accent Line */}
-    <div className={`absolute bottom-0 left-0 w-full h-1 bg-${color}-500/30 group-hover:h-1.5 group-hover:bg-${color}-500/50 transition-all duration-500`} />
-    <div className={`absolute bottom-0 left-0 h-1 bg-${color}-500 shadow-[0_0_15px_rgba(var(--color),0.5)] transition-all duration-1000 w-[65%] group-hover:w-[75%]`} />
+    <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-${color}-500/20`} />
+    <div className={`absolute bottom-0 left-0 h-[2px] bg-${color}-500 w-[50%]`} />
   </div>
 );
 

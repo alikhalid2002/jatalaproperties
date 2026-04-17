@@ -181,54 +181,53 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
           <div 
             key={farmer.id}
             onClick={() => handleFarmerClick(farmer)}
-            className="group bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden"
+            className="group bg-[#1e293b]/40 p-4 lg:p-5 rounded-[24px] border border-white/5 hover:bg-white/5 transition-all duration-300 shadow-xl cursor-copy flex flex-col items-center justify-center gap-3 text-center relative overflow-hidden"
           >
             <div className="space-y-1">
-              <h3 className="text-lg lg:text-3xl font-black text-white leading-tight lg:leading-relaxed py-1 uppercase tracking-tight lg:tracking-tighter break-words">
+              <h3 className="text-lg lg:text-2xl font-black text-white leading-tight uppercase tracking-tight break-words">
                 {farmer.nameEn || transliterateToEnglish(farmer.nameUr)}
               </h3>
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                 <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                 <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
                     farmer.status === 'Paid' ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 border-orange-500/20 text-orange-400'
                  }`}>
-                    {farmer.status === 'Paid' ? 'Paid' : 'Pending'}
+                    {farmer.status}
                  </span>
-                 <span className="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400">
+                 <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                     {farmer.landSize} Acres
                  </span>
                  <button 
                    onClick={(e) => handleEditBalance(e, farmer)}
                    disabled={!isAdmin}
-                   className={`px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400 flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer group/bal' : ''}`}
+                   className={`px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer' : ''}`}
                  >
-                    <Receipt size={12} className="text-slate-500 group-hover/bal:text-indigo-400" />
+                    <Receipt size={10} className="text-slate-500" />
                     BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}
-                    {isAdmin && <Plus size={10} className="text-indigo-500 opacity-0 group-hover/bal:opacity-100 transition-opacity" />}
                  </button>
               </div>
             </div>
 
-            <div className="w-full space-y-1 pt-2 border-t border-slate-700/30 mt-1 overflow-hidden">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-200 opacity-90">
+            <div className="w-full space-y-1.5 pt-2 border-t border-white/5 mt-1 overflow-hidden">
+              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400">
                 <div className="flex items-center gap-1.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                   <span>Recv: {(Number(farmer.totalPaid) || 0).toLocaleString()}</span>
+                   <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                   <span>RECV: {(Number(farmer.totalPaid) || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                   <span>Bal: {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
+                   <div className="w-1 h-1 rounded-full bg-orange-500"></div>
+                   <span>BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
                 </div>
               </div>
               
-              <div className="h-2 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner group">
+              <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden flex shadow-inner">
                 <div 
-                  className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 group-hover:from-emerald-500 group-hover:to-emerald-300 transition-all duration-700 rounded-r-sm"
+                  className="h-full bg-emerald-500 transition-all duration-700"
                   style={{ width: `${Math.min(100, Math.max(0, ((Number(farmer.totalPaid) || 0) / ((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0) || 1)) * 100))}%` }}
                 ></div>
               </div>
 
-              <div className="flex justify-center items-center gap-2">
-                 <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
+              <div className="flex justify-center items-center">
+                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-white transition-colors">
                    Total Value: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
               </div>
