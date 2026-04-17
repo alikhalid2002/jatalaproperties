@@ -5,7 +5,7 @@ import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  authDomain: "jatalaproperties.vercel.app", // 🛡️ CRITICAL SECURITY FIX: Domain must match Vercel production URL
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET?.replace('gs://', '').replace(/\/$/, ''),
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
