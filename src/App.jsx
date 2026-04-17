@@ -33,7 +33,7 @@ import { seedShops } from './seedShops';
 
 const DynamicNav = ({ 
   view, 
-  setView, 
+  handleNavigate,
   selectedYear, 
   setSelectedYear, 
   showYearMenu, 
@@ -48,10 +48,10 @@ const DynamicNav = ({
   return (
     <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#06090f]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
       <div className="flex-shrink-0 flex items-center gap-4">
-        {view === 'Dashboard' ? (
+        {view === 'dashboard' ? (
           <button 
             type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView('Dashboard'); }} 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate('dashboard'); }} 
             className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer"
           >
             <Home size={20} className="text-white" />
@@ -60,7 +60,7 @@ const DynamicNav = ({
           <div className="flex items-center gap-3">
             <button 
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView('Dashboard'); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate('dashboard'); }}
               className="w-10 h-10 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all text-white group"
             >
               <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -80,7 +80,7 @@ const DynamicNav = ({
 
       <div className="flex-grow flex justify-center min-w-0">
         <div className="relative w-full flex justify-center">
-          {view === 'Dashboard' && (
+          {view === 'dashboard' && (
             <button 
               type="button"
               onClick={() => setShowYearMenu(!showYearMenu)} 
@@ -92,7 +92,7 @@ const DynamicNav = ({
             </button>
           )}
           
-          {showYearMenu && view === 'Dashboard' && (
+          {showYearMenu && view === 'dashboard' && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
               <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-[#06090f] border border-white/5 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
@@ -149,10 +149,15 @@ const DynamicNav = ({
 };
 
 const App = () => {
-  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'Dashboard');
+  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'dashboard');
   const [isAdmin, setIsAdmin] = useState(true);
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [selectedYear, setSelectedYear] = useState("2026");
+
+  const handleNavigate = (target) => {
+    console.log('Navigating to:', target);
+    setView(target);
+  };
 
   // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
   useEffect(() => {
@@ -361,7 +366,7 @@ const App = () => {
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <DynamicNav 
           view={view}
-          setView={setView}
+          handleNavigate={handleNavigate}
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
           showYearMenu={showYearMenu}
@@ -378,8 +383,8 @@ const App = () => {
           <div className="lg:px-12 px-4 lg:py-12 py-6 overflow-y-auto no-scrollbar pb-32">
             <div className="max-w-[1600px] mx-auto min-h-full font-sans">
               {globalSearch ? (
-                <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); setView(tab); }} />
-              ) : view === 'Dashboard' ? (
+                <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); handleNavigate(tab); }} />
+              ) : view === 'dashboard' ? (
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
                     <div className="mb-14 pt-6">
@@ -399,7 +404,7 @@ const App = () => {
                             <button
                               key={item.id}
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView(item.id); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate(item.id); }}
                               className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
                               <div className="flex items-center gap-5">
