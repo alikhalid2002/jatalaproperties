@@ -162,7 +162,12 @@ const App = () => {
   }, []);
 
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
-  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'Dashboard');
+
+  useEffect(() => {
+    localStorage.setItem('j-view', view);
+  }, [view]);
+
   const [selectedYear, setSelectedYear] = useState("2026");
 
     useEffect(() => { seedShops(); }, []);
@@ -360,8 +365,8 @@ const App = () => {
     <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <DynamicNav 
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          activeTab={view}
+          setActiveTab={setView}
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
           showYearMenu={showYearMenu}
@@ -378,8 +383,8 @@ const App = () => {
           <div className="lg:px-12 px-4 lg:py-12 py-6 overflow-y-auto no-scrollbar pb-32">
             <div className="max-w-[1600px] mx-auto min-h-full font-sans">
               {globalSearch ? (
-                <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); setActiveTab(tab); }} />
-              ) : activeTab === 'Dashboard' ? (
+                <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); setView(tab); }} />
+              ) : view === 'Dashboard' ? (
                 loading ? <DashboardSkeleton /> : (
                   <div className="flex flex-col gap-10">
                     <div className="mb-14 pt-6">
@@ -399,7 +404,7 @@ const App = () => {
                             <button
                               key={item.id}
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(item.id); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView(item.id); }}
                               className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
                               <div className="flex items-center gap-5">
@@ -417,17 +422,17 @@ const App = () => {
 
                   </div>
                 )
-              ) : activeTab === 'Land' ? (
+              ) : view === 'Land' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><LandAssets isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : activeTab === 'Shops' ? (
+              ) : view === 'Shops' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : activeTab === 'Sold' ? (
+              ) : view === 'Sold' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : activeTab === 'Expenses' ? (
+              ) : view === 'Expenses' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
-              ) : activeTab === 'Reports' ? (
+              ) : view === 'Reports' ? (
                 <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
-              ) : activeTab === 'Settings' ? (
+              ) : view === 'Settings' ? (
                 <SettingsPage 
                   entries={entries} 
                   setTransactions={setEntries}
