@@ -266,7 +266,8 @@ const App = () => {
             ) : (
               <div className="flex items-center gap-3">
                 <button 
-                  onClick={() => setActiveTab('Dashboard')}
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab('Dashboard'); }}
                   className="w-10 h-10 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all text-white group"
                 >
                   <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -367,7 +368,8 @@ const App = () => {
                           return (
                             <button
                               key={item.id}
-                              onClick={() => setActiveTab(item.id)}
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(item.id); }}
                               className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
                             >
                               <div className="flex items-center gap-5">
