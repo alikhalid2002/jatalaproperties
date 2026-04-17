@@ -245,12 +245,13 @@ const App = () => {
         <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#06090f]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
           <div className="flex-shrink-0 flex items-center gap-4">
             {activeTab === 'Dashboard' ? (
-              <div 
+              <button 
+                type="button"
                 onClick={() => setActiveTab('Dashboard')} 
                 className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer"
               >
                 <Home size={20} className="text-white" />
-              </div>
+              </button>
             ) : (
               <div className="flex items-center gap-3">
                 <button 
@@ -316,18 +317,30 @@ const App = () => {
               </div>
             )}
              
-            <button onClick={() => setIsReminderDrawerOpen(true)} className="p-2.5 lg:p-3.5 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl relative hover:bg-white/10 transition-all group">
-              <Bell size={20} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
-              {activeReminders.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-600 rounded-full border-2 border-[#0f172a]" />}
-            </button>
+            <button 
+               type="button"
+               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsReminderDrawerOpen(true); }} 
+               className="p-2.5 lg:p-3.5 bg-white/5 border border-white/5 rounded-xl lg:rounded-2xl relative hover:bg-white/10 transition-all group"
+             >
+               <Bell size={20} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
+               {activeReminders.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-600 rounded-full border-2 border-[#06090f]" />}
+             </button>
 
              <div className="relative">
-               <button onClick={() => setShowAccountMenu(!showAccountMenu)} className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 transition-all">
+               <button 
+                 type="button"
+                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAccountMenu(!showAccountMenu); }} 
+                 className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 transition-all"
+               >
                  <div className="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={18} className="text-white"/></div>
                  <span className="text-[10px] font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
                </button>
                {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-[#06090f] border border-white/5 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
-                 <button onClick={() => {setAccountType(null); setShowAccountMenu(false);}} className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group">
+                 <button 
+                   type="button"
+                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccountType(null); setShowAccountMenu(false); }} 
+                   className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group"
+                 >
                    <Lock size={16} className="group-hover:rotate-12 transition-transform" />
                    <span className="text-xs font-black uppercase tracking-widest">Switch Account</span>
                  </button>
