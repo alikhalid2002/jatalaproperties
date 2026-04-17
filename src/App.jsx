@@ -31,13 +31,6 @@ import { DashboardSkeleton } from './Skeleton';
 
 import { seedShops } from './seedShops';
 
-const formatCompact = (val) => {
-  return Intl.NumberFormat('en-US', {
-    notation: "compact",
-    maximumFractionDigits: 1
-  }).format(val);
-};
-
 const App = () => {
   // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
   useEffect(() => {
@@ -640,14 +633,14 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
 const FinanceCard = ({ label, color, icon, value }) => (
   <div className="group relative bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
     <div className={`relative text-${color}-400/80 group-hover:text-${color}-400 transition-colors shrink-0`}>
-      {React.cloneElement(icon, { size: 20, className: "shrink-0" })}
+      {React.cloneElement(icon, { size: 18, className: "shrink-0" })}
     </div>
     
     <div className="relative flex flex-col items-start min-w-0 flex-1">
-      <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 truncate w-full">{label}</span>
-      <p className="text-sm font-black italic text-white truncate w-full">
+      <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 whitespace-nowrap w-full">{label}</span>
+      <p className="text-sm lg:text-base font-black italic text-white whitespace-nowrap w-full">
         <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
-        {formatCompact(value)}
+        {value.toLocaleString()}
       </p>
     </div>
     <div className={`absolute bottom-0 left-0 w-full h-[1px] bg-white/5`} />
