@@ -23,11 +23,44 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingBalanceFarmer, setEditingBalanceFarmer] = useState(null);
+  const [newBalanceValue, setNewBalanceValue] = useState('');
 
   const yearString = `${Number(selectedYear) - 1}/${selectedYear.slice(-2)}`;
 
   const handleFarmerClick = (farmer) => {
     setSelectedFarmer(farmer);
+  };
+
+  const handleEditBalance = (e, farmer) => {
+    e.stopPropagation();
+    if (!isAdmin) return;
+    setEditingBalanceFarmer(farmer);
+    setNewBalanceValue(farmer.totalRemaining || 0);
+  };
+
+  const saveBalanceOverride = async () => {
+    if (!editingBalanceFarmer) return;
+    
+    const confirmed = window.confirm(`Are you sure you want to manually override ${editingBalanceFarmer.nameEn || editingBalanceFarmer.nameUr}'s balance?`);
+    if (!confirmed) return;
+
+    try {
+      const newVal = Number(newBalanceValue);
+      // We also update totalPayable to maintain mathematical consistency: Paid + Remaining = Payable
+      const currentPaid = Number(editingBalanceFarmer.totalPaid) || 0;
+      const newPayable = currentPaid + newVal;
+
+      await updateFarmerFields(editingBalanceFarmer.id, { 
+        totalRemaining: newVal,
+        totalPayable: newPayable,
+        status: newVal === 0 ? 'Paid' : 'Pending'
+      });
+      
+      setEditingBalanceFarmer(null);
+    } catch (err) {
+      console.error("Balance update failed:", err);
+    }
   };
 
   if (farmersLoading) {
@@ -163,6 +196,15 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                  <span className="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400">
                     {farmer.landSize} Acres
                  </span>
+                 <button 
+                   onClick={(e) => handleEditBalance(e, farmer)}
+                   disabled={!isAdmin}
+                   className={`px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-400 flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer group/bal' : ''}`}
+                 >
+                    <Receipt size={12} className="text-slate-500 group-hover/bal:text-indigo-400" />
+                    BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}
+                    {isAdmin && <Plus size={10} className="text-indigo-500 opacity-0 group-hover/bal:opacity-100 transition-opacity" />}
+                 </button>
               </div>
             </div>
 
@@ -185,10 +227,21 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                 ></div>
               </div>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center gap-2">
                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
                    Total Value: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
+                 <div className="w-1 h-1 rounded-full bg-slate-700"></div>
+                 <button 
+                  onClick={(e) => handleEditBalance(e, farmer)}
+                  disabled={!isAdmin}
+                  className={`flex items-center gap-1.5 group/bal2 ${isAdmin ? 'cursor-pointer' : ''}`}
+                 >
+                   <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] group-hover/bal2:text-indigo-400 transition-colors">
+                     BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}
+                   </span>
+                   {isAdmin && <Plus size={10} className="text-indigo-500 opacity-0 group-hover/bal2:opacity-100 transition-opacity" />}
+                 </button>
               </div>
             </div>
           </div>
@@ -215,6 +268,52 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         isAdmin={isAdmin}
         uploadProgress={uploadProgress}
       />
+
+      {/* Balance Adjust Modal */}
+      {editingBalanceFarmer && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-[#0f172a]/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="w-full max-w-sm bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl p-8 space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-black uppercase italic tracking-widest text-white">Adjust Balance</h3>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{editingBalanceFarmer.nameEn || editingBalanceFarmer.nameUr}</p>
+              </div>
+              <button onClick={() => setEditingBalanceFarmer(null)} className="p-2 transition-colors hover:bg-white/5 rounded-xl"><X size={20} /></button>
+            </div>
+
+            <div className="space-y-4 pt-2">
+               <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-4">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">New Remaining Balance (Rs.)</label>
+                  <div className="flex items-center gap-3 px-2">
+                     <Calculator size={18} className="text-indigo-400"/>
+                     <input 
+                       type="number"
+                       autoFocus
+                       value={newBalanceValue}
+                       onChange={(e) => setNewBalanceValue(e.target.value)}
+                       className="bg-transparent border-none outline-none font-black text-white text-xl w-full italic"
+                       placeholder="0"
+                     />
+                  </div>
+               </div>
+               
+               <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl flex items-start gap-3">
+                 <AlertCircle size={16} className="text-orange-500 shrink-0 mt-0.5" />
+                 <p className="text-[9px] font-bold text-orange-400/80 uppercase leading-relaxed tracking-wider">
+                   Manually overriding the balance will update the member's total payable record to match the new sum of paid + remaining amount.
+                 </p>
+               </div>
+            </div>
+
+            <button 
+              onClick={saveBalanceOverride}
+              className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+            >
+              Update Balance
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -331,7 +331,7 @@ const App = () => {
                     <div className="mb-14 pt-6">
                       <h1 className="text-2xl md:text-5xl lg:text-7xl font-black italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">Jatala Properties</h1>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-5xl mx-auto mb-20">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 max-w-5xl mx-auto mb-20">
                         <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
                         <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
                       </div>
@@ -631,17 +631,17 @@ const QuickEntryModal = ({ modal, onClose, onSave }) => {
 };
 
 const FinanceCard = ({ label, color, icon, value }) => (
-  <div className="group relative bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 rounded-3xl sm:rounded-[36px] border border-white/5 flex flex-row items-center gap-6 sm:gap-8 transition-all duration-500 hover:bg-white/[0.06] hover:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden">
+  <div className="group relative bg-white/[0.03] backdrop-blur-xl p-4 sm:p-8 rounded-[24px] sm:rounded-[36px] border border-white/5 flex flex-row items-center gap-3 sm:gap-8 transition-all duration-500 hover:bg-white/[0.06] hover:border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden min-w-0">
     <div className={`absolute inset-0 bg-gradient-to-br from-${color}-500/5 to-transparent opacity-30 group-hover:opacity-60 transition-opacity duration-500`} />
     
-    <div className={`relative p-5 sm:p-7 bg-${color}-500/10 text-${color}-400 rounded-2xl sm:rounded-3xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shrink-0`}>
-      {React.cloneElement(icon, { size: 40, className: "shrink-0" })}
+    <div className={`relative w-10 h-10 sm:w-20 sm:h-20 flex items-center justify-center bg-${color}-500/10 text-${color}-400 rounded-xl sm:rounded-3xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shrink-0`}>
+      {React.cloneElement(icon, { size: window.innerWidth < 640 ? 18 : 36, className: "shrink-0" })}
     </div>
     
-    <div className="relative flex flex-col items-start min-w-0">
-      <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-1.5">{label}</span>
-      <p className="text-2xl sm:text-4xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] truncate w-full">
-        <span className="text-sm sm:text-lg mr-1 opacity-50 not-italic">Rs.</span>
+    <div className="relative flex flex-col items-start min-w-0 flex-1">
+      <span className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 truncate w-full">{label}</span>
+      <p className="text-base sm:text-xl font-black italic text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] truncate w-full">
+        <span className="text-[10px] sm:text-sm mr-1 opacity-50 not-italic">Rs.</span>
         {value.toLocaleString()}
       </p>
     </div>

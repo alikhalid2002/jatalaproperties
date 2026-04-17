@@ -9,7 +9,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
   const [file, setFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ nameUr: '', nameEn: '', landSize: '', totalPayable: '', theka: '' });
+  const [editData, setEditData] = useState({ nameUr: '', nameEn: '', landSize: '', totalPayable: '', totalRemaining: '', theka: '' });
   const [previewImage, setPreviewImage] = useState(null);
   const [isUploadingDoc, setIsUploadingDoc] = useState({ idCard: false, agreement: false });
 
@@ -24,11 +24,12 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         name: farmer.nameEn || farmer.nameUr || '',
         landSize: farmer.landSize || '',
         totalPayable: farmer.totalPayable || (Number(farmer.totalPaid) + Number(farmer.totalRemaining)) || '',
+        totalRemaining: farmer.totalRemaining || 0,
         theka: farmer.theka || 0
       });
     } else if (!isOpen) {
       // Clear data when closing to prevent leakage to the next farmer opened
-      setEditData({ nameUr: '', nameEn: '', landSize: '', totalPayable: '', theka: '' });
+      setEditData({ nameUr: '', nameEn: '', landSize: '', totalPayable: '', totalRemaining: '', theka: '' });
       setIsEditing(false);
     }
   }, [isOpen, farmer]);
@@ -69,6 +70,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         nameEn: editData.name,
         landSize: editData.landSize,
         totalPayable: Number(editData.totalPayable),
+        totalRemaining: Number(editData.totalRemaining),
         theka: Number(editData.theka)
       });
       setIsEditing(false);
@@ -217,9 +219,11 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                       const newVal = e.target.value;
                       setEditData(prev => {
                         const currentSize = Number(prev.landSize) || 0;
+                        const totalPaid = Number(farmer.totalPaid) || 0;
                         return {
                           ...prev,
                           totalPayable: newVal,
+                          totalRemaining: Math.max(0, Number(newVal) - totalPaid).toString(),
                           theka: currentSize > 0 ? Math.round(Number(newVal) / currentSize).toString() : prev.theka
                         };
                       });
@@ -242,7 +246,28 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
                    <span className="text-[11px] font-black uppercase tracking-widest">Balance Due</span>
                 </div>
-                <p className="text-2xl font-black text-white italic">Rs. {farmer.totalRemaining?.toLocaleString() || 0}</p>
+                {isEditing ? (
+                  <input 
+                    type="number"
+                    value={editData.totalRemaining}
+                    disabled={!isAdmin}
+                    onChange={(e) => {
+                      const newVal = e.target.value;
+                      const totalPaid = Number(farmer.totalPaid) || 0;
+                      const currentSize = Number(editData.landSize) || 0;
+                      const newTotalPayable = totalPaid + Number(newVal);
+                      setEditData(prev => ({
+                        ...prev,
+                        totalRemaining: newVal,
+                        totalPayable: newTotalPayable.toString(),
+                        theka: currentSize > 0 ? Math.round(newTotalPayable / currentSize).toString() : prev.theka
+                      }));
+                    }}
+                    className="bg-transparent border-b border-orange-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
+                  />
+                ) : (
+                  <p className="text-2xl font-black text-white italic">Rs. {farmer.totalRemaining?.toLocaleString() || 0}</p>
+                )}
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-violet-400">
@@ -258,10 +283,13 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                       const newTheka = e.target.value;
                       setEditData(prev => {
                         const currentSize = Number(prev.landSize) || 0;
+                        const totalPaid = Number(farmer.totalPaid) || 0;
+                        const newTotalPayable = Math.round(currentSize * Number(newTheka));
                         return {
                           ...prev,
                           theka: newTheka,
-                          totalPayable: Math.round(currentSize * Number(newTheka)).toString()
+                          totalPayable: newTotalPayable.toString(),
+                          totalRemaining: Math.max(0, newTotalPayable - totalPaid).toString()
                         };
                       });
                     }}
