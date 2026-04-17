@@ -149,47 +149,41 @@ const DynamicNav = ({
 };
 
 const App = () => {
+  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'Dashboard');
+  const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
+  const [selectedYear, setSelectedYear] = useState("2026");
+
   // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
   useEffect(() => {
     const lastVer = localStorage.getItem('jatala_app_ver');
     if (lastVer && lastVer !== APP_VERSION) {
       localStorage.removeItem('jatala_farmers_cache');
       localStorage.setItem('jatala_app_ver', APP_VERSION);
-      console.log("App Version Updated to", APP_VERSION);
     } else {
       localStorage.setItem('jatala_app_ver', APP_VERSION);
     }
   }, []);
 
-  const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
-  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'Dashboard');
-
   useEffect(() => {
     localStorage.setItem('j-view', view);
   }, [view]);
-
-  const [selectedYear, setSelectedYear] = useState("2026");
-
-    useEffect(() => { seedShops(); }, []);
 
   useEffect(() => {
     if (accountType) localStorage.setItem('jatala_auth', accountType);
     else localStorage.removeItem('jatala_auth');
   }, [accountType]);
 
+  useEffect(() => { seedShops(); }, []);
+
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState(false);
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const isAdmin = accountType === 'admin';
   const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const [authStage, setAuthStage] = useState('selection');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [loginError, setLoginError] = useState(false);
-  const [expandedSection, setExpandedSection] = useState(null);
-
-  // FAB States
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [fabMenuMode, setFabMenuMode] = useState('root'); // 'root', 'expenses'
+  const [fabMenuMode, setFabMenuMode] = useState('root');
   const [quickEntryModal, setQuickEntryModal] = useState({ 
     isOpen: false, 
     type: '', 
