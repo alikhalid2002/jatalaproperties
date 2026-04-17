@@ -1,15 +1,16 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { 
   initializeFirestore, 
   persistentLocalCache, 
-  persistentMultipleTabManager 
+  persistentMultipleTabManager,
+  getFirestore
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "jatalaproperties.vercel.app", // 🛡️ CRITICAL SECURITY FIX: Domain must match Vercel production URL
+  authDomain: "jatalaproperties.vercel.app", 
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET?.replace('gs://', '').replace(/\/$/, ''),
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
@@ -17,15 +18,20 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-const app = initializeApp(firebaseConfig);
+// 🛡️ FIREBASE SAFETY: Ensure single initialization
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// 🛡️ MODERN PERSISTENCE & CONNECTIVITY FIX
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  }),
-  experimentalAutoDetectLongPolling: true,
-});
+export let db;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    }),
+    experimentalAutoDetectLongPolling: true,
+  });
+} catch (e) {
+  db = getFirestore(app);
+}
 
 export const storage = getStorage(app);
 export const auth = getAuth(app);
