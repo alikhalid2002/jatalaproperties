@@ -231,17 +231,6 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                  <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
                    Total Value: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
-                 <div className="w-1 h-1 rounded-full bg-slate-700"></div>
-                 <button 
-                  onClick={(e) => handleEditBalance(e, farmer)}
-                  disabled={!isAdmin}
-                  className={`flex items-center gap-1.5 group/bal2 ${isAdmin ? 'cursor-pointer' : ''}`}
-                 >
-                   <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] group-hover/bal2:text-indigo-400 transition-colors">
-                     BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}
-                   </span>
-                   {isAdmin && <Plus size={10} className="text-indigo-500 opacity-0 group-hover/bal2:opacity-100 transition-opacity" />}
-                 </button>
               </div>
             </div>
           </div>
