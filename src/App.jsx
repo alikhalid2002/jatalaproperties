@@ -150,6 +150,7 @@ const DynamicNav = ({
 
 const App = () => {
   const [view, setView] = useState(() => localStorage.getItem('j-view') || 'Dashboard');
+  const [isAdmin, setIsAdmin] = useState(true);
   const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
   const [selectedYear, setSelectedYear] = useState("2026");
 
