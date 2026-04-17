@@ -32,8 +32,8 @@ import { DashboardSkeleton } from './Skeleton';
 import { seedShops } from './seedShops';
 
 const DynamicNav = ({ 
-  activeTab, 
-  setActiveTab, 
+  view, 
+  setView, 
   selectedYear, 
   setSelectedYear, 
   showYearMenu, 
@@ -48,10 +48,10 @@ const DynamicNav = ({
   return (
     <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#06090f]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
       <div className="flex-shrink-0 flex items-center gap-4">
-        {activeTab === 'Dashboard' ? (
+        {view === 'Dashboard' ? (
           <button 
             type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab('Dashboard'); }} 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView('Dashboard'); }} 
             className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer"
           >
             <Home size={20} className="text-white" />
@@ -60,19 +60,19 @@ const DynamicNav = ({
           <div className="flex items-center gap-3">
             <button 
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab('Dashboard'); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setView('Dashboard'); }}
               className="w-10 h-10 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all text-white group"
             >
               <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             </button>
             <h2 className="text-xs lg:text-lg font-black italic uppercase tracking-widest text-white whitespace-nowrap">
-              {activeTab === 'Land' ? 'Land Assets' : 
-               activeTab === 'Shops' ? 'Commercial Shops' : 
-               activeTab === 'Sold' ? 'Sold Properties' : 
-               activeTab === 'Expenses' ? 'Operational Expenses' : 
-               activeTab === 'Reports' ? 'Financial Reports' : 
-               activeTab === 'Settings' ? 'System Settings' : 
-               activeTab}
+              {view === 'Land' ? 'Land Assets' : 
+               view === 'Shops' ? 'Commercial Shops' : 
+               view === 'Sold' ? 'Sold Properties' : 
+               view === 'Expenses' ? 'Operational Expenses' : 
+               view === 'Reports' ? 'Financial Reports' : 
+               view === 'Settings' ? 'System Settings' : 
+               view}
             </h2>
           </div>
         )}
@@ -80,7 +80,7 @@ const DynamicNav = ({
 
       <div className="flex-grow flex justify-center min-w-0">
         <div className="relative w-full flex justify-center">
-          {activeTab === 'Dashboard' && (
+          {view === 'Dashboard' && (
             <button 
               type="button"
               onClick={() => setShowYearMenu(!showYearMenu)} 
@@ -92,7 +92,7 @@ const DynamicNav = ({
             </button>
           )}
           
-          {showYearMenu && activeTab === 'Dashboard' && (
+          {showYearMenu && view === 'Dashboard' && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
               <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-[#06090f] border border-white/5 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
@@ -365,8 +365,8 @@ const App = () => {
     <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <DynamicNav 
-          activeTab={view}
-          setActiveTab={setView}
+          view={view}
+          setView={setView}
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
           showYearMenu={showYearMenu}
