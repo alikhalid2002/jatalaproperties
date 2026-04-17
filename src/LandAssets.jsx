@@ -197,7 +197,8 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                     {farmer.landSize} Acres
                  </span>
                  <button 
-                   onClick={(e) => handleEditBalance(e, farmer)}
+                   type="button"
+                   onClick={(e) => { e.stopPropagation(); handleEditBalance(e, farmer); }}
                    disabled={!isAdmin}
                    className={`px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer' : ''}`}
                  >

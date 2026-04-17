@@ -38,19 +38,7 @@ const App = () => {
     if (lastVer && lastVer !== APP_VERSION) {
       localStorage.removeItem('jatala_farmers_cache');
       localStorage.setItem('jatala_app_ver', APP_VERSION);
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-        });
-      }
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          registrations.forEach(reg => reg.unregister());
-          window.location.reload(true);
-        });
-      } else {
-        window.location.reload(true);
-      }
+      console.log("App Version Updated to", APP_VERSION);
     } else {
       localStorage.setItem('jatala_app_ver', APP_VERSION);
     }
