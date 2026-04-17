@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
@@ -14,7 +14,21 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+// 🛡️ STRICT CONNECTIVITY FIX: Force Long Polling to bypass ISP QUIC/Websocket blocks
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+});
+
+// 💾 Enable Offline Persistence for zero-latency loading from cache
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    console.warn("Firestore Persistence Failed: Multiple tabs open.");
+  } else if (err.code === 'unimplemented') {
+    console.warn("Firestore Persistence Not Supported by Browser.");
+  }
+});
+
 export const storage = getStorage(app);
 export const auth = getAuth(app);
 
