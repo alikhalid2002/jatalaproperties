@@ -142,6 +142,7 @@ const App = () => {
             {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
             {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} />}
             {view === 'Settings' && <SettingsPage entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
+            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] pt-10 text-center">Premium System v1.2.6 — Sync Active</p>
           </Suspense>
         )}
       </main>
