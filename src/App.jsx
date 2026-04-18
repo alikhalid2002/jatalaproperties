@@ -64,7 +64,7 @@ const App = () => {
         {React.cloneElement(icon, { size: 24 })}
       </div>
       <div className="flex flex-col items-start min-w-0 flex-1">
-        <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 whitespace-nowrap">{label}</span>
+        <span className="text-[8px] font-black uppercase text-white tracking-[0.2em] mb-1 whitespace-nowrap drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">{label}</span>
         <p className="text-sm lg:text-xl font-black italic text-white whitespace-nowrap">
           <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
           {value.toLocaleString()}
@@ -92,7 +92,7 @@ const App = () => {
           )}
           {view !== 'dashboard' && (
             <div className="animate-in fade-in slide-in-from-left-4">
-              <h2 className="text-white font-black uppercase tracking-widest leading-none">{view.replace(/_/g, ' ')}</h2>
+              <h2 className="text-white font-black uppercase tracking-widest leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">{view.replace(/_/g, ' ')}</h2>
               <p className="text-[7px] text-indigo-500 font-black uppercase tracking-[0.4em] mt-1">Inventory Database</p>
             </div>
           )}
@@ -127,7 +127,7 @@ const App = () => {
                 >
                   <div className="flex items-center gap-6">
                     <div className={`${item.color} group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span className="text-white font-black uppercase tracking-[0.2em] text-[10px]">{item.title}</span>
+                    <span className="text-white font-black uppercase tracking-[0.2em] text-[10px] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">{item.title}</span>
                   </div>
                   <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
                 </button>
