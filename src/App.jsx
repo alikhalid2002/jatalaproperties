@@ -1,717 +1,163 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { 
-  Map, Store, Receipt, BarChart3, Settings, 
-  UserCircle, ChevronDown, Bell, LayoutDashboard, Search,
-  Plus, Trash2, Loader2, CheckCircle,
-  ArrowUpRight, ArrowDownRight, Activity, 
-  Shield, User, X, Lock, Calendar, Home, ChevronRight,
-  TrendingUp, TrendingDown, Wrench, FileText, Users, Zap, Car, Layers, Save, DollarSign, ArrowLeft
+  Map as LandPlot, Store, Receipt as ReceiptText, Plus, 
+  ChevronRight, ChevronDown, Bell, User, 
+  Home, TrendingUp, TrendingDown, ArrowLeft, 
+  CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { db, getDataPath, auth } from './firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+
+// --- FIREBASE & DATA HOOKS ---
+import { db, auth } from './firebase';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { useFinanceData } from './useFinanceData';
 import { useFarmers } from './useFarmers';
 import { useReminders } from './useReminders';
 import { useGlobalActivity } from './useGlobalActivity';
-import AddEntryModal from './AddEntryModal';
-import SettingsPage from './SettingsPage';
-import SearchResults from './SearchResults';
+
+// --- COMPONENTS ---
+import { DashboardSkeleton } from './Skeleton';
 const LandAssets = lazy(() => import('./LandAssets'));
 const ShopsPage = lazy(() => import('./ShopsPage'));
 const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
-import PullToRefresh from './PullToRefresh';
-import { APP_VERSION } from './firebase';
-
-import { 
-  AreaChart, Area, XAxis, Tooltip, ResponsiveContainer 
-} from 'recharts';
-import { DashboardSkeleton } from './Skeleton';
-
-import { seedShops } from './seedShops';
-
-const DynamicNav = ({ 
-  view, 
-  handleNavigate,
-  selectedYear, 
-  setSelectedYear, 
-  showYearMenu, 
-  setShowYearMenu, 
-  setShowAccountMenu, 
-  showAccountMenu, 
-  activeReminders, 
-  setIsReminderDrawerOpen, 
-  accountType, 
-  setAccountType 
-}) => {
-  return (
-    <header className="h-20 lg:h-24 border-b border-white/5 flex items-center justify-between px-4 lg:px-12 bg-[#06090f]/80 backdrop-blur-xl z-[100] sticky top-0 w-full relative gap-2">
-      <div className="flex-shrink-0 flex items-center gap-4">
-        {view === 'dashboard' ? (
-          <button 
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate('dashboard'); }} 
-            className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:rotate-6 transition-all duration-300 cursor-pointer"
-          >
-            <Home size={20} className="text-white" />
-          </button>
-        ) : (
-          <div className="flex items-center gap-3">
-            <button 
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNavigate('dashboard'); }}
-              className="w-10 h-10 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all text-white group"
-            >
-              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            </button>
-            <h2 className="text-xs lg:text-lg font-black italic uppercase tracking-widest text-white whitespace-nowrap">
-              {view === 'Land' ? 'Land Assets' : 
-               view === 'Shops' ? 'Commercial Shops' : 
-               view === 'Sold' ? 'Sold Properties' : 
-               view === 'Expenses' ? 'Operational Expenses' : 
-               view === 'Reports' ? 'Financial Reports' : 
-               view === 'Settings' ? 'System Settings' : 
-               view}
-            </h2>
-          </div>
-        )}
-      </div>
-
-      <div className="flex-grow flex justify-center min-w-0">
-        <div className="relative w-full flex justify-center">
-          {view === 'dashboard' && (
-            <button 
-              type="button"
-              onClick={() => setShowYearMenu(!showYearMenu)} 
-              className="flex items-center gap-1.5 lg:gap-3 px-3 lg:px-6 py-2 lg:py-3 bg-white/[0.02] border border-white/5 rounded-xl lg:rounded-2xl hover:bg-white/5 transition-all font-black text-[10px] lg:text-xs tracking-wider lg:tracking-[0.15em] text-white uppercase italic shadow-lg whitespace-nowrap overflow-hidden"
-            >
-              <Calendar size={18} className="text-indigo-400 shrink-0" />
-              <span className="truncate">{selectedYear}</span>
-              <ChevronDown size={12} className={`text-slate-500 transition-transform duration-300 shrink-0 ${showYearMenu ? 'rotate-180' : ''}`} />
-            </button>
-          )}
-          
-          {showYearMenu && view === 'dashboard' && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowYearMenu(false)} />
-              <div className="absolute top-16 left-1/2 -translate-x-1/2 w-56 bg-[#06090f] border border-white/5 rounded-3xl z-20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 animate-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
-                {["2024", "2025", "2026", "2027", "2028", "2029", "2030"].map(year => (
-                  <button 
-                    key={year} 
-                    type="button"
-                    onClick={() => { setSelectedYear(year); setShowYearMenu(false); }} 
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${selectedYear === year ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'hover:bg-white/5 text-slate-400 hover:text-white'}`}
-                  >
-                    <span className="text-xs font-black uppercase tracking-widest">{year}</span>
-                    {selectedYear === year && <CheckCircle size={16} />}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-shrink-0 flex justify-end items-center gap-2 lg:gap-4">
-        <button 
-           type="button"
-           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsReminderDrawerOpen(true); }} 
-           className="p-2.5 lg:p-3.5 bg-white/5 border border-white/5 rounded-xl lg:rounded-2xl relative hover:bg-white/10 transition-all group"
-         >
-           <Bell size={20} className="text-white group-hover:rotate-12 transition-transform duration-300"/>
-           {activeReminders.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-600 rounded-full border-2 border-[#06090f]" />}
-         </button>
-
-          <div className="relative">
-            <button 
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAccountMenu(!showAccountMenu); }} 
-              className="flex items-center gap-1.5 lg:gap-3 p-1 pr-1 lg:pr-5 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 transition-all"
-            >
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/20"><UserCircle size={18} className="text-white"/></div>
-              <span className="text-[10px] font-black uppercase lg:block hidden tracking-widest text-white">{accountType}</span>
-            </button>
-            {showAccountMenu && <div className="absolute top-14 right-0 w-56 bg-[#06090f] border border-white/5 rounded-2xl z-[100] shadow-2xl p-2 animate-in slide-in-from-top-2">
-              <button 
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAccountType(null); setShowAccountMenu(false); }} 
-                className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-rose-500/10 text-rose-500 transition-all group"
-              >
-                <Lock size={16} className="group-hover:rotate-12 transition-transform" />
-                <span className="text-xs font-black uppercase tracking-widest">Switch Account</span>
-              </button>
-            </div>}
-          </div>
-      </div>
-    </header>
-  );
-};
+import SettingsPage from './SettingsPage';
+import AddEntryModal from './AddEntryModal';
 
 const App = () => {
-  const [view, setView] = useState(() => localStorage.getItem('j-view') || 'dashboard');
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [accountType, setAccountType] = useState(() => localStorage.getItem('jatala_auth') || null);
-  const [selectedYear, setSelectedYear] = useState("2026");
-
-  const handleNavigate = (target, e = null) => {
-    if (e && e.preventDefault) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    console.log('Navigating to:', target);
-    setView(target);
-  };
-
-  // 🔄 CACHE BUSTING: Force clear local data if app VERSION changes
-  useEffect(() => {
-    const lastVer = localStorage.getItem('jatala_app_ver');
-    if (lastVer && lastVer !== APP_VERSION) {
-      localStorage.removeItem('jatala_farmers_cache');
-      localStorage.setItem('jatala_app_ver', APP_VERSION);
-    } else {
-      localStorage.setItem('jatala_app_ver', APP_VERSION);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('j-view', view);
-  }, [view]);
-
-  useEffect(() => {
-    if (accountType) localStorage.setItem('jatala_auth', accountType);
-    else localStorage.removeItem('jatala_auth');
-  }, [accountType]);
-
-  useEffect(() => { seedShops(); }, []);
-
-  const [passwordInput, setPasswordInput] = useState('');
-  const [loginError, setLoginError] = useState(false);
+  // --- States ---
+  const [view, setView] = useState(() => localStorage.getItem('jatala_view') || 'dashboard');
+  const [selectedYear, setSelectedYear] = useState('2026');
   const [showYearMenu, setShowYearMenu] = useState(false);
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [isAddEntryModalOpen, setIsAddEntryModalOpen] = useState(false);
-  const [globalSearch, setGlobalSearch] = useState('');
-  const [authStage, setAuthStage] = useState('selection');
-  const [isFabOpen, setIsFabOpen] = useState(false);
-  const [fabMenuMode, setFabMenuMode] = useState('root');
-  const [quickEntryModal, setQuickEntryModal] = useState({ 
-    isOpen: false, 
-    type: '', 
-    category: '', 
-    isEdit: false, 
-    editId: null, 
-    sourceCollection: null,
-    initialData: null 
-  });
-  
-  // 🔊 PREMIUM AUDIO FEEDBACK: Subtle click sound for interactions
+  const [showEntryModal, setShowEntryModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
+
+  // --- Sync State to LocalStorage ---
+  useEffect(() => { localStorage.setItem('jatala_view', view); }, [view]);
+
+  // --- Auth Safety ---
   useEffect(() => {
-    const playClick = () => {
-      try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = context.createOscillator();
-        const gain = context.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1200, context.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.04, context.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.05);
-        osc.connect(gain);
-        gain.connect(context.destination);
-        osc.start();
-        osc.stop(context.currentTime + 0.05);
-      } catch (e) { /* Audio context might be blocked */ }
-    };
-
-    const handleGlobalClick = (e) => {
-      const target = e.target.closest('button, [role="button"], label.cursor-pointer, .cursor-pointer');
-      if (target) playClick();
-    };
-
-    window.addEventListener('mousedown', handleGlobalClick);
-    return () => window.removeEventListener('mousedown', handleGlobalClick);
+    signInAnonymously(auth).catch(console.error);
   }, []);
 
-  const handleAdminLogin = (e) => {
-    e?.preventDefault();
-    if (passwordInput === 'ali321') {
-      setAccountType('admin');
-      setAuthStage('selection');
-    } else {
-      setLoginError(true);
-      setTimeout(() => setLoginError(false), 2000);
-    }
-  };
-
+  // --- Data Fetching ---
   const { 
     revenue: revenueVal = 0, 
     pending: pendingVal = 0, 
     expenses: expenseVal = 0, 
     entries = [], 
-    setEntries,
-    loading: financeLoading, 
-    refreshFinance,
+    loading: financeLoading,
     addEntry 
   } = useFinanceData(selectedYear);
-  
-  const { farmers, loading: farmersLoading, refreshFarmers } = useFarmers();
-  const { reminders, activeReminders, markAsRead } = useReminders();
-  const [isReminderDrawerOpen, setIsReminderDrawerOpen] = useState(false);
-  const { activities, loading: activityLoading } = useGlobalActivity();
 
-  const handleGlobalRefresh = async () => {
-    localStorage.removeItem('jatala_farmers_cache');
-    if (refreshFinance) refreshFinance();
-    if (refreshFarmers) refreshFarmers();
-    await new Promise(r => setTimeout(r, 600));
-  };
-
-  const loading = financeLoading || activityLoading || farmersLoading;
-
-  const chartData = useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months.map((month, idx) => {
-      const monthEntries = entries.filter(e => {
-        const d = e.date ? new Date(e.date) : (e.createdAt?.seconds ? new Date(e.createdAt.seconds * 1000) : null);
-        return d && d.getMonth() === idx;
-      });
-      const rev = monthEntries.filter(e => e.type === 'revenue' && e.status === 'received').reduce((s, e) => s + Number(e.amount), 0);
-      return { name: month, revenue: rev };
-    });
-  }, [entries]);
-
-  const navHubItems = [
-    { id: 'Land', label: 'Land Assets', icon: <Map />, baseColor: 'emerald', shadow: 'shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)]' },
-    { id: 'Shops', label: 'Commercial Shops', icon: <Store />, baseColor: 'cyan', shadow: 'shadow-[0_15px_30px_-5px_rgba(6,182,212,0.35)]' },
-    { id: 'Expenses', label: 'Operational Expenses', icon: <Receipt />, baseColor: 'rose', shadow: 'shadow-[0_15px_30px_-5px_rgba(244,63,94,0.35)]' },
-    { id: 'Sold', label: 'Sold Properties', icon: <CheckCircle />, baseColor: 'amber', shadow: 'shadow-[0_15px_30_30px_-5px_rgba(245,158,11,0.35)]' },
-    { id: 'Reports', label: 'Financial Reports', icon: <BarChart3 />, baseColor: 'purple', shadow: 'shadow-[0_15px_30px_-5px_rgba(168,85,247,0.35)]' },
-    { id: 'Settings', label: 'System Settings', icon: <Settings />, baseColor: 'slate', shadow: 'shadow-[0_15px_30px_-5px_rgba(100,116,139,0.35)]' }
+  const categories = [
+    { id: 'Land', title: "Land Assets", icon: <LandPlot size={22} />, color: "text-blue-400", border: "border-blue-500/20", glow: "shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
+    { id: 'Shops', title: "Commercial Shops", icon: <Store size={22} />, color: "text-purple-400", border: "border-purple-500/20", glow: "shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
+    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={22} />, color: "text-rose-400", border: "border-rose-500/20", glow: "shadow-[0_0_20px_rgba(244,63,94,0.2)]" },
+    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={22} />, color: "text-emerald-400", border: "border-emerald-500/20", glow: "shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
+    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={22} />, color: "text-amber-400", border: "border-amber-500/20", glow: "shadow-[0_0_20px_rgba(251,191,36,0.2)]" },
+    { id: 'Settings', title: "System Settings", icon: <Settings size={22} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
   ];
 
-  const handleSaveQuickTransaction = async (data) => {
-    try {
-      if (quickEntryModal.isEdit && quickEntryModal.editId) {
-        const collectionName = quickEntryModal.sourceCollection || 'transactions';
-        const docRef = doc(db, getDataPath(collectionName), quickEntryModal.editId);
-        await updateDoc(docRef, {
-          ...data,
-          amount: Number(data.amount)
-        });
-      } else {
-        await addDoc(collection(db, getDataPath('transactions')), {
-          ...data,
-          createdAt: serverTimestamp(),
-          amount: Number(data.amount)
-        });
-      }
-      setQuickEntryModal({ isOpen: false, type: '', category: '', isEdit: false, editId: null, sourceCollection: null, initialData: null });
-      setIsFabOpen(false);
-      setFabMenuMode('root');
-    } catch (error) {
-      console.error("Quick Entry Error:", error);
-      alert("Failed to save transaction.");
-    }
-  };
+  const FinanceCard = ({ label, color, icon, value }) => (
+    <div className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
+      <div className={`relative text-${color}-400 group-hover:scale-110 transition-transform`}>
+        {React.cloneElement(icon, { size: 24 })}
+      </div>
+      <div className="flex flex-col items-start min-w-0 flex-1">
+        <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 whitespace-nowrap">{label}</span>
+        <p className="text-sm lg:text-xl font-black italic text-white whitespace-nowrap">
+          <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
+          {value.toLocaleString()}
+        </p>
+      </div>
+      <div className={`absolute bottom-0 left-0 h-[2px] bg-${color}-500/50 w-[30%] group-hover:w-[50%] transition-all duration-700`} />
+    </div>
+  );
 
-  const handleNukeExpenses = async () => {
-    const expenseRecords = entries.filter(e => e.type === 'expense' || e.type === 'shop_expense');
-    if (expenseRecords.length === 0) {
-      alert("No expense records found for this year to delete.");
-      return;
-    }
-    
-    if (!window.confirm(`⚠️ DANGER: THIS WILL PERMANENTLY DELETE ALL ${expenseRecords.length} EXPENSE RECORDS FOR ${selectedYear} AND RESET TOTALS TO ZERO. CONTINUE?`)) return;
-    
-    try {
-      const chunks = [];
-      for (let i = 0; i < expenseRecords.length; i += 500) {
-        chunks.push(expenseRecords.slice(i, i + 500));
-      }
-      
-      for (const chunk of chunks) {
-        const batch = writeBatch(db);
-        chunk.forEach(e => {
-          if (e.sourceCollection && e.id) {
-            batch.delete(doc(db, getDataPath(e.sourceCollection), e.id));
-          }
-        });
-        await batch.commit();
-      }
-      
-      alert(`SUCCESS: All ${expenseRecords.length} records deleted. Total reset to 0.`);
-    } catch (err) {
-      console.error("Nuke Error:", err);
-      alert(`Failed to delete records: ${err.message}`);
-    }
-  };
-
-  if (!accountType) {
-    return (
-      <div className="fixed inset-0 bg-[#06090f] flex items-center justify-center p-6 lg:p-10 z-[1000] overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="w-full max-w-2xl text-center space-y-12 relative z-10">
-          <h1 className="text-5xl lg:text-7xl font-black text-white uppercase">Jatala Properties</h1>
-          {authStage === 'selection' ? (
-            <div className="grid grid-cols-2 gap-8 max-w-xl mx-auto">
-              <button onClick={() => setAuthStage('password')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-indigo-600 flex flex-col items-center gap-6"><Shield size={40} /><span className="text-3xl font-black italic uppercase tracking-wide">Admin</span></button>
-              <button onClick={() => setAccountType('user')} className="p-10 bg-slate-800/40 rounded-[40px] hover:bg-slate-800 flex flex-col items-center gap-6"><User size={40} /><span className="text-3xl font-black italic uppercase tracking-wide">User</span></button>
+  return (
+    <div className="min-h-screen bg-[#06090f] text-slate-200 p-4">
+      <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
+        <div className="flex items-center gap-4">
+          {view === 'dashboard' ? (
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
+              <Home className="text-white" size={20} />
             </div>
           ) : (
-            <div className="max-w-md mx-auto w-full"><form onSubmit={handleAdminLogin} className="space-y-6"><input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder="Password" className="w-full bg-slate-900 border border-slate-700 p-5 rounded-2xl text-white text-center font-black" /><div className="flex gap-4"><button type="submit" className="flex-1 py-5 bg-indigo-600 rounded-2xl font-black">Login</button></div></form></div>
+            <button 
+              onClick={() => setView('dashboard')}
+              className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all"
+            >
+              <ArrowLeft className="text-white" size={20} />
+            </button>
+          )}
+          {view !== 'dashboard' && (
+            <div className="animate-in fade-in slide-in-from-left-4">
+              <h2 className="text-white font-black uppercase tracking-widest leading-none">{view.replace(/_/g, ' ')}</h2>
+              <p className="text-[7px] text-indigo-500 font-black uppercase tracking-[0.4em] mt-1">Inventory Database</p>
+            </div>
           )}
         </div>
-      </div>
-    );
-  }
+        <div className="flex gap-4 items-center">
+           <Bell className="text-slate-400 hover:text-white cursor-pointer transition-colors" size={20} />
+           <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer">
+             <User size={18} className="text-white" />
+           </div>
+        </div>
+      </nav>
 
-    console.log("Current State:", view);
-    
-    return (
-      <div className="flex h-screen bg-[#06090f] text-white font-sans overflow-hidden">
-        <main className="flex-1 flex flex-col overflow-hidden relative">
-          <DynamicNav 
-            view={view}
-            handleNavigate={handleNavigate}
-            selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          showYearMenu={showYearMenu}
-          setShowYearMenu={setShowYearMenu}
-          setShowAccountMenu={setShowAccountMenu}
-          showAccountMenu={showAccountMenu}
-          activeReminders={activeReminders}
-          setIsReminderDrawerOpen={setIsReminderDrawerOpen}
-          accountType={accountType}
-          setAccountType={setAccountType}
-        />
+      <main className="max-w-[1600px] mx-auto">
+        {view === 'dashboard' ? (
+          <div className="max-w-2xl mx-auto space-y-4 animate-in fade-in zoom-in-95 duration-500">
+            <header className="text-center py-6 mb-8">
+              <h1 className="text-2xl font-light tracking-[0.3em] uppercase text-white">JATALA <span className="font-black text-indigo-500">PROPERTIES</span></h1>
+              <div className="h-[1px] w-12 bg-indigo-500/30 mx-auto mt-4"></div>
+            </header>
 
-        <PullToRefresh onRefresh={handleGlobalRefresh}>
-          <div className="lg:px-12 px-4 lg:py-12 py-6 overflow-y-auto no-scrollbar pb-32">
-            <div className="max-w-[1600px] mx-auto min-h-full font-sans">
-              {globalSearch ? (
-                <SearchResults query={globalSearch} data={{ farmers, shops: [], soldProperties: [] }} onNavigate={tab => { setGlobalSearch(''); handleNavigate(tab); }} />
-              ) : view === 'dashboard' ? (
-                loading ? <DashboardSkeleton /> : (
-                  <div className="flex flex-col gap-10">
-                    <div className="mb-14 pt-6">
-                      <h1 className="text-2xl md:text-5xl lg:text-7xl font-light italic uppercase tracking-[0.2em] mb-14 text-white text-center drop-shadow-[0_0_20px_rgba(255,255,255,0.15)] animate-in fade-in duration-700 whitespace-nowrap">
-                        Jatala <span className="font-black">Properties</span>
-                      </h1>
-                      
-                      <div className="flex flex-row gap-3 max-w-5xl mx-auto mb-10">
-                        <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
-                        <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
-                      </div>
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
+              <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
+            </div>
 
-                      <div className="flex flex-col gap-3 max-w-5xl mx-auto">
-                        {navHubItems.map((item) => {
-                          if (item.adminOnly && !isAdmin) return null;
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={(e) => handleNavigate(item.id, e)}
-                              className="group flex items-center justify-between p-4 bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-2xl hover:bg-white/5 transition-all w-full"
-                            >
-                              <div className="flex items-center gap-5">
-                                <div className="text-slate-500 group-hover:text-white transition-colors">
-                                  {React.cloneElement(item.icon, { size: 18 })}
-                                </div>
-                                <span className="text-sm font-black text-slate-400 group-hover:text-white uppercase tracking-[0.15em] transition-colors">{item.label}</span>
-                              </div>
-                              <ChevronRight className="text-slate-700 group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" size={16} />
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-
+            <div className="space-y-3">
+              {categories.map(item => (
+                <button 
+                  key={item.id} 
+                  onClick={() => setView(item.id)} 
+                  className={`w-full group bg-[#111827]/40 hover:bg-white/[0.04] border ${item.border} p-6 rounded-[28px] flex justify-between items-center transition-all duration-300 ${item.glow} hover:scale-[1.02] active:scale-[0.98]`}
+                >
+                  <div className="flex items-center gap-6">
+                    <div className={`${item.color} group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
+                    <span className="text-white font-black uppercase tracking-[0.2em] text-[10px]">{item.title}</span>
                   </div>
-                )
-              ) : view === 'Land' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><LandAssets isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : view === 'Shops' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : view === 'Sold' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} /></Suspense>
-              ) : view === 'Expenses' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
-              ) : view === 'Reports' ? (
-                <Suspense fallback={<DashboardSkeleton/>}><FinancialReports entries={entries} selectedYear={selectedYear} onEditEntry={(entry) => setQuickEntryModal({ isOpen: true, type: entry.type === 'revenue' ? 'income' : 'expense', category: entry._category, isEdit: true, editId: entry.id, sourceCollection: entry.sourceCollection, initialData: { date: entry._date, amount: entry.amount, description: entry.description || entry.note || entry._description } })} onDeleteEntry={async (entry) => { if(confirm('Are you sure you want to delete this record?')) { try { const col = entry.sourceCollection || (entry.type === 'revenue' ? 'revenue' : 'expenses'); await deleteDoc(doc(db, getDataPath(col), entry.id)); } catch(e) { console.error(e); alert('Failed to delete'); } } }} /></Suspense>
-              ) : view === 'Settings' ? (
-                <SettingsPage 
-                  entries={entries} 
-                  setTransactions={setEntries}
-                  selectedYear={selectedYear}
-                  isAdmin={isAdmin} 
-                  expandedSection={expandedSection} 
-                  setExpandedSection={setExpandedSection} 
-                />
-              ) : null}
+                  <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
+                </button>
+              ))}
             </div>
           </div>
-        </PullToRefresh>
-
-        {isReminderDrawerOpen && (
-          <div className="fixed inset-0 z-[150] flex justify-end">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsReminderDrawerOpen(false)}/>
-            <div className="w-full max-w-md bg-slate-900 border-l border-white/5 h-full p-8 relative flex flex-col animate-in slide-in-from-right duration-300">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-black uppercase tracking-widest italic">Notifications</h2>
-                <button onClick={() => setIsReminderDrawerOpen(false)} className="p-2 hover:bg-white/5 rounded-xl transition-colors"><X/></button>
-              </div>
-              <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
-                {activeReminders.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-4 opacity-50">
-                    <Bell size={48}/>
-                    <p className="font-black uppercase tracking-widest text-xs">No active alerts</p>
-                  </div>
-                ) : activeReminders.map(r => (
-                  <div key={r.id} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all">
-                    <h4 className="font-black text-indigo-400 mb-1">{r.title}</h4>
-                    <p className="text-xs font-medium text-slate-400 leading-relaxed mb-4">{r.description}</p>
-                    <button onClick={() => markAsRead(r.id)} className="text-[10px] uppercase font-black text-emerald-400 hover:text-emerald-300 transition-colors">Mark as Read</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        ) : (
+          <Suspense fallback={<DashboardSkeleton />}>
+            {view === 'Land' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} />}
+            {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
+            {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
+            {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
+            {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} />}
+            {view === 'Settings' && <SettingsPage entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
+          </Suspense>
         )}
       </main>
 
-      {/* DRAGGABLE FAB INTEGRATION - Visible for both to ensure discovery on mobile */}
-      <div className="fixed bottom-10 right-6 lg:bottom-12 lg:right-12 z-[5000] pointer-events-none">
-         <div className="pointer-events-auto relative">
-           <AnimatePresence>
-              {isFabOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                  className="absolute bottom-20 right-0 flex flex-col items-end gap-3 min-w-[200px]"
-                >
-                   {fabMenuMode === 'root' ? (
-                     <>
-                        <FabMenuItem 
-                          label="Extra Income" 
-                          icon={<TrendingUp size={18}/>} 
-                          color="emerald" 
-                          onClick={() => setQuickEntryModal({ isOpen: true, type: 'income', category: 'Extra Income' })} 
-                        />
-                        <FabMenuItem 
-                          label="Add Expense" 
-                          icon={<TrendingDown size={18}/>} 
-                          color="rose" 
-                          onClick={() => setFabMenuMode('expenses')} 
-                        />
-                     </>
-                   ) : (
-                     <div className="bg-slate-900/95 backdrop-blur-2xl border border-white/10 p-4 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 translate-y-[-10px] sm:translate-y-0">
-                        <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 mb-1">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Expense Type</span>
-                           <button onClick={() => setFabMenuMode('root')} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><X size={14}/></button>
-                        </div>
-                        <FabCategoryItem label="Maintenance" icon={<Wrench size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Maintenance' })} />
-                        <FabCategoryItem label="Tax" icon={<FileText size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Tax' })} />
-                        <FabCategoryItem label="Staff" icon={<Users size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Staff' })} />
-                        <FabCategoryItem label="Utilities" icon={<Zap size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Utilities' })} />
-                        <FabCategoryItem label="Travel" icon={<Car size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Travel' })} />
-                        <FabCategoryItem label="Misc" icon={<Layers size={16}/>} onClick={() => setQuickEntryModal({ isOpen: true, type: 'expense', category: 'Misc' })} />
-                     </div>
-                   )}
-                </motion.div>
-              )}
-           </AnimatePresence>
+      {/* Fab Button */}
+      {view === 'dashboard' && (
+        <button 
+          onClick={() => setShowEntryModal(true)}
+          className="fixed bottom-10 right-10 w-16 h-16 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[24px] shadow-2xl shadow-indigo-600/40 flex items-center justify-center transition-all hover:scale-110 active:scale-95 z-50 border border-white/20"
+        >
+          <Plus size={32} />
+        </button>
+      )}
 
-           <motion.button 
-             drag
-             dragMomentum={false}
-             dragConstraints={{ left: -300, right: 0, top: -600, bottom: 0 }}
-             whileHover={{ scale: 1.05 }}
-             whileTap={{ scale: 0.95 }}
-             onClick={() => { setIsFabOpen(!isFabOpen); if (isFabOpen) setFabMenuMode('root'); }}
-             className={`w-16 h-16 rounded-full flex items-center justify-center shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all duration-300 border border-white/10 cursor-pointer ${isFabOpen ? 'bg-rose-600 rotate-45' : 'bg-indigo-600 shadow-indigo-600/30'}`}
-             style={{ touchAction: 'none' }}
-           >
-              <Plus size={32} strokeWidth={3} />
-           </motion.button>
-         </div>
-      </div>
-
-
-      {/* QUICK ENTRY MODAL INTEGRATION */}
-      <AnimatePresence>
-        {quickEntryModal.isOpen && (
-          <QuickEntryModal 
-            modal={quickEntryModal} 
-            onClose={() => setQuickEntryModal({ isOpen: false, type: '', category: '', isEdit: false, editId: null, sourceCollection: null, initialData: null })} 
-            onSave={handleSaveQuickTransaction}
-          />
-        )}
-      </AnimatePresence>
-
-      <AddEntryModal isOpen={isAddEntryModalOpen} onClose={() => setIsAddEntryModalOpen(false)} onAdd={addEntry} isAdmin={isAdmin} />
+      <AddEntryModal isOpen={showEntryModal} onClose={() => setShowEntryModal(false)} onAdd={addEntry} isAdmin={isAdmin} />
     </div>
   );
 };
-
-const FabMenuItem = ({ label, icon, color, onClick }) => (
-  <button 
-    onClick={onClick}
-    className={`flex items-center gap-4 bg-slate-900/90 backdrop-blur-xl border border-white/10 px-6 py-4 rounded-2xl shadow-xl hover:bg-${color}-600 group transition-all duration-300`}
-  >
-    <span className="text-xs font-black uppercase tracking-widest text-white">{label}</span>
-    <div className={`p-2 bg-${color}-500/20 text-${color}-400 group-hover:bg-white/10 group-hover:text-white rounded-xl transition-colors`}>
-      {icon}
-    </div>
-  </button>
-);
-
-const FabCategoryItem = ({ label, icon, onClick }) => (
-  <button 
-    onClick={onClick}
-    className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-600 rounded-2xl transition-all group w-full text-left"
-  >
-    <div className="p-2 bg-white/5 group-hover:bg-white/10 rounded-xl">
-      {React.cloneElement(icon, { size: 16, className: "text-slate-400 group-hover:text-white" })}
-    </div>
-    <span className="text-[11px] font-black uppercase tracking-widest text-slate-300 group-hover:text-white">{label}</span>
-  </button>
-);
-
-const QuickEntryModal = ({ modal, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    date: modal.initialData?.date || new Date().toISOString().split('T')[0],
-    amount: modal.initialData?.amount || '',
-    description: modal.initialData?.description || ''
-  });
-
-  useEffect(() => {
-    if (modal.initialData) {
-      setFormData({
-        date: modal.initialData.date,
-        amount: modal.initialData.amount,
-        description: modal.initialData.description
-      });
-    }
-  }, [modal.initialData]);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.amount || Number(formData.amount) <= 0) return;
-    setIsSaving(true);
-    await onSave({
-      ...formData,
-      type: modal.type,
-      category: modal.category,
-      label: modal.category
-    });
-    setIsSaving(false);
-  };
-
-  return (
-    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-[#0f172a]/80 backdrop-blur-md animate-in fade-in duration-300">
-       <motion.div 
-         initial={{ scale: 0.9, opacity: 0 }}
-         animate={{ scale: 1, opacity: 1 }}
-         exit={{ scale: 0.9, opacity: 0 }}
-         className="w-full max-w-md bg-[#1e293b] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden relative"
-       >
-          <div className="p-8 pb-4 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${modal.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                   {modal.type === 'income' ? <TrendingUp size={20}/> : <TrendingDown size={20}/>}
-                </div>
-                <div>
-                   <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">Quick Entry</h3>
-                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{modal.category}</p>
-                </div>
-             </div>
-             <button onClick={onClose} className="p-3 bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-2xl transition-all">
-                <X size={20}/>
-             </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-             <div className="space-y-4">
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Transaction Date</label>
-                   <div className="flex items-center gap-3 px-2">
-                      <Calendar size={18} className="text-indigo-400"/>
-                      <input 
-                        type="date" 
-                        required
-                        value={formData.date}
-                        onChange={(e) => setFormData({...formData, date: e.target.value})}
-                        className="bg-transparent border-none outline-none font-black text-white w-full uppercase"
-                      />
-                   </div>
-                </div>
-
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Amount (Rs.)</label>
-                   <div className="flex items-center gap-3 px-2">
-                      <DollarSign size={18} className="text-emerald-400"/>
-                      <input 
-                        type="number" 
-                        required
-                        placeholder="0.00"
-                        value={formData.amount}
-                        onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                        className="bg-transparent border-none outline-none font-black text-white text-2xl w-full italic"
-                      />
-                   </div>
-                </div>
-
-                <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-4">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2 px-2">Description</label>
-                   <div className="flex items-start gap-3 px-2">
-                      <Layers size={18} className="text-slate-500 mt-1"/>
-                      <textarea 
-                        rows="3"
-                        placeholder="Enter details..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        className="bg-transparent border-none outline-none font-medium text-sm text-slate-300 w-full resize-none no-scrollbar"
-                      />
-                   </div>
-                </div>
-             </div>
-
-             <button 
-               type="submit" 
-               disabled={isSaving}
-               className={`w-full h-16 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl flex items-center justify-center gap-3 ${
-                 modal.type === 'income' 
-                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20' 
-                 : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/20'
-               }`}
-             >
-                {isSaving ? <Loader2 size={24} className="animate-spin" /> : <><Save size={20}/> Save Transaction</>}
-             </button>
-          </form>
-       </motion.div>
-    </div>
-  );
-};
-
-const FinanceCard = ({ label, color, icon, value }) => (
-  <div className="group relative bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
-    <div className={`relative text-${color}-400/80 group-hover:text-${color}-400 transition-colors shrink-0`}>
-      {React.cloneElement(icon, { size: 18, className: "shrink-0" })}
-    </div>
-    
-    <div className="relative flex flex-col items-start min-w-0 flex-1">
-      <span className="text-[8px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1 whitespace-nowrap w-full">{label}</span>
-      <p className="text-sm lg:text-base font-black italic text-white whitespace-nowrap w-full">
-        <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
-        {value.toLocaleString()}
-      </p>
-    </div>
-    <div className={`absolute bottom-0 left-0 w-full h-[1px] bg-white/5`} />
-    <div className={`absolute bottom-0 left-0 h-[1px] bg-${color}-500/50 w-[40%] group-hover:w-[60%] transition-all duration-1000`} />
-  </div>
-);
-
 export default App;
