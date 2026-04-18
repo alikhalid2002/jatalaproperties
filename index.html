@@ -13,16 +13,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // 🚀 SEVERE CACHE BUST: Immediate SW and Cache Wipe
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-      }
-      if ('caches' in window) {
-        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
-      }
-      console.log('Mobile Force Update: Environment Wiped');
-    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
