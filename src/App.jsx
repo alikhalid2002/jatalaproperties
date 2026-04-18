@@ -75,7 +75,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#06090f] text-slate-200 p-4">
+    <div className="min-h-screen bg-[#06090f] text-slate-200 p-4 scroll-container">
       <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
         <div className="flex items-center gap-4">
           {view === 'dashboard' ? (
@@ -105,7 +105,7 @@ const App = () => {
         </div>
       </nav>
 
-      <main className="max-w-[1600px] mx-auto">
+      <main className="max-w-[1600px] mx-auto pb-24">
         {view === 'dashboard' ? (
           <div className="max-w-2xl mx-auto space-y-4 animate-in fade-in zoom-in-95 duration-500">
             <header className="text-center py-6 mb-8">

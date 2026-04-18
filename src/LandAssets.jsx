@@ -94,7 +94,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   const remainingPrv = totalExIncome > 0 ? (totalRemainingAmount / totalExIncome) * 100 : 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32" dir="ltr">
+    <div className="flex-1 flex flex-col animate-in fade-in duration-500 pb-32" dir="ltr">
       
       {/* Financial Summary Cards - 3 Column Layout */}
       <div className="grid grid-cols-3 gap-1 md:gap-4 mb-8 px-1 w-full text-center">

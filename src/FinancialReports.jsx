@@ -193,7 +193,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
 
   return (
-    <div className="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden gap-5">
+    <div className="flex-1 flex flex-col animate-in fade-in duration-500 gap-5 pb-32">
 
       {/* ── Header row ─────────────────────────────────────────── */}
       <div className="flex flex-col lg:items-start justify-start gap-6 lg:gap-4 mb-8 text-left">

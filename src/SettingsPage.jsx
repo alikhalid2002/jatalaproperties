@@ -184,7 +184,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, ex
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-8 pb-32 overflow-y-auto no-scrollbar">
+    <div className="flex-1 flex flex-col gap-8 pb-32">
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')} className="w-full flex justify-between p-8 font-black uppercase">Member Management <ChevronDown className={expandedSection === 'members' ? 'rotate-180' : ''} /></button>
         {expandedSection === 'members' && <div className="p-8 border-t border-slate-700/50 grid grid-cols-1 lg:grid-cols-2 gap-8">
