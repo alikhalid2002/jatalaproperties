@@ -110,7 +110,7 @@ const App = () => {
                
                {showYearMenu && (
                  <div className="absolute top-full right-0 mt-4 py-3 w-32 bg-[#111827] border border-white/10 rounded-[24px] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
-                   {['2030', '2029', '2028', '2027', '2026', '2025'].map(year => (
+                   {['2025', '2026', '2027', '2028', '2029', '2030'].map(year => (
                      <button
                        key={year}
                        onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
@@ -124,7 +124,10 @@ const App = () => {
              </div>
 
              <Bell className="text-slate-400 hover:text-white cursor-pointer transition-colors" size={20} />
-             <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer">
+             <div 
+               onClick={() => setView('Settings')}
+               className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all"
+             >
                <User size={18} className="text-white" />
              </div>
           </div>
