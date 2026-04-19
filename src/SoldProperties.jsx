@@ -1,50 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSoldProperties } from './useSoldProperties';
-import { Home, User, CreditCard, ChevronRight, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
+import { Home, User, CreditCard, ChevronRight, CheckCircle, Clock, ArrowUpRight, X, Trash2 } from 'lucide-react';
 import SoldPropertyDetailModal from './SoldPropertyDetailModal';
-import { seedSoldProperties } from './seedSoldProperties';
-import { transliterateToEnglish, transliterateToUrdu } from './urduTransliterator';
+import { transliterateToEnglish } from './urduTransliterator';
 
 const SoldProperties = ({ isAdmin, selectedYear }) => {
   const { properties, loading, recordInstallment, addProperty, deleteProperty } = useSoldProperties();
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hasMounted, setHasMounted] = React.useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  // Debug Alert (Temporary)
-  console.log('Current Filter Year:', selectedYear);
-
-  const transactions = properties;
-
-  // 1. STATE SYNC: Display ALL properties (Removed year-based visibility filter)
-  const displayProperties = transactions;
-
-  // 2. REVENUE CALCULATION: Sum up transactions where year matches selectedYear (STRICT ORDER)
-  const totalSoldRevenue = React.useMemo(() => {
+  const totalSoldRevenue = useMemo(() => {
     if (!hasMounted) return 0;
     const targetYearStr = String(selectedYear);
-    return transactions.reduce((sum, prop) => {
+    return properties.reduce((sum, prop) => {
       const installments = prop.installments || [];
       const yearSum = installments
         .filter(inst => {
           if (!inst.date) return false;
-          // STRICT LOGIC: Compare String with String per user example
-          const instYearStr = String(new Date(inst.date).getFullYear());
-          return instYearStr === targetYearStr;
+          return String(new Date(inst.date).getFullYear()) === targetYearStr;
         })
         .reduce((s, i) => s + Number(i.amount || 0), 0);
       return sum + yearSum;
     }, 0);
-  }, [transactions, selectedYear, hasMounted]);
-
-  const handlePropertyClick = (property) => {
-    setSelectedProperty(property);
-    setIsModalOpen(true);
-  };
+  }, [properties, selectedYear, hasMounted]);
 
   if (loading || !hasMounted) {
     return (
@@ -58,73 +41,73 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 gap-5 pb-32">
       
-      {/* 3. AUTO-UPDATE HEADER: Revenue Card with Dynamic Year Label */}
+      {/* Financial Summary Card - Centered as per instruction */}
       <div className="mb-10 flex justify-center px-2">
         <FinanceCard 
-          key={selectedYear}
           label={`TOTAL SOLD REVENUE (${selectedYear})`}
           value={totalSoldRevenue}
-          color="emerald"
-          icon={<ArrowUpRight className="text-emerald-400" />}
+          icon={<ArrowUpRight size={24} />}
         />
       </div>
 
-      {/* Properties Grid - Responsive 1/2/3 cols */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-24">
-        {displayProperties.map((prop) => {
-          // LIFETIME CALCULATION (Per strict instructions for card history)
+      {/* Properties Grid - Minimalist Redesign */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-24">
+        {properties.map((prop) => {
           const lifetimePaid = (prop.installments || []).reduce((sum, i) => sum + Number(i.amount || 0), 0);
           const totalPrice = Number(prop.totalPrice || 1);
-          
-          // Lifetime Progress & Remaining
           const progress = Math.min(100, (lifetimePaid / totalPrice) * 100);
           const remaining = totalPrice - lifetimePaid;
-          
           const isPaid = prop.status === 'Fully Paid';
 
           return (
             <div 
               key={prop.id}
-              onClick={() => handlePropertyClick(prop)}
-              className="bg-slate-800/40 p-4 md:p-6 rounded-[32px] border border-slate-700/50 hover:bg-slate-800/60 transition-all duration-500 shadow-xl cursor-pointer flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group"
+              onClick={() => { setSelectedProperty(prop); setIsModalOpen(true); }}
+              className="group bg-[#111827] p-8 rounded-[48px] transition-all duration-300 hover:bg-white/[0.02] active:scale-[0.98] cursor-copy flex flex-col gap-8 shadow-2xl relative overflow-hidden"
             >
-               <div className="space-y-2 text-center w-full">
-                  <h3 className="text-xl lg:text-2xl font-black text-white leading-normal lg:leading-relaxed truncate py-1 uppercase tracking-tighter italic">{prop.nameEn || transliterateToEnglish(prop.nameUr)}</h3>
-                  <div className="flex flex-wrap items-center justify-center gap-2">
-                     <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
-                        isPaid ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
-                     }`}>
-                        {isPaid ? 'Fully Paid' : 'Active Installment'}
-                     </span>
-                     <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700">
-                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">Buyer</span>
-                        <span className="text-[13px] font-black text-white leading-tight italic">{prop.buyerNameEn || transliterateToEnglish(prop.buyerName)}</span>
-                     </div>
+               <div className="flex justify-between items-start">
+                  <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tight leading-tight pr-4">
+                    {prop.nameEn || transliterateToEnglish(prop.nameUr)}
+                  </h3>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black uppercase text-indigo-400 flex items-center gap-1.5">
+                      <User size={10} /> {prop.buyerNameEn || transliterateToEnglish(prop.buyerName)}
+                    </span>
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isPaid ? 'text-[#10B981] bg-[#10B981]/10' : 'text-indigo-400 bg-indigo-400/10'}`}>
+                      {isPaid ? 'Paid' : 'Active'}
+                    </span>
                   </div>
                </div>
 
-                <div className="w-full space-y-1.5 pt-2 border-t border-slate-700/30 mt-1 overflow-hidden">
-                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white opacity-95">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span suppressHydrationWarning={true}>Received: {lifetimePaid.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(148,163,184,0.5)]"></div>
-                        <span suppressHydrationWarning={true}>Remaining: {remaining.toLocaleString()}</span>
-                      </div>
+               <div className="space-y-6">
+                  <div className="flex justify-between items-end">
+                     <div>
+                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest text-left">Received</span>
+                       <span className="text-2xl font-black text-white italic tracking-tighter">
+                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                         {lifetimePaid.toLocaleString()}
+                       </span>
+                     </div>
+                     <div className="text-right">
+                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Remaining</span>
+                       <span className="text-2xl font-black text-orange-500 italic tracking-tighter">
+                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                         {remaining.toLocaleString()}
+                       </span>
+                     </div>
                   </div>
-                  
-                  <div className="h-2 w-full bg-slate-900 border border-slate-700/50 rounded-full overflow-hidden flex shadow-inner group">
+
+                  <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full bg-gradient-to-r ${isPaid ? 'from-emerald-600 to-emerald-400' : 'from-indigo-600 to-indigo-400'} group-hover:opacity-80 transition-all duration-700 rounded-r-sm`}
+                      className={`h-full bg-[#10B981] transition-all duration-700`}
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
 
-                  <div className="flex justify-center">
-                     <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">
-                       Total Price: {totalPrice.toLocaleString()}
+                  {/* UI FIX: Perfectly centered Total Value at the bottom */}
+                  <div className="flex justify-center pt-2 border-t border-white/5 mt-4">
+                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
+                       TOTAL VALUE: <span className="text-[#10B981] font-black italic ml-1">{totalPrice.toLocaleString()}</span>
                      </p>
                   </div>
                </div>
@@ -146,22 +129,16 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
   );
 };
 
-// UI COMPONENT FOR REVENUE CARD
-const FinanceCard = ({ label, value, color, icon }) => (
-  <div className="bg-slate-800/60 p-6 md:p-8 rounded-[32px] border border-slate-700/50 hover:bg-indigo-600/10 transition-all flex flex-col items-center justify-center w-full max-w-lg relative overflow-hidden group shadow-2xl backdrop-blur-xl">
-    <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}-500 blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity`}></div>
-    
-    <div className={`mb-4 p-4 bg-${color}-500/10 text-${color}-400 rounded-2xl transition-transform group-hover:scale-110 relative z-10 border border-${color}-500/20`}>
+const FinanceCard = ({ label, value, icon }) => (
+  <div className="bg-[#111827] p-6 md:p-8 rounded-[32px] transition-all flex flex-col justify-center items-center text-center w-full max-w-lg shadow-2xl">
+    <div className="w-10 h-10 md:w-14 md:h-14 bg-white/5 rounded-full flex items-center justify-center mb-6 text-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.1)] border border-white/5">
       {icon}
     </div>
-
-    <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full">
-      <span className="text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.2em] mb-2" suppressHydrationWarning={true}>{label}</span>
-      <p className="text-2xl md:text-4xl font-black italic text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-        <span className="text-sm md:text-lg mr-2 opacity-50 not-italic">Rs.</span>
-        <span suppressHydrationWarning={true}>{value.toLocaleString()}</span>
-      </p>
-    </div>
+    <span className="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">{label}</span>
+    <p className="text-2xl md:text-4xl font-black italic text-white tracking-tighter uppercase">
+      <span className="opacity-50 mr-2 not-italic text-lg">Rs.</span>
+      {value?.toLocaleString()}
+    </p>
   </div>
 );
 
