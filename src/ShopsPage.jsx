@@ -220,7 +220,6 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
               <div className="space-y-4">
                  <div className="flex justify-between items-end">
                     <div>
-                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Area</span>
                       <span className="text-lg font-black text-white italic">{shop.area}</span>
                     </div>
                     <div className="text-right">
