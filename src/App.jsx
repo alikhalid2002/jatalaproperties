@@ -106,7 +106,7 @@ const App = () => {
                    onClick={handleGuestLogin}
                    className="w-full bg-white/5 hover:bg-white/10 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all border border-white/5"
                  >
-                   Continue as Guest (View Only)
+                   GUEST
                  </button>
                </div>
              ) : (
