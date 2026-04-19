@@ -3,7 +3,7 @@ import {
   Map as LandPlot, Store, Receipt as ReceiptText, Plus, 
   ChevronRight, ChevronDown, Bell, User, 
   Home, TrendingUp, TrendingDown, ArrowLeft, 
-  CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight
+  CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight, Calendar
 } from 'lucide-react';
 
 // --- FIREBASE & DATA HOOKS ---
@@ -97,12 +97,38 @@ const App = () => {
             </div>
           )}
         </div>
-        <div className="flex gap-4 items-center">
-           <Bell className="text-slate-400 hover:text-white cursor-pointer transition-colors" size={20} />
-           <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer">
-             <User size={18} className="text-white" />
-           </div>
-        </div>
+          {/* Year Selector Restored */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowYearMenu(!showYearMenu)}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all shadow-lg active:scale-95"
+            >
+              <Calendar className="text-indigo-400" size={16} />
+              <span className="text-white text-xs font-black tracking-[0.2em]">{selectedYear}</span>
+              <ChevronDown className={`text-slate-500 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} size={14} />
+            </button>
+            
+            {showYearMenu && (
+              <div className="absolute top-full left-0 right-0 mt-2 py-3 bg-[#111827] border border-white/10 rounded-[24px] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
+                {['2026', '2025', '2024'].map(year => (
+                  <button
+                    key={year}
+                    onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                    className={`w-full py-3 text-[10px] font-black tracking-[0.3em] uppercase transition-all ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-4 items-center">
+             <Bell className="text-slate-400 hover:text-white cursor-pointer transition-colors" size={20} />
+             <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer">
+               <User size={18} className="text-white" />
+             </div>
+          </div>
       </nav>
 
       <main className="max-w-[1600px] mx-auto pb-24">
