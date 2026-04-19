@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFarmers } from './useFarmers';
 import { useFinanceData } from './useFinanceData';
 import { seedFarmersData } from './seedFarmers';
-import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map, UserCircle, Store, X } from 'lucide-react';
+import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map, UserCircle, Store, X, MapPin } from 'lucide-react';
 import { transliterateToEnglish } from './urduTransliterator';
 import FarmerDetailModal from './FarmerDetailModal';
 
@@ -19,7 +19,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
     uploadProgress
   } = useFarmers();
   
-  const { revenue: revenueVal = 0, pending: pendingVal = 0 } = useFinanceData(selectedYear);
+  const { revenue: revenueVal = 0, pending: pendingVal = 0, expenses: expenseVal = 0 } = useFinanceData(selectedYear);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -55,27 +55,53 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 pb-32" dir="ltr">
       
-      {/* Financial Summary - Minimalist Stat Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-12 px-2">
+      {/* Financial Summary - 3 Stat Cards as per sample */}
+      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-12 px-1">
         <FinanceCard 
-          label="EXPECTED REVENUE"
+          label="EXPECTED LAND REVENUE"
           value={totalExIncome} 
-          year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`}
+          icon={<ArrowUpRight size={20} />}
+          color="emerald"
         />
         <FinanceCard 
           label="REMAINING BALANCE"
           value={totalRemainingAmount} 
-          year={`${parseInt(selectedYear)-1}-${parseInt(selectedYear)}`}
+          icon={<Clock size={20} />}
+          color="emerald"
+        />
+        <FinanceCard 
+          label="TOTAL EXPENSES"
+          value={expenseVal} 
+          icon={<ArrowDownRight size={20} />}
+          color="emerald"
         />
       </div>
 
-      {/* Comparison Bar - Ultra Thin */}
+      {/* Portfolio Area - Horizontal Style as per sample */}
+      <div className="px-2 mb-16">
+        <div className="bg-[#111827]/60 border border-[#10B981]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+           <div className="p-3 bg-[#10B981]/10 text-[#10B981] rounded-2xl">
+              <Map size={24} />
+           </div>
+           <div className="flex items-center gap-3">
+              <span className="text-[10px] md:text-xs font-black text-[#10B981] uppercase tracking-[0.2em]">Total Portfolio Area:</span>
+              <div className="flex items-baseline gap-2">
+                 <span className="text-3xl md:text-5xl font-black text-white italic tracking-tighter">
+                   {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                 </span>
+                 <span className="text-[10px] md:text-xs font-black text-neutral-500 uppercase tracking-widest">Acres</span>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      {/* Distribution Section */}
       <div className="px-4 mb-16">
         <div className="flex justify-between items-center mb-4">
            <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Received Distribution</span>
            <span className="text-[10px] font-black text-[#10B981] uppercase tracking-widest italic">{receivedPrv.toFixed(1)}%</span>
         </div>
-        <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden flex">
+        <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
            <div 
              className="h-full bg-[#10B981] transition-all duration-1000 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
              style={{ width: `${receivedPrv}%` }}
@@ -83,18 +109,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         </div>
       </div>
 
-      {/* Portfolio Area - Hero Number */}
-      <div className="flex flex-col items-center justify-center mb-16">
-        <div className="bg-[#111827] p-10 rounded-[48px] text-center shadow-[0_0_60px_rgba(16,185,129,0.05)]">
-           <h4 className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.4em] mb-4">Portfolio Area</h4>
-           <div className="text-6xl md:text-8xl font-black text-white italic tracking-tighter drop-shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-             {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-           </div>
-           <span className="text-[10px] font-black text-[#10B981] uppercase tracking-[0.3em] mt-4 block">Acres</span>
-        </div>
-      </div>
-
-      {/* Farmers Grid - Flattened Cards */}
+      {/* Member Inventory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
         {filteredFarmers.map((farmer) => (
           <div 
@@ -156,14 +171,16 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   );
 };
 
-const FinanceCard = ({ label, value, year }) => (
-  <div className="bg-[#111827] p-8 rounded-[32px] transition-all flex flex-col justify-center items-center text-center shadow-2xl">
-    <span className="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.3em] mb-2">{label}</span>
-    <span className="text-neutral-600 text-[8px] font-black uppercase tracking-widest mb-4 italic">{year}</span>
-    <p className="text-3xl font-black italic text-white tracking-tighter drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+const FinanceCard = ({ label, value, icon, color }) => (
+  <div className="bg-[#111827] p-4 md:p-8 rounded-[32px] transition-all flex flex-col justify-center items-center text-center">
+    <div className="w-10 h-10 md:w-14 md:h-14 bg-white/5 rounded-full flex items-center justify-center mb-6 text-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.1)] border border-white/5">
+      {icon}
+    </div>
+    <span className="text-neutral-500 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 leading-relaxed max-w-[100px]">{label}</span>
+    <p className="text-xs md:text-2xl font-black italic text-white tracking-tighter uppercase">
+      <span className="opacity-50 mr-1 not-italic text-[10px]">Rs.</span>
       {value?.toLocaleString()}
     </p>
-    <span className="text-[8px] font-black text-[#10B981] uppercase tracking-[0.2em] mt-3 italic">PKR — TOTAL</span>
   </div>
 );
 
