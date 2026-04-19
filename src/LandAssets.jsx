@@ -55,27 +55,6 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 pb-32" dir="ltr">
       
-      {/* Financial Summary - 3 Stat Cards as per sample */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-12 px-1">
-        <FinanceCard 
-          label="EXPECTED LAND REVENUE"
-          value={totalExIncome} 
-          icon={<ArrowUpRight size={20} />}
-          color="emerald"
-        />
-        <FinanceCard 
-          label="REMAINING BALANCE"
-          value={totalRemainingAmount} 
-          icon={<Clock size={20} />}
-          color="emerald"
-        />
-        <FinanceCard 
-          label="TOTAL EXPENSES"
-          value={expenseVal} 
-          icon={<ArrowDownRight size={20} />}
-          color="emerald"
-        />
-      </div>
 
       {/* Portfolio Area - Horizontal Style as per sample */}
       <div className="px-2 mb-16">

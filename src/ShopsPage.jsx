@@ -168,24 +168,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 pb-32" dir="ltr">
       
-      {/* Financial Summary */}
-      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-12 px-1">
-        <FinanceCard 
-          label="EXPECTED SHOP REVENUE"
-          value={shopStats.expected} 
-          icon={<ArrowUpRight size={20} />}
-        />
-        <FinanceCard 
-          label="REMAINING BALANCE"
-          value={shopStats.remaining} 
-          icon={<Clock size={20} />}
-        />
-        <FinanceCard 
-          label="TOTAL SHOP EXPENSES"
-          value={shopStats.expenses} 
-          icon={<ArrowDownRight size={20} />}
-        />
-      </div>
+      <div className="mt-8"></div>
 
       <div className="mt-4"></div>
 

@@ -41,14 +41,7 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 gap-5 pb-32">
       
-      {/* Financial Summary Card - Centered as per instruction */}
-      <div className="mb-10 flex justify-center px-2">
-        <FinanceCard 
-          label={`TOTAL SOLD REVENUE (${selectedYear})`}
-          value={totalSoldRevenue}
-          icon={<ArrowUpRight size={24} />}
-        />
-      </div>
+      <div className="mt-8"></div>
 
       {/* Properties Grid - Minimalist Redesign */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-24">
@@ -80,20 +73,20 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
                </div>
 
                <div className="space-y-6">
-                  <div className="flex justify-between items-end">
-                     <div>
-                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest text-left">Received</span>
-                       <span className="text-2xl font-black text-white italic tracking-tighter">
-                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                  <div className="flex justify-between items-end gap-6">
+                     <div className="flex-1">
+                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1 tracking-widest text-left opacity-60">Received</span>
+                       <h4 className="text-lg md:text-xl font-black text-white italic tracking-tighter whitespace-nowrap">
+                         <span className="text-[10px] opacity-40 mr-1 not-italic">Rs.</span>
                          {lifetimePaid.toLocaleString()}
-                       </span>
+                       </h4>
                      </div>
-                     <div className="text-right">
-                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Remaining</span>
-                       <span className="text-2xl font-black text-orange-500 italic tracking-tighter">
-                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                     <div className="flex-1 text-right">
+                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1 tracking-widest opacity-60">Remaining</span>
+                       <h4 className="text-lg md:text-xl font-black text-orange-500 italic tracking-tighter whitespace-nowrap">
+                         <span className="text-[10px] opacity-40 mr-1 not-italic">Rs.</span>
                          {remaining.toLocaleString()}
-                       </span>
+                       </h4>
                      </div>
                   </div>
 
