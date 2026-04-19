@@ -6,6 +6,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [label, setLabel] = useState('');
+  const [description, setDescription] = useState('');
   const [status, setStatus] = useState('received');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -18,7 +19,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
     if (!isAdmin) return;
     setIsSaving(true);
     try {
-      await onAdd(type, { amount, label, status, date });
+      await onAdd(type, { amount, label, status, date, description });
       onClose();
     } catch (error) {
        console.error("Modal Save Error:", error);
@@ -57,75 +58,87 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Select Date</label>
+              <input 
+                type="date" 
+                value={date}
+                disabled={!isAdmin}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-4 text-white font-bold focus:border-indigo-500 transition-all outline-none cursor-pointer text-[12px] disabled:opacity-50"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+                {type === 'expense' ? 'Category' : 'Source'}
+              </label>
+              <select 
+                disabled={!isAdmin}
+                value={label}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val) setLabel(val);
+                }}
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-4 text-white font-black italic focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer text-[12px] disabled:opacity-50"
+                required
+              >
+                <option value="">-- SELECT --</option>
+                {type === 'expense' ? (
+                  <>
+                    <option value="Travel">Travel / Fuel</option>
+                    <option value="Utility">Electricity Bill</option>
+                    <option value="Labor">Labor / Salary</option>
+                    <option value="Repair">Maintenance</option>
+                    <option value="Tax">Tax / Fees</option>
+                    <option value="Other">Misc / Others</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Extra Income">Extra Income</option>
+                    <option value="Misc Revenue">Misc Revenue</option>
+                    <option value="Booking Fee">Booking / Token</option>
+                    <option value="Refund">Return / Refund</option>
+                  </>
+                )}
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Select Date</label>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Amount (Rs.)</label>
             <input 
-              type="date" 
-              value={date}
+              type="number" 
+              value={amount}
               disabled={!isAdmin}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-bold focus:border-indigo-500 transition-all outline-none cursor-pointer disabled:opacity-50"
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
-              {type === 'expense' ? 'Expense Category' : 'Income Source'}
-            </label>
-            <select 
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Description (Optional)</label>
+            <textarea 
+              rows="2"
+              value={description}
               disabled={!isAdmin}
-              value={label}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val) setLabel(val);
-              }}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer mb-2 disabled:opacity-50"
-              required
-            >
-              <option value="">-- SELECT --</option>
-              {type === 'expense' ? (
-                <>
-                  <option value="Travel">Travel / Fuel</option>
-                  <option value="Utility">Electricity Bill</option>
-                  <option value="Labor">Labor / Salary</option>
-                  <option value="Repair">Maintenance</option>
-                  <option value="Tax">Tax / Fees</option>
-                  <option value="Other">Misc / Others</option>
-                </>
-              ) : (
-                <>
-                  <option value="Extra Income">Extra Income</option>
-                  <option value="Misc Revenue">Misc Revenue</option>
-                  <option value="Booking Fee">Booking / Token</option>
-                  <option value="Refund">Return / Refund</option>
-                </>
-              )}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Amount (Rs.)</label>
-            <div className="relative">
-              <input 
-                type="number" 
-                value={amount}
-                disabled={!isAdmin}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
-                required
-              />
-            </div>
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add details here..."
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-6 text-white font-medium focus:border-indigo-500 transition-all outline-none resize-none disabled:opacity-50"
+            />
           </div>
 
           {isAdmin ? (
             <button 
               type="submit"
               disabled={isSaving}
-              className={`w-full bg-gradient-to-r from-indigo-600 to-indigo-700 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 text-xs uppercase tracking-widest ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full bg-gradient-to-r from-indigo-600 to-indigo-700 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all mt-2 text-xs uppercase tracking-widest ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isSaving ? 'SAVING...' : `RECORD ${type === 'expense' ? 'EXPENSE' : 'INCOME'}`}
             </button>
