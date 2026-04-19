@@ -20,6 +20,7 @@ const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
 import SettingsPage from './SettingsPage';
 import AddEntryModal from './AddEntryModal';
+import { seedFarmersData } from './seedFarmers';
 
 const App = () => {
   // --- Auth & Access States ---
@@ -39,9 +40,10 @@ const App = () => {
   // --- Sync State to LocalStorage ---
   useEffect(() => { localStorage.setItem('jatala_view', view); }, [view]);
 
-  // --- Firebase Guest Initializer ---
+  // --- Firebase Guest Initializer & Data Restoration ---
   useEffect(() => {
     signInAnonymously(auth).catch(console.error);
+    seedFarmersData().catch(console.error);
   }, []);
 
   // --- Real-time Financial Data Logic ---
