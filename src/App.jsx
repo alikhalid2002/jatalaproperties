@@ -58,8 +58,8 @@ const App = () => {
     { id: 'Settings', title: "System Settings", icon: <Settings size={22} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
   ];
 
-  const FinanceCard = ({ id, label, color, icon, value }) => (
-    <div id={id} className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
+  const FinanceCard = ({ label, color, icon, value }) => (
+    <div className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
       <div className={`relative text-${color}-400 opacity-100 group-hover:scale-110 transition-transform`}>
         {React.cloneElement(icon, { size: 24 })}
       </div>
@@ -75,7 +75,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#06090f] text-white p-4 overflow-y-auto scroll-container drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+    <div className="min-h-screen bg-[#06090f] text-white p-4 overflow-y-auto scroll-container">
       <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
         <div className="flex items-center gap-4">
           {view === 'dashboard' ? (
@@ -114,15 +114,14 @@ const App = () => {
             </header>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <FinanceCard id="expected-revenue-card" label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
-              <FinanceCard id="total-expenses-card" label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
+              <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
+              <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
             </div>
 
             <div className="space-y-3">
               {categories.map(item => (
                 <button 
                   key={item.id} 
-                  id={`menu-btn-${item.id.toLowerCase()}`}
                   onClick={() => setView(item.id)} 
                   className={`w-full group bg-[#111827]/40 hover:bg-white/[0.04] border ${item.border} p-6 rounded-[28px] flex justify-between items-center transition-all duration-300 ${item.glow} hover:scale-[1.02] active:scale-[0.98]`}
                 >
