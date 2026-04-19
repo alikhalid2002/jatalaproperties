@@ -39,17 +39,13 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
     
     const rentPaid = transactions.filter(t => {
       if (t.type !== 'Rent') return false;
-      let itemYear = null;
-      if (t.date) itemYear = t.date.split('-')[0];
-      else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
+      let itemYear = t.date ? t.date.split('-')[0] : (t.createdAt?.seconds ? new Date(t.createdAt.seconds * 1000).getFullYear().toString() : null);
       return itemYear === activeYear;
     }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
     const totalExpenses = transactions.filter(t => {
       if (t.type !== 'Expense') return false;
-      let itemYear = null;
-      if (t.date) itemYear = t.date.split('-')[0];
-      else if (t.createdAt?.seconds) itemYear = new Date(t.createdAt.seconds * 1000).getFullYear().toString();
+      let itemYear = t.date ? t.date.split('-')[0] : (t.createdAt?.seconds ? new Date(t.createdAt.seconds * 1000).getFullYear().toString() : null);
       return itemYear === activeYear;
     }).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
@@ -91,10 +87,6 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
       .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
     const percent = annualTotal > 0 ? Math.min(100, (annualPaid / annualTotal) * 100) : 0;
     return { paid: annualPaid, total: annualTotal, percent };
-  };
-
-  const withTimeout = (promise, message = "Connection Timeout") => {
-    return Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error(message)), 10000))]);
   };
 
   const handleSaveTransaction = async (e) => {
@@ -176,7 +168,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500 pb-32" dir="ltr">
       
-      {/* Financial Summary - Minimalist 3-Card Layout */}
+      {/* Financial Summary */}
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-12 px-1">
         <FinanceCard 
           label="EXPECTED SHOP REVENUE"
@@ -195,36 +187,40 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
         />
       </div>
 
-      {/* Spacing adjusted: Banner removed as requested */}
       <div className="mt-4"></div>
 
-      {/* Shops Grid - Flattened Minimalist Cards */}
+      {/* Shops Grid - Redesigned to follow Sample Exactly */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
         {shops.map((shop) => {
           const status = calculateAnnualProgress(shop);
+          const balance = status.total - status.paid;
           return (
             <div 
               key={shop.id}
               onClick={() => setSelectedShop(shop)}
-              className="group bg-[#111827] p-8 rounded-[32px] transition-all duration-300 hover:bg-white/[0.03] active:scale-[0.98] cursor-copy flex flex-col gap-6"
+              className="group bg-[#111827] p-8 rounded-[48px] transition-all duration-300 hover:bg-white/[0.02] active:scale-[0.98] cursor-copy flex flex-col gap-8 shadow-2xl"
             >
               <div className="flex justify-between items-start">
-                 <h3 className="text-xl font-black text-white italic uppercase tracking-tight leading-tight">
+                 <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tight leading-tight pr-4">
                    {shop.tenantEn || transliterateToEnglish(shop.tenant)}
                  </h3>
-                 <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${status.percent < 100 ? 'text-rose-500 bg-rose-500/10' : 'text-[#10B981] bg-[#10B981]/10'}`}>
+                 <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full ${status.percent < 100 ? 'text-orange-500 bg-orange-500/10' : 'text-[#10B981] bg-[#10B981]/10'}`}>
                    {status.percent < 100 ? 'Pending' : 'Paid'}
                  </span>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                  <div className="flex justify-between items-end">
                     <div>
-                      <span className="text-lg font-black text-white italic">{shop.area}</span>
+                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Monthly Rent</span>
+                      <span className="text-2xl font-black text-white italic tracking-tighter">{(Number(shop.rent) || 0).toLocaleString()}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Monthly Rent</span>
-                      <span className="text-lg font-black text-white italic">Rs. {(Number(shop.rent) || 0).toLocaleString()}</span>
+                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Balance</span>
+                      <span className="text-2xl font-black text-white italic tracking-tighter">
+                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                         {(balance).toLocaleString()}
+                      </span>
                     </div>
                  </div>
 
@@ -235,9 +231,9 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                     ></div>
                  </div>
 
-                 <div className="flex justify-between items-center text-[10px] font-bold">
-                    <span className="text-neutral-500 uppercase tracking-widest">RECV: <span className="text-white font-black italic ml-1">{(Number(status.paid) || 0).toLocaleString()}</span></span>
-                    <span className="text-[#10B981] uppercase tracking-widest">ANNUAL: <span className="font-black italic ml-1">{(Number(status.total) || 0).toLocaleString()}</span></span>
+                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <span className="text-neutral-500">Recv: <span className="text-white font-black italic ml-1">{(Number(status.paid) || 0).toLocaleString()}</span></span>
+                    <span className="text-neutral-500">Total: <span className="text-[#10B981] font-black italic ml-1">{(Number(status.total) || 0).toLocaleString()}</span></span>
                  </div>
               </div>
             </div>
@@ -246,33 +242,37 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
       </div>
 
       {selectedShop && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
            {/* Modal Simplified */}
-           <div className="w-full max-w-2xl bg-[#0d1117] rounded-[40px] p-10 relative overflow-hidden flex flex-col max-h-[90vh]">
-              <button onClick={() => setSelectedShop(null)} className="absolute top-6 right-6 p-4 text-white hover:text-rose-500 transition-colors"><X size={24}/></button>
-              <h2 className="text-3xl font-black text-white italic uppercase mb-8">{selectedShop.tenantEn || selectedShop.tenant}</h2>
-              <div className="overflow-y-auto pr-4 space-y-10 custom-scrollbar">
-                {/* Details & Actions */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 p-6 rounded-3xl text-center">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2">Annual Rent</p>
-                    <p className="text-2xl font-black text-white italic">Rs. {(calculateAnnualProgress(selectedShop).total).toLocaleString()}</p>
+           <div className="w-full max-w-2xl bg-[#0d1117] rounded-[48px] p-12 relative overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+              <button onClick={() => setSelectedShop(null)} className="absolute top-8 right-8 p-4 text-white hover:text-rose-500 transition-colors"><X size={24}/></button>
+              <h2 className="text-4xl font-black text-white italic uppercase mb-10 tracking-tighter">
+                {selectedShop.tenantEn || selectedShop.tenant}
+              </h2>
+              <div className="overflow-y-auto pr-4 space-y-12 no-scrollbar">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-white/5 p-8 rounded-[32px] text-center">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-3 tracking-widest">Annual Dues</p>
+                    <p className="text-3xl font-black text-white italic">Rs. {(calculateAnnualProgress(selectedShop).total).toLocaleString()}</p>
                   </div>
-                  <div className="bg-white/5 p-6 rounded-3xl text-center">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2">Total Paid</p>
-                    <p className="text-2xl font-black text-[#10B981] italic">Rs. {(calculateAnnualProgress(selectedShop).paid).toLocaleString()}</p>
+                  <div className="bg-white/5 p-8 rounded-[32px] text-center border border-[#10B981]/10">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-3 tracking-widest">Total Paid</p>
+                    <p className="text-3xl font-black text-[#10B981] italic">Rs. {(calculateAnnualProgress(selectedShop).paid).toLocaleString()}</p>
                   </div>
                 </div>
-                {/* Simplified History */}
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Payment History</p>
+                <div className="space-y-6">
+                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Transaction History</p>
                   {transactions.filter(t => t.shopId === selectedShop.id).map(t => (
-                    <div key={t.id} className="flex justify-between items-center bg-white/5 p-4 rounded-2xl">
+                    <div key={t.id} className="flex justify-between items-center bg-white/3 p-6 rounded-[28px] border border-white/5">
                        <div>
-                         <p className="text-sm font-black text-white">Rs. {t.amount.toLocaleString()}</p>
-                         <p className="text-[9px] text-neutral-500 uppercase">{t.date}</p>
+                         <p className="text-lg font-black text-white italic">Rs. {t.amount.toLocaleString()}</p>
+                         <p className="text-[9px] text-neutral-600 font-bold uppercase mt-1">{t.date}</p>
                        </div>
-                       {isAdmin && <button onClick={() => handleDeleteTransaction(t.id)} className="text-rose-500/50 hover:text-rose-500"><Trash2 size={16}/></button>}
+                       {isAdmin && (
+                         <button onClick={() => handleDeleteTransaction(t.id)} className="p-3 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all">
+                           <Trash2 size={16}/>
+                         </button>
+                       )}
                     </div>
                   ))}
                 </div>
