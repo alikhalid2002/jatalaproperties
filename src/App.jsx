@@ -65,7 +65,7 @@ const App = () => {
   // --- Auth Handlers ---
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    if (password === 'admin123') {
+    if (password === 'ali321') {
       setIsAdmin(true);
       setIsAuthenticated(true);
       setLoginError('');
