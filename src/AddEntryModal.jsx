@@ -30,10 +30,30 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
   const modalContent = (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-[#1e293b] border border-slate-700 w-full max-w-md p-8 rounded-[32px] shadow-2xl animate-in zoom-in-95 duration-300 mx-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Record New Expense</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">
+            Record {type === 'expense' ? 'Expense' : 'Income'}
+          </h2>
           <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
             <X size={24} />
+          </button>
+        </div>
+
+        {/* Type Toggle */}
+        <div className="flex bg-slate-800/50 p-1 rounded-2xl mb-8 border border-white/5">
+          <button 
+            type="button"
+            onClick={() => { setType('expense'); setLabel(''); }}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'expense' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+          >
+            Expense
+          </button>
+          <button 
+            type="button"
+            onClick={() => { setType('revenue'); setLabel(''); }}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'revenue' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+          >
+            Extra Income
           </button>
         </div>
 
@@ -52,7 +72,9 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Expense Category</label>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              {type === 'expense' ? 'Expense Category' : 'Income Source'}
+            </label>
             <select 
               disabled={!isAdmin}
               value={label}
@@ -61,14 +83,26 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
                 if (val) setLabel(val);
               }}
               className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer mb-2 disabled:opacity-50"
+              required
             >
-              <option value="">-- SELECT CATEGORY --</option>
-              <option value="Travel">Travel / Fuel</option>
-              <option value="Utility">Electricity Bill</option>
-              <option value="Labor">Labor / Salary</option>
-              <option value="Repair">Maintenance</option>
-              <option value="Tax">Tax / Fees</option>
-              <option value="Other">Misc / Others</option>
+              <option value="">-- SELECT --</option>
+              {type === 'expense' ? (
+                <>
+                  <option value="Travel">Travel / Fuel</option>
+                  <option value="Utility">Electricity Bill</option>
+                  <option value="Labor">Labor / Salary</option>
+                  <option value="Repair">Maintenance</option>
+                  <option value="Tax">Tax / Fees</option>
+                  <option value="Other">Misc / Others</option>
+                </>
+              ) : (
+                <>
+                  <option value="Extra Income">Extra Income</option>
+                  <option value="Misc Revenue">Misc Revenue</option>
+                  <option value="Booking Fee">Booking / Token</option>
+                  <option value="Refund">Return / Refund</option>
+                </>
+              )}
             </select>
           </div>
 
@@ -93,7 +127,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
               disabled={isSaving}
               className={`w-full bg-gradient-to-r from-indigo-600 to-indigo-700 py-4 rounded-2xl text-white font-black shadow-xl shadow-indigo-600/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 text-xs uppercase tracking-widest ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {isSaving ? 'SAVING...' : 'RECORD EXPENSE'}
+              {isSaving ? 'SAVING...' : `RECORD ${type === 'expense' ? 'EXPENSE' : 'INCOME'}`}
             </button>
           ) : (
             <div className="p-4 bg-slate-800/50 rounded-2xl text-center text-rose-400 text-[10px] font-black uppercase tracking-widest">
