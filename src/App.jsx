@@ -189,10 +189,16 @@ const App = () => {
 
              <Bell className="text-neutral-500 hover:text-indigo-400 cursor-pointer transition-colors" size={24} />
              <div 
-               onClick={() => setView('Settings')}
-               className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center border-4 border-[#06090f] shadow-2xl cursor-pointer hover:scale-110 active:scale-90 transition-all overflow-hidden"
+               onClick={() => {
+                 setIsAuthenticated(false);
+                 setIsAdmin(false);
+                 setPassword('');
+                 setView('dashboard');
+               }}
+               className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border-4 border-[#06090f] shadow-2xl cursor-pointer hover:bg-rose-500/10 hover:scale-110 active:scale-90 transition-all overflow-hidden group"
+               title="Logout"
              >
-               <User size={22} className="text-white" />
+               <User size={22} className="text-white group-hover:text-rose-500 transition-colors" />
              </div>
         </div>
       </nav>
