@@ -106,7 +106,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                <h3 className="text-xl font-black text-white italic uppercase tracking-tight leading-tight">
                  {farmer.nameEn || transliterateToEnglish(farmer.nameUr)}
                </h3>
-               <span className="text-[10px] font-black text-[#10B981] uppercase tracking-widest bg-[#10B981]/10 px-3 py-1.5 rounded-full">
+               <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${farmer.status === 'Pending' ? 'text-rose-500 bg-rose-500/10' : 'text-[#10B981] bg-[#10B981]/10'}`}>
                  {farmer.status}
                </span>
             </div>
