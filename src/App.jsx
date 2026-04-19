@@ -100,7 +100,7 @@ const App = () => {
                    onClick={() => setShowAdminLogin(true)}
                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-95"
                  >
-                   Access as Administrator
+                   ADMIN
                  </button>
                  <button 
                    onClick={handleGuestLogin}
