@@ -95,19 +95,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
         </div>
       </div>
 
-      {/* Distribution Section */}
-      <div className="px-4 mb-16">
-        <div className="flex justify-between items-center mb-4">
-           <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Received Distribution</span>
-           <span className="text-[10px] font-black text-[#10B981] uppercase tracking-widest italic">{receivedPrv.toFixed(1)}%</span>
-        </div>
-        <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-           <div 
-             className="h-full bg-[#10B981] transition-all duration-1000 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
-             style={{ width: `${receivedPrv}%` }}
-           ></div>
-        </div>
-      </div>
+
 
       {/* Member Inventory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
