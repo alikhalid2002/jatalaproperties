@@ -64,9 +64,9 @@ const App = () => {
         {React.cloneElement(icon, { size: 24 })}
       </div>
       <div className="flex flex-col items-start min-w-0 flex-1">
-        <span className="text-[8px] font-black uppercase text-white tracking-[0.18em] mb-1 whitespace-nowrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{label}</span>
-        <p className="text-sm lg:text-xl font-black italic text-white whitespace-nowrap tracking-tighter drop-shadow-[0_4px_12px_rgba(0,0,0,1)]">
-          <span className="text-[10px] mr-1 opacity-100 font-black italic text-white">Rs.</span>
+        <span style={{ color: '#FFFFFF', fontWeight: '900', letterSpacing: '0.18em', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }} className="text-[8px] uppercase mb-1 whitespace-nowrap">{label}</span>
+        <p style={{ color: '#FFFFFF', fontWeight: '900', fontStyle: 'italic', textShadow: '2px 2px 8px rgba(0,0,0,1)' }} className="text-sm lg:text-xl whitespace-nowrap tracking-tighter">
+          <span style={{ color: '#FFFFFF', fontWeight: '900', fontStyle: 'italic' }} className="text-[10px] mr-1 opacity-100">Rs.</span>
           {value.toLocaleString()}
         </p>
       </div>
@@ -75,7 +75,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#06090f] text-white p-4 overflow-y-auto scroll-container">
+    <div style={{ overflowY: 'auto', height: '100vh', WebkitOverflowScrolling: 'touch' }} className="min-h-screen bg-[#06090f] p-4 scroll-container">
       <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
         <div className="flex items-center gap-4">
           {view === 'dashboard' ? (
@@ -127,7 +127,7 @@ const App = () => {
                 >
                   <div className="flex items-center gap-6">
                     <div className={`${item.color} opacity-100 group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span className="text-white font-black uppercase tracking-[0.18em] text-[10px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{item.title}</span>
+                    <span style={{ color: '#FFFFFF', fontWeight: '900', letterSpacing: '0.18em', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }} className="uppercase text-[10px]">{item.title}</span>
                   </div>
                   <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
                 </button>
