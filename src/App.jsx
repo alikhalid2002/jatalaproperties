@@ -58,15 +58,15 @@ const App = () => {
     { id: 'Settings', title: "System Settings", icon: <Settings size={22} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
   ];
 
-  const FinanceCard = ({ label, color, icon, value }) => (
-    <div className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
-      <div className={`relative text-${color}-400 group-hover:scale-110 transition-transform`}>
+  const FinanceCard = ({ id, label, color, icon, value }) => (
+    <div id={id} className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
+      <div className={`relative text-${color}-400 opacity-100 group-hover:scale-110 transition-transform`}>
         {React.cloneElement(icon, { size: 24 })}
       </div>
       <div className="flex flex-col items-start min-w-0 flex-1">
-        <span className="text-[8px] font-black uppercase text-white tracking-[0.2em] mb-1 whitespace-nowrap drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">{label}</span>
-        <p className="text-sm lg:text-xl font-black italic text-white whitespace-nowrap">
-          <span className="text-[10px] mr-1 opacity-50 not-italic">Rs.</span>
+        <span className="text-[8px] font-black uppercase text-white tracking-[0.18em] mb-1 whitespace-nowrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{label}</span>
+        <p className="text-sm lg:text-xl font-black italic text-white whitespace-nowrap tracking-tighter drop-shadow-[0_4px_12px_rgba(0,0,0,1)]">
+          <span className="text-[10px] mr-1 opacity-100 font-black italic text-white">Rs.</span>
           {value.toLocaleString()}
         </p>
       </div>
@@ -75,7 +75,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#06090f] text-slate-200 p-4 scroll-container">
+    <div className="min-h-screen bg-[#06090f] text-white p-4 overflow-y-auto scroll-container drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
       <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
         <div className="flex items-center gap-4">
           {view === 'dashboard' ? (
@@ -92,8 +92,8 @@ const App = () => {
           )}
           {view !== 'dashboard' && (
             <div className="animate-in fade-in slide-in-from-left-4">
-              <h2 className="text-white font-black uppercase tracking-widest leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">{view.replace(/_/g, ' ')}</h2>
-              <p className="text-[7px] text-indigo-500 font-black uppercase tracking-[0.4em] mt-1">Inventory Database</p>
+                <h2 className="text-white font-black uppercase tracking-widest leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{view.replace(/_/g, ' ')}</h2>
+                <p className="text-[7px] text-indigo-500 font-black uppercase tracking-[0.4em] mt-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">Inventory Database</p>
             </div>
           )}
         </div>
@@ -109,25 +109,26 @@ const App = () => {
         {view === 'dashboard' ? (
           <div className="max-w-2xl mx-auto space-y-4 animate-in fade-in zoom-in-95 duration-500">
             <header className="text-center py-6 mb-8">
-              <h1 className="text-2xl font-light tracking-[0.3em] uppercase text-white">JATALA <span className="font-black text-indigo-500">PROPERTIES</span></h1>
+              <h1 className="text-2xl font-black tracking-[0.3em] uppercase text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">JATALA <span className="font-black text-indigo-500">PROPERTIES</span></h1>
               <div className="h-[1px] w-12 bg-indigo-500/30 mx-auto mt-4"></div>
             </header>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
-              <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
+              <FinanceCard id="expected-revenue-card" label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
+              <FinanceCard id="total-expenses-card" label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
             </div>
 
             <div className="space-y-3">
               {categories.map(item => (
                 <button 
                   key={item.id} 
+                  id={`menu-btn-${item.id.toLowerCase()}`}
                   onClick={() => setView(item.id)} 
                   className={`w-full group bg-[#111827]/40 hover:bg-white/[0.04] border ${item.border} p-6 rounded-[28px] flex justify-between items-center transition-all duration-300 ${item.glow} hover:scale-[1.02] active:scale-[0.98]`}
                 >
                   <div className="flex items-center gap-6">
-                    <div className={`${item.color} group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span className="text-white font-black uppercase tracking-[0.2em] text-[10px] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">{item.title}</span>
+                    <div className={`${item.color} opacity-100 group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
+                    <span className="text-white font-black uppercase tracking-[0.18em] text-[10px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{item.title}</span>
                   </div>
                   <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
                 </button>
