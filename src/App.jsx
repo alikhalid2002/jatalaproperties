@@ -110,7 +110,7 @@ const App = () => {
                
                {showYearMenu && (
                  <div className="absolute top-full right-0 mt-4 py-3 w-32 bg-[#111827] border border-white/10 rounded-[24px] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
-                   {['2026', '2025', '2024'].map(year => (
+                   {['2030', '2029', '2028', '2027', '2026', '2025'].map(year => (
                      <button
                        key={year}
                        onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
