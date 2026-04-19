@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { 
   Map as LandPlot, Store, Receipt as ReceiptText, Plus, 
-  ChevronRight, ChevronDown, Bell, User, 
+  ChevronRight, ChevronDown, Bell, User, Lock, Eye, EyeOff,
   Home, TrendingUp, TrendingDown, ArrowLeft, 
   CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight, Calendar
 } from 'lucide-react';
@@ -10,9 +10,6 @@ import {
 import { db, auth } from './firebase';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { useFinanceData } from './useFinanceData';
-import { useFarmers } from './useFarmers';
-import { useReminders } from './useReminders';
-import { useGlobalActivity } from './useGlobalActivity';
 
 // --- COMPONENTS ---
 import { DashboardSkeleton } from './Skeleton';
@@ -24,97 +21,164 @@ import SettingsPage from './SettingsPage';
 import AddEntryModal from './AddEntryModal';
 
 const App = () => {
-  // --- States ---
+  // --- Auth & Access States ---
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  // --- UI States ---
   const [view, setView] = useState(() => localStorage.getItem('jatala_view') || 'dashboard');
   const [selectedYear, setSelectedYear] = useState('2026');
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showEntryModal, setShowEntryModal] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(true);
 
   // --- Sync State to LocalStorage ---
   useEffect(() => { localStorage.setItem('jatala_view', view); }, [view]);
 
-  // --- Auth Safety ---
+  // --- Firebase Guest Initializer ---
   useEffect(() => {
     signInAnonymously(auth).catch(console.error);
   }, []);
 
-  // --- Data Fetching ---
+  // --- Real-time Financial Data Logic ---
   const { 
-    revenue: revenueVal = 0, 
-    pending: pendingVal = 0, 
-    expenses: expenseVal = 0, 
+    revenue = 0, 
+    pending = 0, 
+    expenses = 0, 
     entries = [], 
     loading: financeLoading,
     addEntry 
   } = useFinanceData(selectedYear);
 
+  // --- Navigation Categories ---
   const categories = [
-    { id: 'Land', title: "Land Assets", icon: <LandPlot size={24} />, color: "text-blue-400", border: "border-blue-500/20", glow: "shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
-    { id: 'Shops', title: "Commercial Shops", icon: <Store size={24} />, color: "text-purple-400", border: "border-purple-500/20", glow: "shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
-    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={24} />, color: "text-rose-400", border: "border-rose-500/20", glow: "shadow-[0_0_20px_rgba(244,63,94,0.2)]" },
-    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={24} />, color: "text-emerald-400", border: "border-emerald-500/20", glow: "shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
-    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={24} />, color: "text-amber-400", border: "border-amber-500/20", glow: "shadow-[0_0_20px_rgba(251,191,36,0.2)]" },
-    { id: 'Settings', title: "System Settings", icon: <Settings size={24} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
+    { id: 'Land', title: "Land Assets", icon: <LandPlot size={24} />, color: "text-indigo-400" },
+    { id: 'Shops', title: "Commercial Shops", icon: <Store size={24} />, color: "text-indigo-400" },
+    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={24} />, color: "text-indigo-400" },
+    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={24} />, color: "text-indigo-400" },
+    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={24} />, color: "text-indigo-400" },
+    { id: 'Settings', title: "System Settings", icon: <Settings size={24} />, color: "text-indigo-400" },
   ];
 
-  const FinanceCard = ({ label, color, icon, value }) => (
-    <div className="group relative bg-[#111827]/40 backdrop-blur-md p-6 rounded-[32px] border border-white/5 flex flex-row items-center gap-4 transition-all duration-500 hover:bg-white/5 shadow-xl overflow-hidden min-w-0 flex-1">
-      <div className={`relative text-${color}-400 opacity-100 group-hover:scale-110 transition-transform`}>
-        {React.cloneElement(icon, { size: 24 })}
-      </div>
-      <div className="flex flex-col items-start min-w-0 flex-1">
-        <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '14px', letterSpacing: '0.15em', opacity: 1 }} className="uppercase mb-1 whitespace-nowrap">{label}</span>
-        <p style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '28px', fontStyle: 'italic', textShadow: '0px 2px 8px rgba(0,0,0,1)', opacity: 1 }} className="whitespace-nowrap tracking-tighter">
-          <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '12px', fontStyle: 'italic', opacity: 1 }} className="mr-1">Rs.</span>
-          {value.toLocaleString()}
-        </p>
-      </div>
-      <div className={`absolute bottom-0 left-0 h-[2px] bg-${color}-500/50 w-[30%] group-hover:w-[50%] transition-all duration-700`} />
-    </div>
-  );
+  // --- Auth Handlers ---
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (password === 'admin123') {
+      setIsAdmin(true);
+      setIsAuthenticated(true);
+      setLoginError('');
+    } else {
+      setLoginError('Incorrect administrative password');
+    }
+  };
 
+  const handleGuestLogin = () => {
+    setIsAdmin(false);
+    setIsAuthenticated(true);
+  };
+
+  // --- 1. DUAL LOGIN GATEWAY ---
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#06090f] flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden">
+        <div className="w-full max-w-md space-y-12 text-center animate-in fade-in zoom-in-95 duration-700">
+           <header className="space-y-4">
+             <div className="w-20 h-20 bg-indigo-600 rounded-[32px] mx-auto flex items-center justify-center shadow-2xl shadow-indigo-600/30">
+               <Home className="text-white" size={40} />
+             </div>
+             <h1 className="text-3xl font-black tracking-[0.4em] text-white uppercase italic drop-shadow-2xl">JATALA <span className="text-indigo-500">PROPERTIES</span></h1>
+             <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.5em] opacity-60">Management Gateway</p>
+           </header>
+
+           <div className="bg-[#111827] p-10 rounded-[48px] shadow-2xl space-y-8 border border-white/5">
+             <form onSubmit={handleAdminLogin} className="space-y-6">
+                <div className="relative group">
+                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    placeholder="ADMIN PASSWORD"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-black/40 border border-white/5 p-6 pl-16 rounded-3xl text-sm font-black text-white outline-none focus:border-indigo-600 focus:bg-black/60 transition-all uppercase tracking-widest placeholder:text-neutral-700"
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {loginError && <p className="text-rose-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">{loginError}</p>}
+                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-95">
+                  Access as Administrator
+                </button>
+             </form>
+
+             <div className="relative flex items-center">
+                <div className="flex-grow border-t border-white/5"></div>
+                <span className="mx-4 text-[10px] font-black text-neutral-800 uppercase tracking-widest">OR</span>
+                <div className="flex-grow border-t border-white/5"></div>
+             </div>
+
+             <button 
+               onClick={handleGuestLogin}
+               className="w-full bg-white/5 hover:bg-white/10 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all border border-white/5"
+             >
+               Continue as Guest (View Only)
+             </button>
+           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- 2. UNIFIED DASHBOARD UI ---
   return (
-    <div style={{ overflowY: 'auto', height: '100vh', WebkitOverflowScrolling: 'touch' }} className="min-h-screen bg-[#06090f] p-4 scroll-container">
-      <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto py-4">
-        <div className="flex items-center gap-4">
+    <div style={{ overflowX: 'hidden' }} className="min-h-screen bg-[#06090f] p-4 sm:p-8 flex flex-col text-white font-sans selection:bg-indigo-500/30">
+      
+      {/* Navigation Bar */}
+      <nav className="flex justify-between items-center mb-10 max-w-4xl mx-auto py-4 w-full">
+        <div className="flex items-center gap-6">
           {view === 'dashboard' ? (
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
-              <Home className="text-white" size={20} />
+            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-600/30">
+              <Home className="text-white" size={24} />
             </div>
           ) : (
             <button 
               onClick={() => setView('dashboard')}
-              className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all"
+              className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:scale-110 transition-all active:scale-90"
             >
-              <ArrowLeft className="text-white" size={20} />
+              <ArrowLeft className="text-white" size={24} />
             </button>
           )}
           {view !== 'dashboard' && (
             <div className="animate-in fade-in slide-in-from-left-4">
-                <h2 className="text-white font-black uppercase tracking-widest leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{view.replace(/_/g, ' ')}</h2>
-                <p className="text-[7px] text-indigo-500 font-black uppercase tracking-[0.4em] mt-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">Inventory Database</p>
+                <h2 className="text-2xl font-black uppercase tracking-tighter leading-none italic">{view.replace(/_/g, ' ')}</h2>
+                <p className="text-[9px] text-indigo-500 font-bold uppercase tracking-[0.4em] mt-1 opacity-80 italic">Management Database</p>
             </div>
           )}
         </div>
-          <div className="flex gap-6 items-center">
-             {/* Year Selector Restored (Position optimized) */}
+
+        <div className="flex gap-6 items-center">
+             {/* Year Selector */}
              <div className="relative">
                <button 
                  onClick={() => setShowYearMenu(!showYearMenu)}
-                 className="flex items-center gap-2 text-slate-400 hover:text-white transition-all active:scale-95"
+                 className="flex items-center gap-2 group transition-all active:scale-95"
                >
-                 <span className="text-xs font-black tracking-[0.2em]">{selectedYear}</span>
-                 <ChevronDown className={`transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} size={14} />
+                 <span className="text-[13px] font-black tracking-[0.2em] text-white italic">{selectedYear}</span>
+                 <ChevronDown className={`text-neutral-500 group-hover:text-indigo-400 transition-transform duration-300 ${showYearMenu ? 'rotate-180' : ''}`} size={16} />
                </button>
-               
                {showYearMenu && (
-                 <div className="absolute top-full right-0 mt-4 py-3 w-32 bg-[#111827] border border-white/10 rounded-[24px] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
+                 <div className="absolute top-full right-0 mt-6 py-4 w-40 bg-[#111827] border border-white/10 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 animate-in fade-in zoom-in-95 duration-200 backdrop-blur-3xl">
                    {['2025', '2026', '2027', '2028', '2029', '2030'].map(year => (
                      <button
                        key={year}
                        onClick={() => { setSelectedYear(year); setShowYearMenu(false); }}
-                       className={`w-full py-3 text-[10px] font-black tracking-[0.3em] uppercase transition-all ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                       className={`w-full py-4 text-[11px] font-black tracking-[0.3em] uppercase transition-all ${selectedYear === year ? 'text-indigo-400 bg-indigo-500/10' : 'text-neutral-500 hover:text-white hover:bg-white/5'}`}
                      >
                        {year}
                      </button>
@@ -123,83 +187,109 @@ const App = () => {
                )}
              </div>
 
-             <Bell className="text-slate-400 hover:text-white cursor-pointer transition-colors" size={20} />
+             <Bell className="text-neutral-500 hover:text-indigo-400 cursor-pointer transition-colors" size={24} />
              <div 
                onClick={() => setView('Settings')}
-               className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all"
+               className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center border-4 border-[#06090f] shadow-2xl cursor-pointer hover:scale-110 active:scale-90 transition-all overflow-hidden"
              >
-               <User size={18} className="text-white" />
+               <User size={22} className="text-white" />
              </div>
-          </div>
+        </div>
       </nav>
 
-      <main className="max-w-[1600px] mx-auto pb-24">
+      <main className="max-w-[1600px] mx-auto w-full pb-24">
         {view === 'dashboard' ? (
-          <div className="max-w-2xl mx-auto space-y-4 animate-in fade-in zoom-in-95 duration-500">
-            <header className="text-center py-6 mb-8">
-              <h1 className="text-2xl font-black tracking-[0.3em] uppercase text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">JATALA <span className="font-black text-indigo-500">PROPERTIES</span></h1>
-              <div className="h-[1px] w-12 bg-indigo-500/30 mx-auto mt-4"></div>
+          <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-500">
+            <header className="text-center py-10">
+              <h1 className="text-4xl font-black tracking-[0.3em] uppercase text-white italic">JATALA <span className="text-indigo-500">PROPERTIES</span></h1>
+              <div className="h-1 w-16 bg-indigo-600/40 mx-auto mt-6 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.3)]"></div>
             </header>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <FinanceCard label="Expected Revenue" color="emerald" icon={<ArrowUpRight />} value={revenueVal + pendingVal} />
-              <FinanceCard label="Total Expenses" color="rose" icon={<ArrowDownRight />} value={expenseVal} />
+            {/* Financial Summary - 2 Large Unified Cards */}
+            <div className="flex flex-col sm:flex-row gap-6 mb-12">
+              <FinanceCard 
+                label="EXPECTED REVENUE" 
+                color="emerald" 
+                icon={<ArrowUpRight />} 
+                value={revenue + pending} 
+              />
+              <FinanceCard 
+                label="TOTAL EXPENSES" 
+                color="rose" 
+                icon={<ArrowDownRight />} 
+                value={expenses} 
+              />
             </div>
 
-            <div className="space-y-3">
+            {/* Navigation Menu Rows */}
+            <div className="space-y-4">
               {categories.map(item => (
                 <button 
                   key={item.id} 
                   onClick={() => setView(item.id)} 
-                  className={`w-full group bg-[#111827]/40 hover:bg-white/[0.04] border ${item.border} p-6 rounded-[28px] flex justify-between items-center transition-all duration-300 ${item.glow} hover:scale-[1.02] active:scale-[0.98]`}
+                  className={`w-full group bg-[#111827] hover:bg-white/[0.04] p-8 rounded-[40px] flex justify-between items-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-2xl border border-white/[0.02]`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '16px' }}>
-                    <div className={`${item.color} opacity-100 group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '14px', letterSpacing: '0.2em', textShadow: '0px 2px 4px rgba(0,0,0,0.8)', opacity: 1, whiteSpace: 'nowrap' }} className="uppercase">{item.title}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '20px' }}>
+                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600/[0.1] group-hover:scale-110 group-hover:text-indigo-400 transition-all duration-500">
+                      {item.icon}
+                    </div>
+                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '15px', letterSpacing: '0.25em', opacity: 1, whiteSpace: 'nowrap' }} className="uppercase italic tracking-widest">{item.title}</span>
                   </div>
-                  <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
+                  <div className="flex items-center gap-4">
+                    <ChevronRight className="text-neutral-700 group-hover:text-indigo-400 group-hover:translate-x-2 transition-all duration-300" size={24} />
+                  </div>
                 </button>
               ))}
             </div>
           </div>
         ) : (
           <Suspense fallback={<DashboardSkeleton />}>
-            {view === 'Land' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} />}
-            {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
-            {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
-            {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
-            {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} />}
-            {view === 'Settings' && <SettingsPage entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
-            <p 
-              onClick={() => {
-                if(window.confirm('Clear cache and force update?')) {
-                  localStorage.clear();
-                  if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-                  }
-                  window.location.reload(true);
-                }
-              }}
-              className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] pt-10 text-center cursor-pointer hover:text-indigo-400 transition-colors"
-            >
-              Premium System v1.2.7 — Tap to Sync
-            </p>
+            <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
+              {view === 'Land' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} />}
+              {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
+              {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
+              {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
+              {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} />}
+              {view === 'Settings' && <SettingsPage entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
+            </div>
           </Suspense>
         )}
       </main>
 
-      {/* Fab Button */}
-      {view === 'dashboard' && (
+      {/* Floating Action Button - Restricted to Admin (Dual Login Rule) */}
+      {view === 'dashboard' && isAdmin && (
         <button 
           onClick={() => setShowEntryModal(true)}
-          className="fixed bottom-10 right-10 w-16 h-16 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[24px] shadow-2xl shadow-indigo-600/40 flex items-center justify-center transition-all hover:scale-110 active:scale-95 z-50 border border-white/20"
+          className="fixed bottom-12 right-12 w-20 h-20 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[40px] shadow-[0_20px_50px_rgba(79,70,229,0.3)] flex items-center justify-center transition-all hover:scale-110 active:scale-90 z-50 border border-white/20"
         >
-          <Plus size={32} />
+          <Plus size={40} strokeWidth={3} />
         </button>
       )}
+
+      {/* Footer Branding */}
+      <footer className="w-full flex justify-center py-10 opacity-30 mt-auto">
+         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Premium Management System v2.0</p>
+      </footer>
 
       <AddEntryModal isOpen={showEntryModal} onClose={() => setShowEntryModal(false)} onAdd={addEntry} isAdmin={isAdmin} />
     </div>
   );
 };
+
+// --- 3. UNIFIED HERO CARDS COMPONENT ---
+const FinanceCard = ({ label, icon, value, color }) => (
+  <div className="group relative bg-[#111827] p-8 md:p-10 rounded-[48px] flex flex-col items-center justify-center gap-6 transition-all duration-500 hover:bg-white/[0.03] shadow-2xl overflow-hidden min-w-0 flex-1 border border-white/[0.02]">
+    <div className={`w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-${color}-500 shadow-[0_0_20px_rgba(0,0,0,0.2)] group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500`}>
+      {React.cloneElement(icon, { size: 28 })}
+    </div>
+    <div className="flex flex-col items-center text-center">
+      <span className="text-neutral-500 font-bold text-[10px] uppercase tracking-[0.4em] mb-3 leading-relaxed opacity-80">{label}</span>
+      <p style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '28px', fontStyle: 'italic', opacity: 1 }} className="whitespace-nowrap tracking-tight leading-none flex items-center">
+        <span className="text-sm mr-2 opacity-50 not-italic font-bold">Rs.</span>
+        {value.toLocaleString()}
+      </p>
+    </div>
+  </div>
+);
+
 export default App;
