@@ -39,24 +39,7 @@ const AMOUNT_COLORS = {
   shop_expense: 'text-rose-400',
 };
 
-const SummaryCard = ({ label, year, value, sub, icon, color }) => (
-    <div className="bg-slate-800/40 p-1 md:p-6 rounded-lg md:rounded-[32px] border border-slate-700/50 hover:bg-slate-800 transition-all flex flex-col items-center justify-center w-full min-h-[85px] md:min-h-0 relative overflow-hidden group shadow-lg">
-        <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500 blur-[80px] opacity-10`}></div>
-        <div className="flex flex-col items-center justify-center relative z-10 w-full">
-            <div className={`mb-1 p-1 md:p-4 bg-${color}-500/10 text-${color}-400 rounded-md md:rounded-2xl transition-transform group-hover:scale-110`}>
-                {React.cloneElement(icon, { size: window.innerWidth < 768 ? 14 : 24 })}
-            </div>
-            <div className="flex flex-col items-center text-center w-full px-0.5">
-              <span className={`text-${color}-400 text-[9px] md:text-sm font-black leading-tight whitespace-nowrap overflow-hidden w-full uppercase tracking-tighter`}>{label}</span>
-              <span className={`text-${color}-400 opacity-80 text-[6.5px] md:text-xs font-black`}>{year}</span>
-            </div>
-        </div>
-        <div className="relative z-10 text-center w-full px-0.5">
-            <p className="text-[10px] md:text-xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic">Rs. {value?.toLocaleString()}</p>
-            <span className="text-slate-500 text-[6.5px] md:text-xs font-black hidden md:block uppercase tracking-widest">{sub}</span>
-        </div>
-    </div>
-);
+
 
 function TypeBadge({ type }) {
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.expense;
@@ -242,41 +225,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
         </div>
       </div>
 
-      {/* Financial Summary Cards: Strictly single row on mobile */}
-      <div className="grid grid-cols-4 gap-1 md:gap-4 mb-10 w-full px-1">
-        <SummaryCard 
-          label="Total Revenue"    
-          year={`${selectedYear}-${Number(selectedYear)-1}`}
-          value={totals.revenue}    
-          color="emerald" 
-          icon={<ArrowUpRight />}   
-          sub={`${filtered.filter(r=>r._type==='revenue').length} Received`}
-        />
-        <SummaryCard 
-          label="Pending Dues"    
-          year={`${selectedYear}-${Number(selectedYear)-1}`}
-          value={totals.pending}    
-          color="amber"   
-          icon={<Clock />}          
-          sub={`${filtered.filter(r=>r._type==='pending').length} Pending`}
-        />
-        <SummaryCard 
-          label="Total Expense"   
-          year={`${selectedYear}-${Number(selectedYear)-1}`}
-          value={totals.expense}    
-          color="rose"    
-          icon={<ArrowDownRight />} 
-          sub={`${filtered.filter(r=>r._type==='expense').length} Records`}
-        />
-        <SummaryCard 
-          label="Shop Repairs" 
-          year={`${selectedYear}-${Number(selectedYear)-1}`}
-          value={totals.shopRepair} 
-          color="orange"  
-          icon={<Store />}         
-          sub={`${filtered.filter(r=>r._type==='shop_expense').length} Repair Logs`}
-        />
-      </div>
+      <div className="mt-4"></div>
 
       {/* ── Filters panel ─────────────────────────────────────── */}
       {showFilters && (
