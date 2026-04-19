@@ -3,7 +3,8 @@ import {
   Map as LandPlot, Store, Receipt as ReceiptText, Plus, 
   ChevronRight, ChevronDown, Bell, User, Lock, Eye, EyeOff,
   Home, TrendingUp, TrendingDown, ArrowLeft, 
-  CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight, Calendar
+  CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight, Calendar,
+  Fingerprint, Building2
 } from 'lucide-react';
 
 // --- FIREBASE & DATA HOOKS ---
@@ -55,12 +56,12 @@ const App = () => {
 
   // --- Navigation Categories ---
   const categories = [
-    { id: 'Land', title: "Land Assets", icon: <LandPlot size={24} />, color: "text-indigo-400" },
-    { id: 'Shops', title: "Commercial Shops", icon: <Store size={24} />, color: "text-indigo-400" },
-    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={24} />, color: "text-indigo-400" },
-    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={24} />, color: "text-indigo-400" },
-    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={24} />, color: "text-indigo-400" },
-    { id: 'Settings', title: "System Settings", icon: <Settings size={24} />, color: "text-indigo-400" },
+    { id: 'Land', title: "Land Assets", icon: <LandPlot size={24} />, color: "text-blue-400" },
+    { id: 'Shops', title: "Commercial Shops", icon: <Store size={24} />, color: "text-purple-400" },
+    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={24} />, color: "text-emerald-400" },
+    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={24} />, color: "text-rose-400" },
+    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={24} />, color: "text-amber-400" },
+    { id: 'Settings', title: "System Settings", icon: <Settings size={24} />, color: "text-slate-400" },
   ];
 
   // --- Auth Handlers ---
@@ -83,43 +84,58 @@ const App = () => {
   // --- 1. DUAL LOGIN GATEWAY ---
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#06090f] flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden">
-        <div className="w-full max-w-md space-y-12 text-center animate-in fade-in zoom-in-95 duration-700">
-           <header className="space-y-4">
-             <div className="w-20 h-20 bg-indigo-600 rounded-[32px] mx-auto flex items-center justify-center shadow-2xl shadow-indigo-600/30">
-               <Home className="text-white" size={40} />
+      <div className="min-h-screen bg-[#030406] flex flex-col items-center justify-center p-6 overflow-hidden">
+        <div className="w-full max-w-sm space-y-16 text-center animate-in fade-in zoom-in-95 duration-1000">
+           {/* Logo Section */}
+           <header className="flex flex-col items-center space-y-8">
+             <div className="w-24 h-24 bg-[#11141b] rounded-[32px] flex items-center justify-center border border-white/5 shadow-2xl shadow-indigo-500/10 relative group">
+               <div className="absolute inset-0 bg-indigo-500/5 blur-2xl rounded-full group-hover:bg-indigo-500/10 transition-all"></div>
+               <Building2 className="text-[#818cf8]" size={42} strokeWidth={1.5} />
              </div>
-             <h1 className="text-3xl font-black tracking-[0.4em] text-white uppercase italic drop-shadow-2xl">JATALA <span className="text-indigo-500">PROPERTIES</span></h1>
-             <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.5em] opacity-60">Management Gateway</p>
+             <div className="space-y-1">
+               <h2 className="text-xl font-light tracking-[0.6em] text-white opacity-90 uppercase">Jatala</h2>
+               <h1 className="text-4xl font-black tracking-[0.1em] text-[#818cf8] uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.3)]">Properties</h1>
+             </div>
            </header>
 
-           <div className="bg-[#111827] p-10 rounded-[48px] shadow-2xl space-y-8 border border-white/5">
+           {/* Buttons Section */}
+           <div className="space-y-4 w-full px-4">
              {!showAdminLogin ? (
-               <div className="space-y-6">
-                 <button 
-                   onClick={() => setShowAdminLogin(true)}
-                   className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-95"
-                 >
-                   ADMIN
-                 </button>
+               <>
+                 {/* GUEST BUTTON */}
                  <button 
                    onClick={handleGuestLogin}
-                   className="w-full bg-white/5 hover:bg-white/10 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all border border-white/5"
+                   className="w-full group bg-[#0c0f16] border border-white/5 p-2 rounded-[24px] flex items-center transition-all hover:bg-[#11151f] hover:border-white/10 active:scale-95 shadow-xl"
                  >
-                   GUEST
+                   <div className="w-14 h-14 bg-[#11151f] rounded-[20px] flex items-center justify-center border border-white/5 text-emerald-400 group-hover:scale-110 transition-all">
+                     <Eye size={24} strokeWidth={1.5} />
+                   </div>
+                   <span className="flex-1 text-center text-white text-xl font-black italic tracking-widest uppercase ml-[-14px]">Guest</span>
                  </button>
-               </div>
+
+                 {/* ADMIN BUTTON */}
+                 <button 
+                   onClick={() => setShowAdminLogin(true)}
+                   className="w-full group bg-[#0c0f16] border border-white/5 p-2 rounded-[24px] flex items-center transition-all hover:bg-[#11151f] hover:border-white/10 active:scale-95 shadow-xl"
+                 >
+                   <div className="w-14 h-14 bg-[#11151f] rounded-[20px] flex items-center justify-center border border-white/5 text-neutral-500 group-hover:scale-110 group-hover:text-indigo-400 transition-all">
+                     <Fingerprint size={24} strokeWidth={1.5} />
+                   </div>
+                   <span className="flex-1 text-center text-white text-xl font-black italic tracking-widest uppercase ml-[-14px]">Admin</span>
+                 </button>
+               </>
              ) : (
-               <form onSubmit={handleAdminLogin} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+               <form onSubmit={handleAdminLogin} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="relative group">
-                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                    <div className="absolute inset-0 bg-indigo-500/5 blur-xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-[#818cf8] transition-colors" size={20} />
                     <input 
                       autoFocus
                       type={showPassword ? "text" : "password"}
                       placeholder="ENTER PIN"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-black/40 border border-white/5 p-6 pl-16 rounded-3xl text-sm font-black text-white outline-none focus:border-indigo-600 focus:bg-black/60 transition-all uppercase tracking-widest placeholder:text-neutral-700"
+                      className="w-full bg-[#0c0f16] border border-white/5 p-6 pl-16 rounded-[24px] text-sm font-black text-white outline-none focus:border-[#818cf8]/50 focus:bg-[#11151f] transition-all uppercase tracking-widest placeholder:text-neutral-700"
                     />
                     <button 
                       type="button"
@@ -130,16 +146,19 @@ const App = () => {
                     </button>
                   </div>
                   {loginError && <p className="text-rose-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">{loginError}</p>}
-                  <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all active:scale-95">
-                    Confirm Access
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => setShowAdminLogin(false)}
-                    className="w-full text-neutral-600 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
-                  >
-                    Go Back
-                  </button>
+                  
+                  <div className="flex flex-col gap-4">
+                    <button type="submit" className="w-full bg-[#818cf8] hover:bg-[#6366f1] text-white p-6 rounded-[24px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-indigo-500/20 transition-all active:scale-95">
+                      Authorize Access
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setShowAdminLogin(false)}
+                      className="text-neutral-500 hover:text-white text-[10px] font-black uppercase tracking-[0.3em] transition-colors"
+                    >
+                      Back to Gateway
+                    </button>
+                  </div>
                </form>
              )}
            </div>
@@ -150,7 +169,7 @@ const App = () => {
 
   // --- 2. UNIFIED DASHBOARD UI ---
   return (
-    <div style={{ overflowX: 'hidden' }} className="min-h-screen bg-[#06090f] p-4 sm:p-8 flex flex-col text-white font-sans selection:bg-indigo-500/30">
+    <div style={{ overflowX: 'hidden' }} className="min-h-screen bg-[#030406] p-4 sm:p-8 flex flex-col text-white font-sans selection:bg-indigo-500/30">
       
       {/* Navigation Bar */}
       <nav className="flex justify-between items-center mb-10 max-w-4xl mx-auto py-4 w-full">
@@ -218,44 +237,63 @@ const App = () => {
 
       <main className="max-w-[1600px] mx-auto w-full pb-24">
         {view === 'dashboard' ? (
-          <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-500">
-            <header className="text-center py-10">
-              <h1 className="text-4xl font-black tracking-[0.3em] uppercase text-white italic">JATALA <span className="text-indigo-500">PROPERTIES</span></h1>
-              <div className="h-1 w-16 bg-indigo-600/40 mx-auto mt-6 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.3)]"></div>
+          <div className="max-w-xl mx-auto space-y-12 animate-in fade-in zoom-in-95 duration-700">
+            {/* Logo Heading */}
+            <header className="flex flex-col items-center space-y-1 pt-2">
+               <div className="flex items-center gap-3">
+                 <h2 className="text-lg font-light tracking-[0.5em] text-white opacity-80 uppercase leading-none">Jatala</h2>
+                 <h1 className="text-2xl font-black tracking-[0.05em] text-[#818cf8] uppercase drop-shadow-[0_0_10px_rgba(129,140,248,0.2)] leading-none">Properties</h1>
+               </div>
+               <div className="w-12 h-[1px] bg-indigo-500/10 rounded-full mt-2"></div>
             </header>
 
-            {/* Financial Summary - 2 Large Unified Cards */}
-            <div className="flex flex-col sm:flex-row gap-6 mb-12">
-              <FinanceCard 
-                label="EXPECTED REVENUE" 
-                color="emerald" 
-                icon={<ArrowUpRight />} 
-                value={revenue + pending} 
-              />
-              <FinanceCard 
-                label="TOTAL EXPENSES" 
-                color="rose" 
-                icon={<ArrowDownRight />} 
-                value={expenses} 
-              />
+            {/* Unified Financial Card */}
+            <div className="bg-[#0c0f16] border border-white/5 rounded-[48px] p-10 flex shadow-2xl relative overflow-hidden group">
+               <div className="absolute inset-0 bg-indigo-500/[0.02] pointer-events-none"></div>
+               
+               {/* Expected Section */}
+               <div className="flex-1 flex flex-col items-center space-y-4 border-r border-white/5">
+                  <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/10 transition-transform group-hover:scale-110">
+                    <TrendingUp size={24} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em] mb-1">Expected</p>
+                    <h3 className="text-2xl font-black italic text-white tracking-tight">
+                      <span className="text-xs mr-1 opacity-40 not-italic">Rs.</span>{(revenue + pending).toLocaleString()}
+                    </h3>
+                  </div>
+               </div>
+
+               {/* Expenses Section */}
+               <div className="flex-1 flex flex-col items-center space-y-4">
+                  <div className="w-14 h-14 bg-rose-500/10 rounded-2xl flex items-center justify-center text-rose-400 border border-rose-500/10 transition-transform group-hover:scale-110">
+                    <TrendingDown size={24} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em] mb-1">Expenses</p>
+                    <h3 className="text-2xl font-black italic text-white tracking-tight">
+                      <span className="text-xs mr-1 opacity-40 not-italic">Rs.</span>{expenses.toLocaleString()}
+                    </h3>
+                  </div>
+               </div>
             </div>
 
-            {/* Navigation Menu Rows */}
-            <div className="space-y-4">
+            {/* Navigation Menu List */}
+            <div className="space-y-4 px-2">
               {categories.map(item => (
                 <button 
                   key={item.id} 
                   onClick={() => setView(item.id)} 
-                  className={`w-full group bg-[#111827] hover:bg-white/[0.04] p-8 rounded-[40px] flex justify-between items-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-2xl border border-white/[0.02]`}
+                  className="w-full group bg-[#0c0f16] border border-white/5 p-2 rounded-[24px] flex items-center transition-all hover:bg-[#11151f] hover:border-white/10 active:scale-95 shadow-xl min-h-[72px]"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '20px' }}>
-                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600/[0.1] group-hover:scale-110 group-hover:text-indigo-400 transition-all duration-500">
-                      {item.icon}
-                    </div>
-                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '15px', letterSpacing: '0.25em', opacity: 1, whiteSpace: 'nowrap' }} className="uppercase italic tracking-widest">{item.title}</span>
+                  <div className={`w-14 h-14 bg-[#11151f] rounded-[20px] flex items-center justify-center border border-white/5 ${item.color} group-hover:scale-110 transition-all ml-1 flex-shrink-0`}>
+                    {React.cloneElement(item.icon, { size: 22, strokeWidth: 1.5 })}
                   </div>
-                  <div className="flex items-center gap-4">
-                    <ChevronRight className="text-neutral-700 group-hover:text-indigo-400 group-hover:translate-x-2 transition-all duration-300" size={24} />
+                  <span className="flex-1 text-center text-white text-[15px] font-black italic tracking-widest uppercase px-4 leading-tight">
+                    {item.title}
+                  </span>
+                  <div className="mr-6 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0">
+                    <ChevronRight size={18} />
                   </div>
                 </button>
               ))}
