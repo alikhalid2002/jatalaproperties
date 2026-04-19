@@ -50,12 +50,12 @@ const App = () => {
   } = useFinanceData(selectedYear);
 
   const categories = [
-    { id: 'Land', title: "Land Assets", icon: <LandPlot size={22} />, color: "text-blue-400", border: "border-blue-500/20", glow: "shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
-    { id: 'Shops', title: "Commercial Shops", icon: <Store size={22} />, color: "text-purple-400", border: "border-purple-500/20", glow: "shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
-    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={22} />, color: "text-rose-400", border: "border-rose-500/20", glow: "shadow-[0_0_20px_rgba(244,63,94,0.2)]" },
-    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={22} />, color: "text-emerald-400", border: "border-emerald-500/20", glow: "shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
-    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={22} />, color: "text-amber-400", border: "border-amber-500/20", glow: "shadow-[0_0_20px_rgba(251,191,36,0.2)]" },
-    { id: 'Settings', title: "System Settings", icon: <Settings size={22} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
+    { id: 'Land', title: "Land Assets", icon: <LandPlot size={24} />, color: "text-blue-400", border: "border-blue-500/20", glow: "shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
+    { id: 'Shops', title: "Commercial Shops", icon: <Store size={24} />, color: "text-purple-400", border: "border-purple-500/20", glow: "shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
+    { id: 'Expenses', title: "Operational Expenses", icon: <ReceiptText size={24} />, color: "text-rose-400", border: "border-rose-500/20", glow: "shadow-[0_0_20px_rgba(244,63,94,0.2)]" },
+    { id: 'Sold', title: "Sold Properties", icon: <CheckCircle size={24} />, color: "text-emerald-400", border: "border-emerald-500/20", glow: "shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
+    { id: 'Reports', title: "Financial Reports", icon: <BarChart3 size={24} />, color: "text-amber-400", border: "border-amber-500/20", glow: "shadow-[0_0_20px_rgba(251,191,36,0.2)]" },
+    { id: 'Settings', title: "System Settings", icon: <Settings size={24} />, color: "text-cyan-400", border: "border-cyan-500/20", glow: "shadow-[0_0_20px_rgba(34,211,238,0.2)]" },
   ];
 
   const FinanceCard = ({ label, color, icon, value }) => (
@@ -64,9 +64,9 @@ const App = () => {
         {React.cloneElement(icon, { size: 24 })}
       </div>
       <div className="flex flex-col items-start min-w-0 flex-1">
-        <span style={{ color: '#FFFFFF', fontWeight: '900', letterSpacing: '0.15em', opacity: 1 }} className="text-[8px] uppercase mb-1 whitespace-nowrap">{label}</span>
-        <p style={{ color: '#FFFFFF', fontWeight: '900', fontStyle: 'italic', textShadow: '0px 2px 8px rgba(0,0,0,1)', opacity: 1 }} className="text-sm lg:text-xl whitespace-nowrap tracking-tighter">
-          <span style={{ color: '#FFFFFF', fontWeight: '900', fontStyle: 'italic', opacity: 1 }} className="text-[10px] mr-1">Rs.</span>
+        <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '14px', letterSpacing: '0.15em', opacity: 1 }} className="uppercase mb-1 whitespace-nowrap">{label}</span>
+        <p style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '28px', fontStyle: 'italic', textShadow: '0px 2px 8px rgba(0,0,0,1)', opacity: 1 }} className="whitespace-nowrap tracking-tighter">
+          <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '12px', fontStyle: 'italic', opacity: 1 }} className="mr-1">Rs.</span>
           {value.toLocaleString()}
         </p>
       </div>
@@ -127,7 +127,7 @@ const App = () => {
                 >
                   <div className="flex items-center gap-6">
                     <div className={`${item.color} opacity-100 group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span style={{ color: '#FFFFFF', fontWeight: '900', letterSpacing: '0.2em', textShadow: '0px 2px 4px rgba(0,0,0,0.8)', opacity: 1 }} className="uppercase text-[10px]">{item.title}</span>
+                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '16px', letterSpacing: '0.2em', textShadow: '0px 2px 4px rgba(0,0,0,0.8)', opacity: 1 }} className="uppercase">{item.title}</span>
                   </div>
                   <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
                 </button>
