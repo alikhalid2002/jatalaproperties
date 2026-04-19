@@ -65,9 +65,9 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
 
   if (farmersLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 animate-pulse text-slate-500">
+      <div className="flex flex-col items-center justify-center p-20 animate-pulse text-white font-black">
         <div className="w-16 h-16 border-4 border-slate-700 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-        <p className="font-black uppercase tracking-widest text-xs">Loading Land Assets...</p>
+        <p className="uppercase tracking-widest text-xs">Loading Land Assets...</p>
       </div>
     );
   }
@@ -166,9 +166,9 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                   <Map size={18} />
                </div>
                <div className="text-left">
-                  <h4 className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
+                  <h4 className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-0.5 italic">Total Portfolio Area</h4>
                   <p className="text-xl font-black text-white italic tracking-tighter leading-none">
-                     {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} <span className="text-[10px] font-black text-slate-500 not-italic ml-1 uppercase">Acres</span>
+                     {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })} <span className="text-[10px] font-black text-white not-italic ml-1 uppercase">Acres</span>
                   </p>
                </div>
             </div>
@@ -193,34 +193,34 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                  }`}>
                     {farmer.status}
                  </span>
-                 <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                 <span className="px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-[9px] font-black text-white uppercase tracking-widest">
                     {farmer.landSize} Acres
                  </span>
                  <button 
                    type="button"
                    onClick={(e) => { e.stopPropagation(); handleEditBalance(e, farmer); }}
                    disabled={!isAdmin}
-                   className={`px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer' : ''}`}
+                   className={`px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-[9px] font-black text-white flex items-center gap-1.5 transition-all ${isAdmin ? 'hover:border-indigo-500 hover:text-white cursor-pointer' : ''}`}
                  >
-                    <Receipt size={10} className="text-slate-500" />
+                    <Receipt size={10} className="text-white" />
                     BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}
                  </button>
               </div>
             </div>
 
             <div className="w-full space-y-1.5 pt-2 border-t border-white/5 mt-1 overflow-hidden">
-              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400">
+              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white">
                 <div className="flex items-center gap-1.5">
-                   <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                    <span>RECV: {(Number(farmer.totalPaid) || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                   <div className="w-1 h-1 rounded-full bg-orange-500"></div>
+                   <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
                    <span>BAL: {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
                 </div>
               </div>
               
-              <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden flex shadow-inner">
+              <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden flex shadow-inner">
                 <div 
                   className="h-full bg-emerald-500 transition-all duration-700"
                   style={{ width: `${Math.min(100, Math.max(0, ((Number(farmer.totalPaid) || 0) / ((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0) || 1)) * 100))}%` }}
@@ -228,7 +228,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
               </div>
 
               <div className="flex justify-center items-center">
-                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-white transition-colors">
+                 <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                    Total Value: {((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}
                  </p>
               </div>
@@ -317,7 +317,7 @@ const FinanceCard = ({ label, year, value, color, icon }) => (
 
     <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 w-full px-0.5">
       <span className={`text-${color}-400 text-[10px] md:text-[13px] font-black leading-normal block w-full drop-shadow-[0_0_8px_rgba(var(--tw-shadow-color),0.5)] py-0.5 uppercase tracking-tighter`} style={{ '--tw-shadow-color': color === 'emerald' ? '16,185,129' : color === 'indigo' ? '99,102,241' : color === 'orange' ? '249,115,22' : '244,63,94' }}>{label}</span>
-      <span className={`text-${color}-400 opacity-80 text-[8px] md:text-xs font-black text-center w-full`}>{year}</span>
+      <span className="text-white font-black text-[8px] md:text-xs text-center w-full uppercase tracking-widest">{year}</span>
       <p className="text-[11px] md:text-2xl font-bold tracking-tighter whitespace-nowrap overflow-hidden text-white mt-1 w-full italic drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Rs. {value?.toLocaleString()}</p>
     </div>
   </div>
