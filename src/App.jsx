@@ -27,6 +27,7 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   // --- UI States ---
   const [view, setView] = useState(() => localStorage.getItem('jatala_view') || 'dashboard');
@@ -93,42 +94,54 @@ const App = () => {
            </header>
 
            <div className="bg-[#111827] p-10 rounded-[48px] shadow-2xl space-y-8 border border-white/5">
-             <form onSubmit={handleAdminLogin} className="space-y-6">
-                <div className="relative group">
-                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-indigo-500 transition-colors" size={20} />
-                  <input 
-                    type={showPassword ? "text" : "password"}
-                    placeholder="ADMIN PASSWORD"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-black/40 border border-white/5 p-6 pl-16 rounded-3xl text-sm font-black text-white outline-none focus:border-indigo-600 focus:bg-black/60 transition-all uppercase tracking-widest placeholder:text-neutral-700"
-                  />
+             {!showAdminLogin ? (
+               <div className="space-y-6">
+                 <button 
+                   onClick={() => setShowAdminLogin(true)}
+                   className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-95"
+                 >
+                   Access as Administrator
+                 </button>
+                 <button 
+                   onClick={handleGuestLogin}
+                   className="w-full bg-white/5 hover:bg-white/10 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all border border-white/5"
+                 >
+                   Continue as Guest (View Only)
+                 </button>
+               </div>
+             ) : (
+               <form onSubmit={handleAdminLogin} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="relative group">
+                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                    <input 
+                      autoFocus
+                      type={showPassword ? "text" : "password"}
+                      placeholder="ENTER PIN"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-black/40 border border-white/5 p-6 pl-16 rounded-3xl text-sm font-black text-white outline-none focus:border-indigo-600 focus:bg-black/60 transition-all uppercase tracking-widest placeholder:text-neutral-700"
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {loginError && <p className="text-rose-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">{loginError}</p>}
+                  <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all active:scale-95">
+                    Confirm Access
+                  </button>
                   <button 
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition-colors"
+                    onClick={() => setShowAdminLogin(false)}
+                    className="w-full text-neutral-600 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    Go Back
                   </button>
-                </div>
-                {loginError && <p className="text-rose-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">{loginError}</p>}
-                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-95">
-                  Access as Administrator
-                </button>
-             </form>
-
-             <div className="relative flex items-center">
-                <div className="flex-grow border-t border-white/5"></div>
-                <span className="mx-4 text-[10px] font-black text-neutral-800 uppercase tracking-widest">OR</span>
-                <div className="flex-grow border-t border-white/5"></div>
-             </div>
-
-             <button 
-               onClick={handleGuestLogin}
-               className="w-full bg-white/5 hover:bg-white/10 text-white p-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all border border-white/5"
-             >
-               Continue as Guest (View Only)
-             </button>
+               </form>
+             )}
            </div>
         </div>
       </div>
