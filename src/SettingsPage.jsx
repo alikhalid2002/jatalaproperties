@@ -9,7 +9,8 @@ import { useSoldProperties } from './useSoldProperties';
 import { db, getDataPath } from './firebase';
 import { collection, addDoc, doc, deleteDoc, onSnapshot, getDocs, writeBatch, Timestamp, query, where, getFirestore } from 'firebase/firestore';
 
-const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin, expandedSection, setExpandedSection }) => {
+const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) => {
+  const [expandedSection, setExpandedSection] = useState(null);
   const { farmers, deleteFarmer, addNewFarmer, purgeAllFarmers } = useFarmers();
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
   const { properties: soldProperties, addProperty, deleteProperty, updateProperty } = useSoldProperties();
