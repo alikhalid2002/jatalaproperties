@@ -125,9 +125,9 @@ const App = () => {
                   onClick={() => setView(item.id)} 
                   className={`w-full group bg-[#111827]/40 hover:bg-white/[0.04] border ${item.border} p-6 rounded-[28px] flex justify-between items-center transition-all duration-300 ${item.glow} hover:scale-[1.02] active:scale-[0.98]`}
                 >
-                  <div className="flex items-center gap-6">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '16px' }}>
                     <div className={`${item.color} opacity-100 group-hover:scale-110 transition-transform duration-500`}>{item.icon}</div>
-                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '16px', letterSpacing: '0.2em', textShadow: '0px 2px 4px rgba(0,0,0,0.8)', opacity: 1 }} className="uppercase">{item.title}</span>
+                    <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '14px', letterSpacing: '0.2em', textShadow: '0px 2px 4px rgba(0,0,0,0.8)', opacity: 1, whiteSpace: 'nowrap' }} className="uppercase">{item.title}</span>
                   </div>
                   <ChevronRight className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" size={18} />
                 </button>
