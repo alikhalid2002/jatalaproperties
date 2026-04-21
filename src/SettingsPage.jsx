@@ -15,7 +15,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
   const { reminders, addReminder, deleteReminder, markAsRead } = useReminders();
   const { properties: soldProperties, addProperty, deleteProperty, updateProperty } = useSoldProperties();
   const [isSaving, setIsSaving] = useState(false);
-  const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' });
+  const [newFarmer, setNewFarmer] = useState({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres', area: 'RAJANPUR' });
   const [shops, setShops] = useState([]);
   const [newShop, setNewShop] = useState({ tenant: '', name: '', rent: '', area: '' });
   const [newSoldProperty, setNewSoldProperty] = useState({ nameEn: '', buyerName: '', totalPrice: '' });
@@ -47,7 +47,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
   const handleAddMember = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    try { await addNewFarmer(newFarmer); setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres' }); alert("Registered!"); } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
+    try { await addNewFarmer(newFarmer); setNewFarmer({ nameUr: '', nameEn: '', landSize: '', landUnit: 'Acres', area: 'RAJANPUR' }); alert("Registered!"); } catch (err) { alert(`Error: ${err.message}`); } finally { setIsSaving(false); }
   };
 
   const handleAddShop = async (e) => {
@@ -193,6 +193,10 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
              <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
              <div className="flex gap-2">
                <input type="number" step="any" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
+               <select value={newFarmer.area} onChange={e => setNewFarmer({...newFarmer, area: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-indigo-400">
+                 <option value="RAJANPUR">Rajanpur</option>
+                 <option value="DASUHA">Dasuha</option>
+               </select>
                <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-400">
                  <option value="Acres">Acres</option>
                  <option value="Kanal">Kanal</option>

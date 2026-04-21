@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useFarmers } from './useFarmers';
 import { useFinanceData } from './useFinanceData';
 import { seedFarmersData } from './seedFarmers';
-import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map, UserCircle, Store, X, MapPin } from 'lucide-react';
+import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map as LandPlot, UserCircle, Store, X, MapPin } from 'lucide-react';
 import { transliterateToEnglish } from './urduTransliterator';
 import FarmerDetailModal from './FarmerDetailModal';
 
-const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmin }) => {
+const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmin, selectedArea }) => {
   const { 
     farmers, 
     loading: farmersLoading, 
@@ -41,6 +41,11 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   };
 
   const filteredFarmers = [...farmers]
+    .filter(f => {
+      // If no area is set, treat it as RAJANPUR for legacy data migration
+      const farmerArea = f.area || 'RAJANPUR';
+      return farmerArea.toUpperCase() === selectedArea.toUpperCase();
+    })
     .sort((a, b) => normalizeToAcres(b.landSize, b.landUnit) - normalizeToAcres(a.landSize, a.landUnit))
     .filter(f => 
       (f.nameUr || "").includes(searchTerm) || 
@@ -60,7 +65,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
       <div className="px-2 mb-16">
         <div className="bg-[#111827]/60 border border-[#10B981]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
            <div className="p-3 bg-[#10B981]/10 text-[#10B981] rounded-2xl">
-              <Map size={24} />
+              <LandPlot size={24} />
            </div>
            <div className="flex items-center gap-3">
               <span className="text-[10px] md:text-xs font-black text-[#10B981] uppercase tracking-[0.2em]">Total Portfolio Area:</span>

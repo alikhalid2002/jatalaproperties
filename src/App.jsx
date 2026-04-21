@@ -33,12 +33,17 @@ const App = () => {
 
   // --- UI States ---
   const [view, setView] = useState(() => localStorage.getItem('jatala_view') || 'dashboard');
+  const [selectedArea, setSelectedArea] = useState(() => localStorage.getItem('jatala_selected_area') || null);
   const [selectedYear, setSelectedYear] = useState('2026');
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showEntryModal, setShowEntryModal] = useState(false);
 
   // --- Sync State to LocalStorage ---
-  useEffect(() => { localStorage.setItem('jatala_view', view); }, [view]);
+  useEffect(() => { 
+    localStorage.setItem('jatala_view', view);
+    if (selectedArea) localStorage.setItem('jatala_selected_area', selectedArea);
+    else localStorage.removeItem('jatala_selected_area');
+  }, [view, selectedArea]);
 
   // --- Firebase Guest Initializer & Data Restoration ---
   useEffect(() => {
@@ -182,7 +187,11 @@ const App = () => {
             </div>
           ) : (
             <button 
-              onClick={() => setView('dashboard')}
+              onClick={() => {
+                if (view === 'landMembers') setView('landSelection');
+                else if (view === 'landSelection') setView('dashboard');
+                else setView('dashboard');
+              }}
               className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:scale-110 transition-all active:scale-90"
             >
               <ArrowLeft className="text-white" size={24} />
@@ -190,7 +199,9 @@ const App = () => {
           )}
           {view !== 'dashboard' && (
             <div className="animate-in fade-in slide-in-from-left-4">
-                <h2 className="text-2xl font-black uppercase tracking-tighter leading-none italic">{view.replace(/_/g, ' ')}</h2>
+                <h2 className="text-2xl font-black uppercase tracking-tighter leading-none italic">
+                  {view === 'landSelection' ? 'Land Database' : (view === 'landMembers' ? selectedArea : view.replace(/_/g, ' '))}
+                </h2>
                 <p className="text-[9px] text-indigo-500 font-bold uppercase tracking-[0.4em] mt-1 opacity-80 italic">Management Database</p>
             </div>
           )}
@@ -285,7 +296,13 @@ const App = () => {
               {categories.map(item => (
                 <button 
                   key={item.id} 
-                  onClick={() => setView(item.id)} 
+                  onClick={() => {
+                    if (item.id === 'Land') {
+                      setView('landSelection');
+                    } else {
+                      setView(item.id);
+                    }
+                  }} 
                   className="w-full group bg-[#0c0f16] border border-white/5 p-2 rounded-[24px] flex items-center transition-all hover:bg-[#11151f] hover:border-white/10 active:scale-95 shadow-xl min-h-[72px]"
                 >
                   <div className={`w-14 h-14 bg-[#11151f] rounded-[20px] flex items-center justify-center border border-white/5 ${item.color} group-hover:scale-110 transition-all ml-1 flex-shrink-0`}>
@@ -304,7 +321,34 @@ const App = () => {
         ) : (
           <Suspense fallback={<DashboardSkeleton />}>
             <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
-              {view === 'Land' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} />}
+              {view === 'landSelection' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto px-4 py-12">
+                   {[
+                     { name: 'RAJANPUR' },
+                     { name: 'DASUHA' }
+                   ].map((area) => (
+                     <button
+                        key={area.name}
+                        onClick={() => {
+                          setSelectedArea(area.name);
+                          setView('landMembers');
+                        }}
+                        className="group relative bg-[#0c0f16] border border-white/5 p-12 rounded-[48px] flex flex-col items-center gap-6 transition-all hover:bg-[#11151f] hover:border-white/10 active:scale-95 shadow-2xl"
+                     >
+                        <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all border border-indigo-500/10">
+                           <LandPlot size={32} />
+                        </div>
+                        <div className="text-center">
+                           <h3 className="text-3xl font-black italic tracking-widest text-white uppercase">{area.name}</h3>
+                        </div>
+                        <div className="absolute top-8 right-8 opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all">
+                           <ChevronRight size={24} />
+                        </div>
+                     </button>
+                   ))}
+                </div>
+              )}
+              {view === 'landMembers' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} selectedArea={selectedArea} />}
               {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
               {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
               {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
