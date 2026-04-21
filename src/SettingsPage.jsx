@@ -115,13 +115,46 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         const snap = await getDocs(collection(db, getDataPath(col)));
         backupData[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       }
-      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      
+      const fileName = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      const jsonStr = JSON.stringify(backupData, null, 2);
+
+      // Try using the File System Access API to show a "Save As" dialog
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [{
+              description: 'JSON Backup File',
+              accept: { 'application/json': ['.json'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(jsonStr);
+          await writable.close();
+          alert("Backup saved successfully!");
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return; // User cancelled
+          console.error("Save system failed, falling back to download...", err);
+        }
+      }
+
+      // Fallback for browsers without File System Access API (Standard Download)
+      const blob = new Blob([jsonStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url; link.download = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.href = url;
+      link.download = fileName;
       link.click();
-      alert("Backup Finished!");
-    } catch (err) { alert("Backup Failed"); } finally { setIsBackingUp(false); }
+      URL.revokeObjectURL(url);
+      alert("Backup downloaded to your default folder!");
+    } catch (err) { 
+      console.error("Backup Error:", err);
+      alert("Backup Failed: " + err.message); 
+    } finally { 
+      setIsBackingUp(false); 
+    }
   };
 
   const handleRestore = async (e) => {
@@ -186,8 +219,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
 
   return (
     <div className="flex-1 flex flex-col gap-8 pb-32">
-      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
-        <button onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')} className="w-full flex justify-between p-8 font-black uppercase">Member Management <ChevronDown className={expandedSection === 'members' ? 'rotate-180' : ''} /></button>
+      <section className="relative bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl">
+        <button 
+          type="button"
+          onClick={() => setExpandedSection(prev => prev === 'members' ? null : 'members')} 
+          className="w-full flex justify-between items-center p-8 font-black uppercase tracking-widest text-sm hover:bg-slate-800/40 transition-colors relative z-50"
+        >
+          <span>Member Management</span>
+          <ChevronDown className={`transition-transform duration-300 ${expandedSection === 'members' ? 'rotate-180' : ''}`} />
+        </button>
         {expandedSection === 'members' && <div className="p-8 border-t border-slate-700/50 grid grid-cols-1 lg:grid-cols-2 gap-8">
            <form onSubmit={handleAddMember} className="space-y-4">
              <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
@@ -226,8 +266,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         </div>}
       </section>
 
-      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
-        <button onClick={() => setExpandedSection(expandedSection === 'shops' ? null : 'shops')} className="w-full flex justify-between p-8 font-black uppercase">Commercial Shops <ChevronDown className={expandedSection === 'shops' ? 'rotate-180' : ''} /></button>
+      <section className="relative bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl">
+        <button 
+          type="button"
+          onClick={() => setExpandedSection(prev => prev === 'shops' ? null : 'shops')} 
+          className="w-full flex justify-between items-center p-8 font-black uppercase tracking-widest text-sm hover:bg-slate-800/40 transition-colors relative z-50"
+        >
+          <span>Commercial Shops</span>
+          <ChevronDown className={`transition-transform duration-300 ${expandedSection === 'shops' ? 'rotate-180' : ''}`} />
+        </button>
         {expandedSection === 'shops' && <div className="p-8 border-t border-slate-700/50">
            <form onSubmit={handleAddShop} className="grid grid-cols-2 gap-4 mb-8">
              <input value={newShop.tenant} onChange={e => setNewShop({...newShop, tenant: e.target.value})} className="bg-slate-900 p-4 rounded-xl font-black text-xs" placeholder="Tenant" />
@@ -238,8 +285,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         </div>}
       </section>
 
-      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
-        <button onClick={() => setExpandedSection(expandedSection === 'sold' ? null : 'sold')} className="w-full flex justify-between p-8 font-black uppercase">Sold Properties <ChevronDown className={expandedSection === 'sold' ? 'rotate-180' : ''} /></button>
+      <section className="relative bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl">
+        <button 
+          type="button"
+          onClick={() => setExpandedSection(prev => prev === 'sold' ? null : 'sold')} 
+          className="w-full flex justify-between items-center p-8 font-black uppercase tracking-widest text-sm hover:bg-slate-800/40 transition-colors relative z-50"
+        >
+          <span>Sold Properties</span>
+          <ChevronDown className={`transition-transform duration-300 ${expandedSection === 'sold' ? 'rotate-180' : ''}`} />
+        </button>
         {expandedSection === 'sold' && <div className="p-8 border-t border-slate-700/50">
            <form onSubmit={handleAddSoldProperty} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
              <input value={newSoldProperty.nameEn} onChange={e => setNewSoldProperty({...newSoldProperty, nameEn: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Property Name" />
@@ -295,8 +349,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         </div>}
       </section>
 
-      <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
-        <button onClick={() => setIsBackupOpen(!isBackupOpen)} className="w-full flex justify-between p-8 font-black uppercase">System Tools <ChevronDown/></button>
+      <section className="relative bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl">
+        <button 
+          type="button"
+          onClick={() => setIsBackupOpen(!isBackupOpen)} 
+          className="w-full flex justify-between items-center p-8 font-black uppercase tracking-widest text-sm hover:bg-slate-800/40 transition-colors relative z-50"
+        >
+          <span>System Tools</span>
+          <ChevronDown className={`transition-transform duration-300 ${isBackupOpen ? 'rotate-180' : ''}`} />
+        </button>
         {isBackupOpen && (
           <div className="p-4 lg:p-8 border-t border-slate-700/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
             <button 
