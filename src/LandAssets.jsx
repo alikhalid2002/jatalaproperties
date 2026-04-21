@@ -52,7 +52,13 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
       (f.nameEn || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const totalLandArea = farmers.reduce((sum, f) => sum + normalizeToAcres(f.landSize, f.landUnit), 0);
+  let totalLandArea = filteredFarmers.reduce((sum, f) => sum + normalizeToAcres(f.landSize, f.landUnit), 0);
+  
+  // Specific override for DASUHA area as requested
+  if (selectedArea.toUpperCase() === 'DASUHA' && totalLandArea === 0) {
+    totalLandArea = 5.32;
+  }
+
   const totalExIncome = Math.round(totalLandArea * 60000);
   const totalRemainingAmount = totalExIncome - revenueVal;
   const receivedPrv = totalExIncome > 0 ? (revenueVal / totalExIncome) * 100 : 0;
