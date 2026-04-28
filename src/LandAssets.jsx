@@ -56,7 +56,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
   
   // Specific override for DASUHA area as requested
   if (selectedArea.toUpperCase() === 'DASUHA' && totalLandArea === 0) {
-    totalLandArea = 5.32;
+    totalLandArea = 4.5;
   }
 
   const totalExIncome = Math.round(totalLandArea * 60000);
@@ -68,7 +68,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
       
 
       {/* Portfolio Area - Horizontal Style as per sample */}
-      <div className="px-2 mb-16">
+      <div className={`px-2 ${selectedArea.toUpperCase() === 'DASUHA' ? 'mb-4' : 'mb-16'}`}>
         <div className="bg-[#111827]/60 border border-[#10B981]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
            <div className="p-3 bg-[#10B981]/10 text-[#10B981] rounded-2xl">
               <LandPlot size={24} />
@@ -84,6 +84,26 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
            </div>
         </div>
       </div>
+
+      {/* Yearly Income - Horizontal Style - ONLY FOR DASUHA */}
+      {selectedArea.toUpperCase() === 'DASUHA' && (
+        <div className="px-2 mb-16">
+          <div className="bg-[#111827]/60 border border-[#818cf8]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(129,140,248,0.05)]">
+             <div className="p-3 bg-[#818cf8]/10 text-[#818cf8] rounded-2xl">
+                <Receipt size={24} />
+             </div>
+             <div className="flex items-center gap-3">
+                <span className="text-[10px] md:text-xs font-black text-[#818cf8] uppercase tracking-[0.2em]">Total Yearly Income:</span>
+                <div className="flex items-baseline gap-2">
+                   <span className="text-3xl md:text-5xl font-black text-white italic tracking-tighter">
+                   <span className="text-sm md:text-xl opacity-40 not-italic mr-1">Rs.</span>
+                   <span className="text-rose-500">0</span>
+                   </span>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
 
 
 

@@ -115,13 +115,43 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         const snap = await getDocs(collection(db, getDataPath(col)));
         backupData[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       }
-      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url; link.download = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      alert("Backup Finished!");
-    } catch (err) { alert("Backup Failed"); } finally { setIsBackingUp(false); }
+      
+      const fileName = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      const jsonContent = JSON.stringify(backupData, null, 2);
+
+      // Try using the modern File System Access API to prompt for location
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [{
+              description: 'JSON Backup File',
+              accept: { 'application/json': ['.json'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(jsonContent);
+          await writable.close();
+          alert("Backup saved successfully to your chosen location!");
+        } catch (err) {
+          if (err.name === 'AbortError') return; // User cancelled
+          throw err;
+        }
+      } else {
+        // Fallback for browsers that don't support showSaveFilePicker
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url; 
+        link.download = fileName;
+        link.click();
+        alert("Backup Finished! (Check your downloads folder)");
+      }
+    } catch (err) { 
+      alert("Backup Failed: " + err.message); 
+    } finally { 
+      setIsBackingUp(false); 
+    }
   };
 
   const handleRestore = async (e) => {
