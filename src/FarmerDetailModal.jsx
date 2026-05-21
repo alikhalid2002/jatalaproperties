@@ -204,7 +204,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
 
         <div className="flex-1 overflow-y-auto no-scrollbar px-8 pb-8">
           {/* Top Financial Stats - 3 Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-indigo-400">
                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
@@ -231,7 +231,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                     className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-2xl font-black text-white italic">Rs. {Number(farmer.totalPayable)?.toLocaleString() || 0}</p>
+                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{Number(farmer.totalPayable)?.toLocaleString() || 0}</p>
                 )}
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
@@ -239,7 +239,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                    <span className="text-[11px] font-black uppercase tracking-widest">Total Paid</span>
                 </div>
-                <p className="text-2xl font-black text-white italic">Rs. {farmer.totalPaid?.toLocaleString() || 0}</p>
+                <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{farmer.totalPaid?.toLocaleString() || 0}</p>
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-orange-400">
@@ -266,7 +266,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                     className="bg-transparent border-b border-orange-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-2xl font-black text-white italic">Rs. {farmer.totalRemaining?.toLocaleString() || 0}</p>
+                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{farmer.totalRemaining?.toLocaleString() || 0}</p>
                 )}
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
@@ -296,7 +296,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                     className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-2xl font-black text-white italic">Rs. {Number(farmer.theka)?.toLocaleString() || 0}</p>
+                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{Number(farmer.theka)?.toLocaleString() || 0}</p>
                 )}
              </div>
           </div>

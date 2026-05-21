@@ -227,20 +227,26 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
       {selectedShop && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
            {/* Modal Simplified */}
-           <div className="w-full max-w-2xl bg-[#0d1117] rounded-[48px] p-12 relative overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
-              <button onClick={() => setSelectedShop(null)} className="absolute top-8 right-8 p-4 text-white hover:text-rose-500 transition-colors"><X size={24}/></button>
-              <h2 className="text-4xl font-black text-white italic uppercase mb-10 tracking-tighter">
+           <div className="w-full max-w-2xl bg-[#0d1117] rounded-[32px] sm:rounded-[48px] p-6 sm:p-10 md:p-12 relative overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] shadow-2xl">
+              <button onClick={() => setSelectedShop(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 p-2 sm:p-4 text-white hover:text-rose-500 transition-colors"><X size={24}/></button>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white italic uppercase mb-6 sm:mb-8 md:mb-10 tracking-tighter leading-tight pr-10">
                 {selectedShop.tenantEn || selectedShop.tenant}
               </h2>
-              <div className="overflow-y-auto pr-4 space-y-12 no-scrollbar">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-white/5 p-8 rounded-[32px] text-center">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-3 tracking-widest">Annual Dues</p>
-                    <p className="text-3xl font-black text-white italic">Rs. {(calculateAnnualProgress(selectedShop).total).toLocaleString()}</p>
+              <div className="overflow-y-auto pr-2 sm:pr-4 space-y-8 md:space-y-12 no-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-white/5 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[32px] text-center flex flex-col justify-center">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2 tracking-widest">Annual Dues</p>
+                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-white italic tracking-tight">
+                      <span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>
+                      {(calculateAnnualProgress(selectedShop).total).toLocaleString()}
+                    </p>
                   </div>
-                  <div className="bg-white/5 p-8 rounded-[32px] text-center border border-[#10B981]/10">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-3 tracking-widest">Total Paid</p>
-                    <p className="text-3xl font-black text-[#10B981] italic">Rs. {(calculateAnnualProgress(selectedShop).paid).toLocaleString()}</p>
+                  <div className="bg-white/5 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[32px] text-center border border-[#10B981]/10 flex flex-col justify-center">
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2 tracking-widest">Total Paid</p>
+                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-[#10B981] italic tracking-tight">
+                      <span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>
+                      {(calculateAnnualProgress(selectedShop).paid).toLocaleString()}
+                    </p>
                   </div>
                 </div>
                 {isAdmin && (
@@ -251,7 +257,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                        <CreditCard size={12} className="text-indigo-400" />
                     </div>
 
-                    <div className="bg-slate-800/20 border border-slate-700/30 p-8 rounded-[36px] shadow-2xl relative overflow-hidden group space-y-6">
+                    <div className="bg-slate-800/20 border border-slate-700/30 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[36px] shadow-2xl relative overflow-hidden group space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                          {/* Left: Image Upload Zone */}
                          <div className="relative group/upload h-full">
