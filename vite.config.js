@@ -5,7 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   server: {
     allowedHosts: true,
-    host: true
+    host: true,
+    watch: {
+      ignored: ['**/node_modules_corrupted/**']
+    }
   },
   build: {
     rollupOptions: {

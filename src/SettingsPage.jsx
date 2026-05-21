@@ -115,43 +115,13 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
         const snap = await getDocs(collection(db, getDataPath(col)));
         backupData[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       }
-      
-      const fileName = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
-      const jsonContent = JSON.stringify(backupData, null, 2);
-
-      // Try using the modern File System Access API to prompt for location
-      if ('showSaveFilePicker' in window) {
-        try {
-          const handle = await window.showSaveFilePicker({
-            suggestedName: fileName,
-            types: [{
-              description: 'JSON Backup File',
-              accept: { 'application/json': ['.json'] },
-            }],
-          });
-          const writable = await handle.createWritable();
-          await writable.write(jsonContent);
-          await writable.close();
-          alert("Backup saved successfully to your chosen location!");
-        } catch (err) {
-          if (err.name === 'AbortError') return; // User cancelled
-          throw err;
-        }
-      } else {
-        // Fallback for browsers that don't support showSaveFilePicker
-        const blob = new Blob([jsonContent], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url; 
-        link.download = fileName;
-        link.click();
-        alert("Backup Finished! (Check your downloads folder)");
-      }
-    } catch (err) { 
-      alert("Backup Failed: " + err.message); 
-    } finally { 
-      setIsBackingUp(false); 
-    }
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = `Jatala_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      alert("Backup Finished!");
+    } catch (err) { alert("Backup Failed"); } finally { setIsBackingUp(false); }
   };
 
   const handleRestore = async (e) => {
@@ -263,12 +233,58 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setExpandedSection(expandedSection === 'shops' ? null : 'shops')} className="w-full flex justify-between p-8 font-black uppercase">Commercial Shops <ChevronDown className={expandedSection === 'shops' ? 'rotate-180' : ''} /></button>
         {expandedSection === 'shops' && <div className="p-8 border-t border-slate-700/50">
-           <form onSubmit={handleAddShop} className="grid grid-cols-2 gap-4 mb-8">
-             <input value={newShop.tenant} onChange={e => setNewShop({...newShop, tenant: e.target.value})} className="bg-slate-900 p-4 rounded-xl font-black text-xs" placeholder="Tenant" />
-             <input value={newShop.name} onChange={e => setNewShop({...newShop, name: e.target.value})} className="bg-slate-900 p-4 rounded-xl font-black text-xs" placeholder="ID" />
-             <button className="col-span-2 bg-blue-600 py-4 rounded-xl font-black">Add Shop</button>
+           <form onSubmit={handleAddShop} className="space-y-4 mb-8">
+             <input 
+               value={newShop.tenant} 
+               onChange={e => setNewShop({...newShop, tenant: e.target.value})} 
+               className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs text-white" 
+               placeholder="Tenant Name" 
+             />
+             <div className="flex gap-2">
+               <input 
+                 value={newShop.name} 
+                 onChange={e => setNewShop({...newShop, name: e.target.value})} 
+                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                 placeholder="Shop Name / ID (e.g. Shop No. 6)" 
+               />
+               <input 
+                 type="number"
+                 value={newShop.rent} 
+                 onChange={e => setNewShop({...newShop, rent: e.target.value})} 
+                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                 placeholder="Monthly Rent (Rs.)" 
+               />
+               <input 
+                 value={newShop.area} 
+                 onChange={e => setNewShop({...newShop, area: e.target.value})} 
+                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                 placeholder="Area/Size (e.g. 12x15)" 
+               />
+             </div>
+             <button className="w-full bg-blue-600 py-4 rounded-xl font-black italic uppercase tracking-widest text-xs">Add Commercial Shop</button>
            </form>
-           <div className="divide-y divide-slate-800">{shops.map(s => <div key={s.id} className="py-4 flex justify-between font-black uppercase text-xs"><span>{s.tenant} - {s.name}</span><button onClick={() => handleDeleteShop(s.id)}><Trash2 size={16}/></button></div>)}</div>
+           <div className="divide-y divide-slate-800/50 max-h-[300px] overflow-y-auto no-scrollbar">
+             {shops.length > 0 ? (
+               shops.map(s => (
+                 <div key={s.id} className="py-3 flex justify-between items-center font-black uppercase text-xs">
+                   <div className="flex flex-col">
+                     <span className="text-white tracking-wider font-black text-xs">{s.tenant}</span>
+                     <span className="text-[9px] font-bold text-slate-500 lowercase">{s.name} | Rs. {Number(s.rent || 0).toLocaleString()} | {s.area || 'N/A'}</span>
+                   </div>
+                   <button 
+                     onClick={() => handleDeleteShop(s.id)}
+                     className="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                   >
+                     <Trash2 size={14}/>
+                   </button>
+                 </div>
+               ))
+             ) : (
+               <div className="py-12 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+                 No Shops Found
+               </div>
+             )}
+           </div>
         </div>}
       </section>
 
