@@ -30,3 +30,8 @@ dist-ssr
 
 
 .vercel
+
+# Corrupted backups
+.git_corrupted/
+node_modules_corrupted/
+
