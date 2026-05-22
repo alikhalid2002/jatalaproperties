@@ -263,50 +263,54 @@ const App = () => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
         {view === 'dashboard' ? (
           <div className="space-y-8">
-            {/* Logo / Brand area - Modernized typography */}
-            <div className="text-center py-2">
-              <h1 className="text-xl tracking-[0.3em] text-slate-200 font-light inline-block uppercase mr-2">Jatala</h1>
-              <span className="text-xl tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-500 font-black uppercase">Properties</span>
+            {/* Logo / Brand area - Centered uppercase premium typography */}
+            <div className="text-center py-4">
+              <h1 className="text-2xl md:text-3xl tracking-[0.25em] uppercase">
+                <span className="text-slate-100 font-extralight">Jatala</span> <span className="text-[#818cf8] font-black">Properties</span>
+              </h1>
             </div>
 
             {/* Expected & Expenses Summary Card */}
-            <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/20 rounded-[32px] border border-slate-800/60 p-6 md:p-8 shadow-xl relative overflow-hidden group">
+            <div className="bg-[#0c101a] rounded-[28px] border border-slate-800/80 p-5 md:p-6 shadow-2xl relative overflow-hidden group">
               <div className="absolute -right-24 -top-24 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center relative z-10">
                 
-                {/* Expected Revenues */}
-                <div className="md:border-r md:border-slate-800/80 md:pr-8 flex flex-col justify-center">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                {/* Expected Revenues Column */}
+                <div className="flex flex-col justify-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#0a1e16] border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                       <TrendingUp className="w-5 h-5" />
                     </div>
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-200/95">Expected Revenues</span>
+                    <span className="text-xs font-black tracking-widest text-[#94a3b8] uppercase">Expected</span>
                   </div>
-                  <div className="text-slate-400 text-xs mb-1.5">Estimated Inflow</div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                    <span className="text-lg font-normal text-emerald-400/90 mr-1">Rs.</span>
+                  <div className="text-slate-400 text-xs mt-4 mb-1 font-semibold">Est. Revenue</div>
+                  <div className="text-xl md:text-2xl font-black text-white tracking-tight flex items-baseline">
+                    <span className="text-emerald-400 font-bold text-sm md:text-base mr-1">Rs.</span>
                     {(revenue + pending).toLocaleString()}
                   </div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full font-medium self-start">
-                    <ArrowUpRight className="w-3.5 h-3.5" /> +14.2% YoY
+                  <div className="mt-3.5 inline-flex items-center gap-1 text-[10px] bg-[#0a1e16] text-emerald-400 px-3 py-1 rounded-full font-extrabold border border-emerald-500/10 self-start">
+                    <ArrowUpRight className="w-3 h-3" /> +14.2% YoY
                   </div>
                 </div>
 
-                {/* Expenses Block */}
-                <div className="md:pl-8 flex flex-col justify-center border-t border-slate-800/40 md:border-t-0 pt-6 md:pt-0">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                {/* Vertical Divider */}
+                <div className="w-[1px] bg-slate-800/80 h-28 self-center"></div>
+
+                {/* Expenses Column */}
+                <div className="flex flex-col justify-center pl-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#220c12] border border-rose-500/20 flex items-center justify-center text-rose-400">
                       <TrendingDown className="w-5 h-5" />
                     </div>
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-200/95">Total Expenses</span>
+                    <span className="text-xs font-black tracking-widest text-[#94a3b8] uppercase">Expenses</span>
                   </div>
-                  <div className="text-slate-400 text-xs mb-1.5">Year to Date Outflow</div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                    <span className="text-lg font-normal text-rose-400/90 mr-1">Rs.</span>
+                  <div className="text-slate-400 text-xs mt-4 mb-1 font-semibold">YTD Spent</div>
+                  <div className="text-xl md:text-2xl font-black text-white tracking-tight flex items-baseline">
+                    <span className="text-rose-500 font-bold text-sm md:text-base mr-1">Rs.</span>
                     {expenses.toLocaleString()}
                   </div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs bg-rose-500/10 text-rose-400 px-3 py-1 rounded-full font-medium self-start">
+                  <div className="mt-3.5 inline-flex items-center gap-1 text-[10px] bg-[#220c12] text-rose-400 px-3 py-1 rounded-full font-extrabold border border-rose-500/10 self-start">
                     Active Ledger
                   </div>
                 </div>
