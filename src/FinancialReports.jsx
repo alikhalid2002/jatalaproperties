@@ -50,7 +50,7 @@ function TypeBadge({ type }) {
   );
 }
 
-export default function FinancialReports({ entries = [], selectedYear = new Date().getFullYear().toString(), preFilter = 'All', onEditEntry, onDeleteEntry }) {
+export default function FinancialReports({ entries = [], selectedYear = new Date().getFullYear().toString(), preFilter = 'All', onEditEntry, onDeleteEntry, isAdmin }) {
   const [search, setSearch]               = useState('');
   const [typeFilter, setTypeFilter]       = useState(preFilter);
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -323,13 +323,13 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
                 >
                   Amount {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right">Actions</th>
+                {isAdmin && <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/40">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-24 text-center">
+                  <td colSpan={isAdmin ? 5 : 4} className="py-24 text-center">
                     <div className="flex flex-col items-center gap-4 opacity-40">
                       <FileText size={48} className="text-indigo-300" />
                       <p className="text-lg font-black uppercase tracking-widest text-indigo-200/80">No Records Found</p>
@@ -353,24 +353,26 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
                       {['revenue', 'pending'].includes(entry._type) ? '+' : '−'} Rs. {Number(entry.amount).toLocaleString()}
                     </p>
                   </td>
-                  <td className="p-5 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end gap-2">
-                      <button 
-                        onClick={() => onEditEntry && onEditEntry(entry)}
-                        className="p-2.5 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl transition-all"
-                        title="Edit Record"
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button 
-                        onClick={() => onDeleteEntry && onDeleteEntry(entry)}
-                        className="p-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white rounded-xl transition-all"
-                        title="Delete Record"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td className="p-5 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => onEditEntry && onEditEntry(entry)}
+                          className="p-2.5 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl transition-all"
+                          title="Edit Record"
+                        >
+                          <Edit3 size={14} />
+                        </button>
+                        <button 
+                          onClick={() => onDeleteEntry && onDeleteEntry(entry)}
+                          className="p-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white rounded-xl transition-all"
+                          title="Delete Record"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

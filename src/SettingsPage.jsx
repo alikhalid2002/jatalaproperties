@@ -189,21 +189,23 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setExpandedSection(expandedSection === 'members' ? null : 'members')} className="w-full flex justify-between p-8 font-black uppercase">Member Management <ChevronDown className={expandedSection === 'members' ? 'rotate-180' : ''} /></button>
         {expandedSection === 'members' && <div className="p-8 border-t border-slate-700/50 grid grid-cols-1 lg:grid-cols-2 gap-8">
-           <form onSubmit={handleAddMember} className="space-y-4">
-             <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
-             <div className="flex gap-2">
-               <input type="number" step="any" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
-               <select value={newFarmer.area} onChange={e => setNewFarmer({...newFarmer, area: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-indigo-400">
-                 <option value="RAJANPUR">Rajanpur</option>
-                 <option value="DASUHA">Dasuha</option>
-               </select>
-               <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-200">
-                 <option value="Acres">Acres</option>
-                 <option value="Kanal">Kanal</option>
-               </select>
-             </div>
-             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Register Member</button>
-           </form>
+           {isAdmin && (
+             <form onSubmit={handleAddMember} className="space-y-4">
+               <input value={newFarmer.nameEn} onChange={e => setNewFarmer({...newFarmer, nameEn: e.target.value.toUpperCase()})} className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Full Name (English)" />
+               <div className="flex gap-2">
+                 <input type="number" step="any" value={newFarmer.landSize} onChange={e => setNewFarmer({...newFarmer, landSize: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Size" />
+                 <select value={newFarmer.area} onChange={e => setNewFarmer({...newFarmer, area: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-indigo-400">
+                   <option value="RAJANPUR">Rajanpur</option>
+                   <option value="DASUHA">Dasuha</option>
+                 </select>
+                 <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-200">
+                   <option value="Acres">Acres</option>
+                   <option value="Kanal">Kanal</option>
+                 </select>
+               </div>
+               <button className="w-full bg-indigo-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Register Member</button>
+             </form>
+           )}
             <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-slate-800/50">
               {farmers.length > 0 ? (
                 farmers.map(f => (
@@ -212,13 +214,15 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                       <div className="font-black text-xs uppercase text-white tracking-wider">{f.nameEn || f.nameUr}</div>
                       <div className="text-[9px] font-bold text-indigo-200/80 uppercase">{f.landSize} {f.landUnit}</div>
                     </div>
-                    <button 
-                      onClick={() => deleteFarmer(f.id)}
-                      className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
-                      title="Remove Member"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {isAdmin && (
+                      <button 
+                        onClick={() => deleteFarmer(f.id)}
+                        className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                        title="Remove Member"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (
@@ -233,36 +237,38 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setExpandedSection(expandedSection === 'shops' ? null : 'shops')} className="w-full flex justify-between p-8 font-black uppercase">Commercial Shops <ChevronDown className={expandedSection === 'shops' ? 'rotate-180' : ''} /></button>
         {expandedSection === 'shops' && <div className="p-8 border-t border-slate-700/50">
-           <form onSubmit={handleAddShop} className="space-y-4 mb-8">
-             <input 
-               value={newShop.tenant} 
-               onChange={e => setNewShop({...newShop, tenant: e.target.value})} 
-               className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs text-white" 
-               placeholder="Tenant Name" 
-             />
-             <div className="flex gap-2">
+           {isAdmin && (
+             <form onSubmit={handleAddShop} className="space-y-4 mb-8">
                <input 
-                 value={newShop.name} 
-                 onChange={e => setNewShop({...newShop, name: e.target.value})} 
-                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
-                 placeholder="Shop Name / ID (e.g. Shop No. 6)" 
+                 value={newShop.tenant} 
+                 onChange={e => setNewShop({...newShop, tenant: e.target.value})} 
+                 className="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs text-white" 
+                 placeholder="Tenant Name" 
                />
-               <input 
-                 type="number"
-                 value={newShop.rent} 
-                 onChange={e => setNewShop({...newShop, rent: e.target.value})} 
-                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
-                 placeholder="Monthly Rent (Rs.)" 
-               />
-               <input 
-                 value={newShop.area} 
-                 onChange={e => setNewShop({...newShop, area: e.target.value})} 
-                 className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
-                 placeholder="Area/Size (e.g. 12x15)" 
-               />
-             </div>
-             <button className="w-full bg-blue-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Add Commercial Shop</button>
-           </form>
+               <div className="flex gap-2">
+                 <input 
+                   value={newShop.name} 
+                   onChange={e => setNewShop({...newShop, name: e.target.value})} 
+                   className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                   placeholder="Shop Name / ID (e.g. Shop No. 6)" 
+                 />
+                 <input 
+                   type="number"
+                   value={newShop.rent} 
+                   onChange={e => setNewShop({...newShop, rent: e.target.value})} 
+                   className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                   placeholder="Monthly Rent (Rs.)" 
+                 />
+                 <input 
+                   value={newShop.area} 
+                   onChange={e => setNewShop({...newShop, area: e.target.value})} 
+                   className="flex-1 bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs text-white" 
+                   placeholder="Area/Size (e.g. 12x15)" 
+                 />
+               </div>
+               <button className="w-full bg-blue-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Add Commercial Shop</button>
+             </form>
+           )}
            <div className="divide-y divide-slate-800/50 max-h-[300px] overflow-y-auto no-scrollbar">
              {shops.length > 0 ? (
                shops.map(s => (
@@ -271,12 +277,14 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                      <span className="text-white tracking-wider font-black text-xs">{s.tenant}</span>
                      <span className="text-[9px] font-bold text-indigo-200/80 lowercase">{s.name} | Rs. {Number(s.rent || 0).toLocaleString()} | {s.area || 'N/A'}</span>
                    </div>
-                   <button 
-                     onClick={() => handleDeleteShop(s.id)}
-                     className="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
-                   >
-                     <Trash2 size={14}/>
-                   </button>
+                   {isAdmin && (
+                     <button 
+                       onClick={() => handleDeleteShop(s.id)}
+                       className="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                     >
+                       <Trash2 size={14}/>
+                     </button>
+                   )}
                  </div>
                ))
              ) : (
@@ -291,19 +299,21 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
       <section className="bg-slate-800/20 border border-slate-700/50 rounded-3xl overflow-hidden">
         <button onClick={() => setExpandedSection(expandedSection === 'sold' ? null : 'sold')} className="w-full flex justify-between p-8 font-black uppercase">Sold Properties <ChevronDown className={expandedSection === 'sold' ? 'rotate-180' : ''} /></button>
         {expandedSection === 'sold' && <div className="p-8 border-t border-slate-700/50">
-           <form onSubmit={handleAddSoldProperty} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-             <input value={newSoldProperty.nameEn} onChange={e => setNewSoldProperty({...newSoldProperty, nameEn: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Property Name" />
-             <input value={newSoldProperty.buyerName} onChange={e => setNewSoldProperty({...newSoldProperty, buyerName: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Buyer Name" />
-             <input type="number" value={newSoldProperty.totalPrice} onChange={e => setNewSoldProperty({...newSoldProperty, totalPrice: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Total Price (Rs.)" />
-             <div className="flex gap-2 md:col-span-1">
-               <button className="flex-1 bg-amber-600 py-4 rounded-xl font-black uppercase text-xs">
-                 {editingSoldPropertyId ? 'Update Property' : 'Register Sale'}
-               </button>
-               {editingSoldPropertyId && (
-                 <button type="button" onClick={() => { setEditingSoldPropertyId(null); setNewSoldProperty({ nameEn: '', buyerName: '', totalPrice: '' }); }} className="px-6 bg-slate-700 py-4 rounded-xl font-black uppercase text-xs">Cancel</button>
-               )}
-             </div>
-           </form>
+           {isAdmin && (
+             <form onSubmit={handleAddSoldProperty} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+               <input value={newSoldProperty.nameEn} onChange={e => setNewSoldProperty({...newSoldProperty, nameEn: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Property Name" />
+               <input value={newSoldProperty.buyerName} onChange={e => setNewSoldProperty({...newSoldProperty, buyerName: e.target.value.toUpperCase()})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black uppercase text-xs" placeholder="Buyer Name" />
+               <input type="number" value={newSoldProperty.totalPrice} onChange={e => setNewSoldProperty({...newSoldProperty, totalPrice: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-xs" placeholder="Total Price (Rs.)" />
+               <div className="flex gap-2 md:col-span-1">
+                 <button className="flex-1 bg-amber-600 py-4 rounded-xl font-black uppercase text-xs">
+                   {editingSoldPropertyId ? 'Update Property' : 'Register Sale'}
+                 </button>
+                 {editingSoldPropertyId && (
+                   <button type="button" onClick={() => { setEditingSoldPropertyId(null); setNewSoldProperty({ nameEn: '', buyerName: '', totalPrice: '' }); }} className="px-6 bg-slate-700 py-4 rounded-xl font-black uppercase text-xs">Cancel</button>
+                 )}
+               </div>
+             </form>
+           )}
            
            <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-slate-800/50">
              {soldProperties.length > 0 ? (
@@ -313,27 +323,29 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                      <div className="font-black text-xs uppercase text-white tracking-wider">{p.nameEn || p.nameUr}</div>
                      <div className="text-[9px] font-bold text-indigo-200/80 uppercase">Buyer: {p.buyerName} | Rs. {Number(p.totalPrice || 0).toLocaleString()}</div>
                    </div>
-                   <div className="flex gap-2">
-                    <button 
-                       onClick={() => {
-                         setEditingSoldPropertyId(p.id);
-                         setNewSoldProperty({ nameEn: p.nameEn || p.nameUr || '', buyerName: p.buyerName || '', totalPrice: p.totalPrice || '' });
-                         setExpandedSection('sold'); // Ensure same section is open
-                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                       }}
-                       className="p-3 bg-slate-900 hover:bg-indigo-500/20 text-slate-200 hover:text-indigo-400 rounded-xl transition-all active:scale-90"
-                       title="Edit Property"
-                     >
-                       <Settings size={16} />
-                     </button>
-                     <button 
-                       onClick={() => { if(window.confirm('Delete this sold property?')) deleteProperty(p.id) }}
-                       className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
-                       title="Remove Property"
-                     >
-                       <Trash2 size={16} />
-                     </button>
-                   </div>
+                   {isAdmin && (
+                     <div className="flex gap-2">
+                      <button 
+                         onClick={() => {
+                           setEditingSoldPropertyId(p.id);
+                           setNewSoldProperty({ nameEn: p.nameEn || p.nameUr || '', buyerName: p.buyerName || '', totalPrice: p.totalPrice || '' });
+                           setExpandedSection('sold'); // Ensure same section is open
+                           window.scrollTo({ top: 0, behavior: 'smooth' });
+                         }}
+                         className="p-3 bg-slate-900 hover:bg-indigo-500/20 text-slate-200 hover:text-indigo-400 rounded-xl transition-all active:scale-90"
+                         title="Edit Property"
+                       >
+                         <Settings size={16} />
+                       </button>
+                       <button 
+                         onClick={() => { if(window.confirm('Delete this sold property?')) deleteProperty(p.id) }}
+                         className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                         title="Remove Property"
+                       >
+                         <Trash2 size={16} />
+                       </button>
+                     </div>
+                   )}
                  </div>
                ))
              ) : (
@@ -361,37 +373,41 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
             >
               Database Backup
             </button>
-            <label className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-orange-400 border border-slate-700/50 hover:bg-slate-800 transition-all cursor-pointer text-center leading-tight gap-2">
-              Restore Data 
-              <input type="file" className="hidden" onChange={handleRestore} />
-            </label>
-            <button 
-              onClick={() => {
-                if (window.confirm("Delete all local data and refresh? This fixes stuck names.")) {
-                  localStorage.clear();
-                  window.location.reload();
-                }
-              }} 
-              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-slate-200 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
-            >
-              Wipe Mobile Cache
-            </button>
-            <button 
-              type="button"
-              onClick={handleNuke}
-              style={{ position: 'relative', zIndex: 9999 }}
-              className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
-            >
-              <Trash2 size={13} className="mb-1" />
-              NUKE {selectedYear} EXPENSES
-            </button>
-            <button 
-              onClick={purgeAllFarmers}
-              className="col-span-full mt-4 flex items-center justify-center p-8 bg-rose-600/20 rounded-2xl lg:rounded-[32px] font-black uppercase text-xs text-rose-500 border-2 border-dashed border-rose-500/50 hover:bg-rose-600 hover:text-white transition-all text-center gap-4 group"
-            >
-              <Trash2 size={24} className="group-hover:animate-bounce" />
-              NUKE ALL MEMBERS (Permanent Delete)
-            </button>
+            {isAdmin && (
+              <>
+                <label className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-orange-400 border border-slate-700/50 hover:bg-slate-800 transition-all cursor-pointer text-center leading-tight gap-2">
+                  Restore Data 
+                  <input type="file" className="hidden" onChange={handleRestore} />
+                </label>
+                <button 
+                  onClick={() => {
+                    if (window.confirm("Delete all local data and refresh? This fixes stuck names.")) {
+                      localStorage.clear();
+                      window.location.reload();
+                    }
+                  }} 
+                  className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-slate-200 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
+                >
+                  Wipe Mobile Cache
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleNuke}
+                  style={{ position: 'relative', zIndex: 9999 }}
+                  className="flex flex-col items-center justify-center p-6 bg-rose-500/10 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all text-center leading-tight gap-2"
+                >
+                  <Trash2 size={13} className="mb-1" />
+                  NUKE {selectedYear} EXPENSES
+                </button>
+                <button 
+                  onClick={purgeAllFarmers}
+                  className="col-span-full mt-4 flex items-center justify-center p-8 bg-rose-600/20 rounded-2xl lg:rounded-[32px] font-black uppercase text-xs text-rose-500 border-2 border-dashed border-rose-500/50 hover:bg-rose-600 hover:text-white transition-all text-center gap-4 group"
+                >
+                  <Trash2 size={24} className="group-hover:animate-bounce" />
+                  NUKE ALL MEMBERS (Permanent Delete)
+                </button>
+              </>
+            )}
           </div>
         )}
       </section>

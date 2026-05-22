@@ -399,8 +399,8 @@ const App = () => {
               {view === 'landMembers' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} selectedArea={selectedArea} />}
               {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
               {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
-              {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" />}
-              {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} />}
+              {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" isAdmin={isAdmin} />}
+              {view === 'Reports' && <FinancialReports entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
               {view === 'Settings' && <SettingsPage entries={entries} selectedYear={selectedYear} isAdmin={isAdmin} />}
             </div>
           </Suspense>
