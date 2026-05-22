@@ -183,29 +183,29 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
               onClick={() => setSelectedShop(shop)}
               className="group bg-[#111827] p-8 rounded-[48px] transition-all duration-300 hover:bg-white/[0.02] active:scale-[0.98] cursor-copy flex flex-col gap-8 shadow-2xl"
             >
-              <div className="flex justify-between items-start">
-                 <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tight leading-tight pr-4">
-                   {shop.tenantEn || transliterateToEnglish(shop.tenant)}
-                 </h3>
+               <div className="flex justify-between items-start">
+                  <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight pr-4">
+                    {shop.tenantEn || transliterateToEnglish(shop.tenant)}
+                  </h3>
                  <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full ${status.percent < 100 ? 'text-orange-500 bg-orange-500/10' : 'text-[#10B981] bg-[#10B981]/10'}`}>
                    {status.percent < 100 ? 'Pending' : 'Paid'}
                  </span>
               </div>
 
               <div className="space-y-6">
-                 <div className="flex justify-between items-end">
-                    <div>
-                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Monthly Rent</span>
-                      <span className="text-2xl font-black text-white italic tracking-tighter">{(Number(shop.rent) || 0).toLocaleString()}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-2 tracking-widest">Balance</span>
-                      <span className="text-2xl font-black text-white italic tracking-tighter">
-                         <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
-                         {(balance).toLocaleString()}
-                      </span>
-                    </div>
-                 </div>
+                  <div className="flex justify-between items-end">
+                     <div>
+                       <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-2 tracking-widest">Monthly Rent</span>
+                       <span className="text-2xl font-black text-white tracking-tighter">{(Number(shop.rent) || 0).toLocaleString()}</span>
+                     </div>
+                     <div className="text-right">
+                       <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-2 tracking-widest">Balance</span>
+                       <span className="text-2xl font-black text-white tracking-tighter">
+                          <span className="text-sm opacity-50 mr-1 not-italic">Rs.</span>
+                          {(balance).toLocaleString()}
+                       </span>
+                     </div>
+                  </div>
 
                  <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
                     <div 
@@ -214,10 +214,10 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                     ></div>
                  </div>
 
-                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                    <span className="text-neutral-500">Recv: <span className="text-white font-black italic ml-1">{(Number(status.paid) || 0).toLocaleString()}</span></span>
-                    <span className="text-neutral-500">Total: <span className="text-[#10B981] font-black italic ml-1">{(Number(status.total) || 0).toLocaleString()}</span></span>
-                 </div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                     <span className="text-slate-300">Recv: <span className="text-white font-black ml-1">{(Number(status.paid) || 0).toLocaleString()}</span></span>
+                     <span className="text-slate-300">Total: <span className="text-[#10B981] font-black ml-1">{(Number(status.total) || 0).toLocaleString()}</span></span>
+                  </div>
               </div>
             </div>
           );
@@ -229,21 +229,21 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
            {/* Modal Simplified */}
            <div className="w-full max-w-2xl bg-[#0d1117] rounded-[32px] sm:rounded-[48px] p-6 sm:p-10 md:p-12 relative overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] shadow-2xl">
               <button onClick={() => setSelectedShop(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 p-2 sm:p-4 text-white hover:text-rose-500 transition-colors"><X size={24}/></button>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white italic uppercase mb-6 sm:mb-8 md:mb-10 tracking-tighter leading-tight pr-10">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white uppercase mb-6 sm:mb-8 md:mb-10 tracking-tighter leading-tight pr-10">
                 {selectedShop.tenantEn || selectedShop.tenant}
               </h2>
               <div className="overflow-y-auto pr-2 sm:pr-4 space-y-8 md:space-y-12 no-scrollbar">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-white/5 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[32px] text-center flex flex-col justify-center">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2 tracking-widest">Annual Dues</p>
-                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-white italic tracking-tight">
+                    <p className="text-[10px] font-bold text-indigo-200/80 uppercase mb-2 tracking-widest">Annual Dues</p>
+                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight">
                       <span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>
                       {(calculateAnnualProgress(selectedShop).total).toLocaleString()}
                     </p>
                   </div>
                   <div className="bg-white/5 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[32px] text-center border border-[#10B981]/10 flex flex-col justify-center">
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase mb-2 tracking-widest">Total Paid</p>
-                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-[#10B981] italic tracking-tight">
+                    <p className="text-[10px] font-bold text-indigo-200/80 uppercase mb-2 tracking-widest">Total Paid</p>
+                    <p className="text-lg sm:text-2xl md:text-3xl font-black text-[#10B981] tracking-tight">
                       <span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>
                       {(calculateAnnualProgress(selectedShop).paid).toLocaleString()}
                     </p>
@@ -252,17 +252,17 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                 {isAdmin && (
                   <form onSubmit={handleSaveTransaction} className="space-y-6">
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent my-6"></div>
-                    <div className="flex items-center justify-start gap-2 mb-4">
-                       <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Record New Transaction</span>
-                       <CreditCard size={12} className="text-indigo-400" />
-                    </div>
+                     <div className="flex items-center justify-start gap-2 mb-4">
+                        <span className="text-[11px] font-black text-indigo-200/80 uppercase tracking-widest">Record New Transaction</span>
+                        <CreditCard size={12} className="text-indigo-400" />
+                     </div>
 
                     <div className="bg-slate-800/20 border border-slate-700/30 p-5 sm:p-6 md:p-8 rounded-[24px] sm:rounded-[36px] shadow-2xl relative overflow-hidden group space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                          {/* Left: Image Upload Zone */}
                          <div className="relative group/upload h-full">
                             <label className="flex flex-col items-center justify-center w-full h-40 bg-slate-900/50 border-2 border-dashed border-slate-700 hover:border-indigo-500/50 cursor-pointer rounded-[28px] p-4 transition-all group-active/upload:scale-95">
-                               <div className="w-12 h-12 bg-slate-850 rounded-2xl flex items-center justify-center text-slate-500 group-hover/upload:text-indigo-400 transition-colors mb-3 relative overflow-hidden">
+                               <div className="w-12 h-12 bg-slate-850 rounded-2xl flex items-center justify-center text-indigo-200/80 group-hover/upload:text-indigo-400 transition-colors mb-3 relative overflow-hidden">
                                   {uploadProgress?.receipt > 0 ? (
                                     <div className="flex flex-col items-center">
                                       <Loader2 size={20} className="animate-spin text-indigo-500" />
@@ -275,10 +275,10 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                                   )}
                                </div>
                                <div className="text-center">
-                                  <p className="text-xs font-black text-slate-300">
-                                    {uploadProgress?.receipt > 0 ? "Uploading Receipt..." : entryFile ? "Receipt Selected" : "Choose Receipt"}
-                                  </p>
-                                  <p className="text-[8px] text-slate-500 mt-1.5 uppercase tracking-widest italic">{entryFile ? entryFile.name : "PDF, PNG, JPEG SUPPORT"}</p>
+                                   <p className="text-xs font-black text-slate-300">
+                                     {uploadProgress?.receipt > 0 ? "Uploading Receipt..." : entryFile ? "Receipt Selected" : "Choose Receipt"}
+                                   </p>
+                                   <p className="text-[8px] text-slate-400 mt-1.5 uppercase tracking-widest">{entryFile ? entryFile.name : "PDF, PNG, JPEG SUPPORT"}</p>
                                </div>
                                <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => setEntryFile(e.target.files[0])} />
                             </label>
@@ -295,7 +295,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                                     type="button"
                                     key={opt.key}
                                     onClick={() => setEntryType(opt.key)}
-                                    className={`flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 ${entryType === opt.key ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-900/50 border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
+                                    className={`flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 ${entryType === opt.key ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-800 border border-slate-700 text-indigo-200/75 hover:bg-slate-700 hover:text-slate-100'}`}
                                  >
                                    {opt.label}
                                  </button>
@@ -303,7 +303,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                             </div>
 
                             <div className="relative bg-slate-900/80 border border-slate-700 rounded-[24px] p-1.5 flex items-center shadow-inner group/input focus-within:border-indigo-500/50 transition-all font-sans">
-                               <div className="w-10 h-10 flex items-center justify-center text-slate-500">
+                               <div className="w-10 h-10 flex items-center justify-center text-indigo-300">
                                   <CreditCard size={20} />
                                </div>
                                <input 
@@ -311,7 +311,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                                   value={entryAmount}
                                   onChange={(e) => setEntryAmount(e.target.value)}
                                   placeholder="Amount (Rs.)..."
-                                  className="bg-transparent flex-1 py-3 pl-4 text-left text-lg font-black text-white italic placeholder:text-slate-700 focus:outline-none"
+                                   className="bg-transparent flex-1 py-3 pl-4 text-left text-lg font-black text-white placeholder:text-slate-500 focus:outline-none"
                                />
                             </div>
 
@@ -321,7 +321,7 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                                   value={entryNote}
                                   onChange={(e) => setEntryNote(e.target.value)}
                                   placeholder="Optional note..."
-                                  className="bg-transparent flex-1 py-2 pl-4 text-xs font-bold text-white placeholder:text-slate-700 focus:outline-none"
+                                  className="bg-transparent flex-1 py-2 pl-4 text-xs font-bold text-white placeholder:text-slate-500 focus:outline-none"
                                />
                             </div>
                          </div>
@@ -339,13 +339,13 @@ const ShopsPage = ({ isAdmin, selectedYear = new Date().getFullYear().toString()
                 )}
 
                 <div className="space-y-6">
-                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Transaction History</p>
+                  <p className="text-[10px] font-bold text-indigo-200/80 uppercase tracking-widest">Transaction History</p>
                   {transactions.filter(t => t.shopId === selectedShop.id).map(t => (
                     <div key={t.id} className="flex justify-between items-center bg-white/3 p-6 rounded-[28px] border border-white/5">
-                       <div>
-                         <p className="text-lg font-black text-white italic">Rs. {t.amount.toLocaleString()}</p>
-                         <p className="text-[9px] text-neutral-600 font-bold uppercase mt-1">{t.date}</p>
-                       </div>
+                        <div>
+                          <p className="text-lg font-black text-white">Rs. {t.amount.toLocaleString()}</p>
+                          <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">{t.date}</p>
+                        </div>
                        <div className="flex items-center gap-3">
                          {t.receiptUrl && (
                            <a 
@@ -380,8 +380,8 @@ const FinanceCard = ({ label, value, icon }) => (
     <div className="w-10 h-10 md:w-14 md:h-14 bg-white/5 rounded-full flex items-center justify-center mb-6 text-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.1)] border border-white/5">
       {icon}
     </div>
-    <span className="text-neutral-500 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 leading-relaxed max-w-[100px]">{label}</span>
-    <p className="text-sm md:text-2xl font-black italic text-white tracking-tighter uppercase">
+    <span className="text-indigo-200/80 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 leading-relaxed max-w-[100px]">{label}</span>
+    <p className="text-sm md:text-2xl font-black text-white tracking-tighter uppercase">
       <span className="opacity-50 mr-1 not-italic text-[10px]">Rs.</span>
       {value?.toLocaleString()}
     </p>

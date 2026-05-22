@@ -76,10 +76,10 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
            <div className="flex items-center gap-3">
               <span className="text-[10px] md:text-xs font-black text-[#10B981] uppercase tracking-[0.2em]">Total Portfolio Area:</span>
               <div className="flex items-baseline gap-2">
-                 <span className="text-3xl md:text-5xl font-black text-white italic tracking-tighter">
+                 <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
                    {totalLandArea.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                  </span>
-                 <span className="text-[10px] md:text-xs font-black text-neutral-500 uppercase tracking-widest">Acres</span>
+                 <span className="text-[10px] md:text-xs font-black text-slate-300 uppercase tracking-widest">Acres</span>
               </div>
            </div>
         </div>
@@ -95,8 +95,8 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
              <div className="flex items-center gap-3">
                 <span className="text-[10px] md:text-xs font-black text-[#818cf8] uppercase tracking-[0.2em]">Total Yearly Income:</span>
                 <div className="flex items-baseline gap-2">
-                   <span className="text-3xl md:text-5xl font-black text-white italic tracking-tighter">
-                   <span className="text-sm md:text-xl opacity-40 not-italic mr-1">Rs.</span>
+                   <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+                   <span className="text-sm md:text-xl opacity-40 mr-1">Rs.</span>
                    <span className="text-rose-500">0</span>
                    </span>
                 </div>
@@ -116,7 +116,7 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
             className="group bg-[#111827] p-8 rounded-[32px] transition-all duration-300 hover:bg-white/[0.03] active:scale-[0.98] cursor-copy flex flex-col gap-6"
           >
             <div className="flex justify-between items-start">
-               <h3 className="text-xl font-black text-white italic uppercase tracking-tight leading-tight">
+               <h3 className="text-xl font-black text-white uppercase tracking-tight leading-tight">
                  {farmer.nameEn || transliterateToEnglish(farmer.nameUr)}
                </h3>
                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${farmer.status === 'Pending' ? 'text-rose-500 bg-rose-500/10' : 'text-[#10B981] bg-[#10B981]/10'}`}>
@@ -127,12 +127,12 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
             <div className="space-y-4">
                <div className="flex justify-between items-end">
                   <div>
-                    <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Acres</span>
-                    <span className="text-lg font-black text-white italic">{farmer.landSize}</span>
+                    <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-1">Acres</span>
+                    <span className="text-lg font-black text-white">{farmer.landSize}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1">Balance</span>
-                    <span className="text-lg font-black text-white italic">Rs. {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
+                    <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-1">Balance</span>
+                    <span className="text-lg font-black text-white">Rs. {(Number(farmer.totalRemaining) || 0).toLocaleString()}</span>
                   </div>
                </div>
 
@@ -144,8 +144,8 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
                </div>
 
                <div className="flex justify-between items-center text-[10px] font-bold">
-                  <span className="text-neutral-500 uppercase tracking-widest">RECV: <span className="text-white font-black italic ml-1">{(Number(farmer.totalPaid) || 0).toLocaleString()}</span></span>
-                  <span className="text-[#10B981] uppercase tracking-widest">TOTAL: <span className="font-black italic ml-1">{((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}</span></span>
+                  <span className="text-slate-300 uppercase tracking-widest">RECV: <span className="text-white font-black ml-1">{(Number(farmer.totalPaid) || 0).toLocaleString()}</span></span>
+                  <span className="text-[#10B981] uppercase tracking-widest">TOTAL: <span className="font-black ml-1">{((Number(farmer.totalPaid) || 0) + (Number(farmer.totalRemaining) || 0)).toLocaleString()}</span></span>
                </div>
             </div>
           </div>
@@ -174,8 +174,8 @@ const FinanceCard = ({ label, value, icon, color }) => (
     <div className="w-10 h-10 md:w-14 md:h-14 bg-white/5 rounded-full flex items-center justify-center mb-6 text-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.1)] border border-white/5">
       {icon}
     </div>
-    <span className="text-neutral-500 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 leading-relaxed max-w-[100px]">{label}</span>
-    <p className="text-xs md:text-2xl font-black italic text-white tracking-tighter uppercase">
+    <span className="text-indigo-200/80 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-4 leading-relaxed max-w-[100px]">{label}</span>
+    <p className="text-xs md:text-2xl font-black text-white tracking-tighter uppercase">
       <span className="opacity-50 mr-1 not-italic text-[10px]">Rs.</span>
       {value?.toLocaleString()}
     </p>

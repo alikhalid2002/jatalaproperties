@@ -31,7 +31,7 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
 
   if (loading || !hasMounted) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 animate-pulse text-slate-500">
+      <div className="flex flex-col items-center justify-center p-20 animate-pulse text-indigo-200/80">
         <div className="w-16 h-16 border-4 border-slate-700 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
         <p className="font-black uppercase tracking-widest text-xs">Loading Sold Properties...</p>
       </div>
@@ -59,7 +59,7 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
               className="group bg-[#111827] p-8 rounded-[48px] transition-all duration-300 hover:bg-white/[0.02] active:scale-[0.98] cursor-copy flex flex-col gap-8 shadow-2xl relative overflow-hidden"
             >
                <div className="flex justify-between items-start">
-                  <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tight leading-tight pr-4">
+                  <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight pr-4">
                     {prop.nameEn || transliterateToEnglish(prop.nameUr)}
                   </h3>
                   <div className="flex gap-2">
@@ -75,16 +75,16 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
                <div className="space-y-6">
                   <div className="flex justify-between items-end gap-6">
                      <div className="flex-1">
-                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1 tracking-widest text-left opacity-60">Received</span>
-                       <h4 className="text-lg md:text-xl font-black text-white italic tracking-tighter whitespace-nowrap">
-                         <span className="text-[10px] opacity-40 mr-1 not-italic">Rs.</span>
+                       <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-1 tracking-widest text-left">Received</span>
+                       <h4 className="text-lg md:text-xl font-black text-white tracking-tighter whitespace-nowrap">
+                         <span className="text-[10px] opacity-40 mr-1 font-bold">Rs.</span>
                          {lifetimePaid.toLocaleString()}
                        </h4>
                      </div>
                      <div className="flex-1 text-right">
-                       <span className="text-[10px] font-bold text-neutral-500 uppercase block mb-1 tracking-widest opacity-60">Remaining</span>
-                       <h4 className="text-lg md:text-xl font-black text-orange-500 italic tracking-tighter whitespace-nowrap">
-                         <span className="text-[10px] opacity-40 mr-1 not-italic">Rs.</span>
+                       <span className="text-[10px] font-bold text-indigo-200/80 uppercase block mb-1 tracking-widest">Remaining</span>
+                       <h4 className="text-lg md:text-xl font-black text-orange-500 tracking-tighter whitespace-nowrap">
+                         <span className="text-[10px] opacity-40 mr-1 font-bold">Rs.</span>
                          {remaining.toLocaleString()}
                        </h4>
                      </div>
@@ -99,8 +99,8 @@ const SoldProperties = ({ isAdmin, selectedYear }) => {
 
                   {/* UI FIX: Perfectly centered Total Value at the bottom */}
                   <div className="flex justify-center pt-2 border-t border-white/5 mt-4">
-                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
-                       TOTAL VALUE: <span className="text-[#10B981] font-black italic ml-1">{totalPrice.toLocaleString()}</span>
+                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">
+                       TOTAL VALUE: <span className="text-[#10B981] font-black ml-1">{totalPrice.toLocaleString()}</span>
                      </p>
                   </div>
                </div>
@@ -127,9 +127,9 @@ const FinanceCard = ({ label, value, icon }) => (
     <div className="w-10 h-10 md:w-14 md:h-14 bg-white/5 rounded-full flex items-center justify-center mb-6 text-[#10B981] shadow-[0_0_20px_rgba(16,185,129,0.1)] border border-white/5">
       {icon}
     </div>
-    <span className="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">{label}</span>
-    <p className="text-2xl md:text-4xl font-black italic text-white tracking-tighter uppercase">
-      <span className="opacity-50 mr-2 not-italic text-lg">Rs.</span>
+    <span className="text-indigo-200/80 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">{label}</span>
+    <p className="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase">
+      <span className="opacity-50 mr-2 text-lg font-bold">Rs.</span>
       {value?.toLocaleString()}
     </p>
   </div>

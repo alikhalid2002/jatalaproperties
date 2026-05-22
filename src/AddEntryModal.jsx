@@ -32,10 +32,10 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-[#1e293b] border border-slate-700 w-full max-w-md p-8 rounded-[32px] shadow-2xl animate-in zoom-in-95 duration-300 mx-4">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">
+          <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
             Record {type === 'expense' ? 'Expense' : 'Income'}
           </h2>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="p-2 text-slate-200 hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -45,14 +45,14 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
           <button 
             type="button"
             onClick={() => { setType('expense'); setLabel(''); }}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'expense' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'expense' ? 'bg-indigo-600 text-white shadow-lg' : 'text-indigo-200/75 hover:text-slate-100'}`}
           >
             Expense
           </button>
           <button 
             type="button"
             onClick={() => { setType('revenue'); setLabel(''); }}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'revenue' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${type === 'revenue' ? 'bg-indigo-600 text-white shadow-lg' : 'text-indigo-200/75 hover:text-slate-100'}`}
           >
             Extra Income
           </button>
@@ -62,7 +62,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">Select Date</label>
+              <label className="block text-[10px] font-black text-indigo-200/80 mb-2 uppercase tracking-widest">Select Date</label>
               <input 
                 type="date" 
                 value={date}
@@ -74,7 +74,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              <label className="block text-[10px] font-black text-slate-200 mb-2 uppercase tracking-widest">
                 {type === 'expense' ? 'Category' : 'Source'}
               </label>
               <select 
@@ -84,7 +84,7 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
                   const val = e.target.value;
                   if (val) setLabel(val);
                 }}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-4 text-white font-black italic focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer text-[12px] disabled:opacity-50"
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 px-4 text-white font-black focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer text-[12px] disabled:opacity-50"
                 required
               >
                 <option value="">-- SELECT --</option>
@@ -110,20 +110,20 @@ const AddEntryModal = ({ isOpen, onClose, onAdd, isAdmin }) => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Amount (Rs.)</label>
+            <label className="block text-[10px] font-black text-slate-200 mb-2 uppercase tracking-widest">Amount (Rs.)</label>
             <input 
               type="number" 
               value={amount}
               disabled={!isAdmin}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black italic focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-6 text-white font-black focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Description (Optional)</label>
+            <label className="block text-[10px] font-black text-slate-200 mb-2 uppercase tracking-widest">Description (Optional)</label>
             <textarea 
               rows="2"
               value={description}

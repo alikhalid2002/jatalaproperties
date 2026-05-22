@@ -138,7 +138,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
         {/* Header */}
         <div className="p-8 pb-4 flex flex-col items-center justify-center relative">
           <div className="flex items-center gap-3">
-             <h2 className="text-2xl lg:text-3xl font-black text-white italic uppercase tracking-tighter text-center leading-none">
+             <h2 className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tighter text-center leading-none">
                {isEditing ? (
                  <input 
                    value={editData.name}
@@ -148,8 +148,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                  />
                ) : (farmer.nameEn || farmer.nameUr)}
              </h2>
-             <span className="text-slate-500 font-black">•</span>
-             <span className="text-lg lg:text-xl font-black text-slate-300 tracking-tighter italic whitespace-nowrap">
+             <span className="text-indigo-300/80 font-black">•</span>
+             <span className="text-lg lg:text-xl font-black text-slate-200 tracking-tighter whitespace-nowrap">
                {isEditing ? (
                  <input 
                    type="number"
@@ -196,7 +196,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                  </div>
                )
              )}
-             <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-2xl transition-all group">
+             <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-2xl transition-all group">
                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
              </button>
           </div>
@@ -228,10 +228,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         };
                       });
                     }}
-                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
+                    className="bg-transparent border-b border-indigo-500/50 text-center outline-none w-full text-white font-black text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{Number(farmer.totalPayable)?.toLocaleString() || 0}</p>
+                  <p className="text-lg sm:text-2xl font-black text-white"><span className="text-xs sm:text-sm opacity-50 mr-1 font-normal">Rs.</span>{Number(farmer.totalPayable)?.toLocaleString() || 0}</p>
                 )}
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
@@ -239,7 +239,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                    <span className="text-[11px] font-black uppercase tracking-widest">Total Paid</span>
                 </div>
-                <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{farmer.totalPaid?.toLocaleString() || 0}</p>
+                <p className="text-lg sm:text-2xl font-black text-white"><span className="text-xs sm:text-sm opacity-50 mr-1 font-normal">Rs.</span>{farmer.totalPaid?.toLocaleString() || 0}</p>
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
                 <div className="flex items-center justify-center gap-2 mb-3 text-orange-400">
@@ -263,10 +263,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         theka: currentSize > 0 ? Math.round(newTotalPayable / currentSize).toString() : prev.theka
                       }));
                     }}
-                    className="bg-transparent border-b border-orange-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
+                    className="bg-transparent border-b border-orange-500/50 text-center outline-none w-full text-white font-black text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{farmer.totalRemaining?.toLocaleString() || 0}</p>
+                  <p className="text-lg sm:text-2xl font-black text-white"><span className="text-xs sm:text-sm opacity-50 mr-1 font-normal">Rs.</span>{farmer.totalRemaining?.toLocaleString() || 0}</p>
                 )}
              </div>
              <div className="bg-slate-800/40 p-6 rounded-[32px] border border-slate-700/50 text-center group hover:bg-slate-800 transition-all">
@@ -293,10 +293,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         };
                       });
                     }}
-                    className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black italic text-xl disabled:opacity-50"
+                    className="bg-transparent border-b border-violet-500/50 text-center outline-none w-full text-white font-black text-xl disabled:opacity-50"
                   />
                 ) : (
-                  <p className="text-lg sm:text-2xl font-black text-white italic"><span className="text-xs sm:text-sm opacity-50 mr-1 not-italic font-normal">Rs.</span>{Number(farmer.theka)?.toLocaleString() || 0}</p>
+          <p className="text-lg sm:text-2xl font-black text-white"><span className="text-xs sm:text-sm opacity-50 mr-1 font-normal">Rs.</span>{Number(farmer.theka)?.toLocaleString() || 0}</p>
                 )}
              </div>
           </div>
@@ -306,7 +306,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           {/* Document Vault Section */}
           <div className="mb-10">
             <div className="flex items-center justify-start gap-2 mb-6">
-               <span className="text-[11px] font-black text-emerald-400/80 uppercase tracking-widest italic">Documents</span>
+               <span className="text-[11px] font-black text-emerald-400/80 uppercase tracking-widest">Documents</span>
                <Shield size={12} className="text-emerald-500" />
             </div>
  
@@ -314,8 +314,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                 <div className="bg-slate-800/30 border border-slate-700/40 p-5 rounded-[28px] relative group transition-all hover:bg-slate-800/50">
                   <div className="flex items-center justify-between mb-4">
                      <div className="flex items-center gap-2">
-                        <User size={14} className="text-slate-500" />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National ID</span>
+                        <User size={14} className="text-indigo-300/80" />
+                        <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">National ID</span>
                      </div>
                      {farmer.idCardUrl && (
                         <button onClick={() => setPreviewImage(farmer.idCardUrl)} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 underline uppercase tracking-widest">View</button>
@@ -325,33 +325,33 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   {isAdmin ? (
                     <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[100px] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer group/upload">
                        {isUploadingDoc.idCard ? (
-                         <div className="flex flex-col items-center gap-2">
-                            <div className="relative w-12 h-12 flex items-center justify-center">
-                              <Loader2 size={24} className="animate-spin text-indigo-500" />
-                              <span className="absolute text-[8px] font-black text-white">{uploadProgress?.idCard || 0}%</span>
-                            </div>
-                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
-                         </div>
+                          <div className="flex flex-col items-center gap-2">
+                             <div className="relative w-12 h-12 flex items-center justify-center">
+                               <Loader2 size={24} className="animate-spin text-indigo-500" />
+                               <span className="absolute text-[8px] font-black text-white">{uploadProgress?.idCard || 0}%</span>
+                             </div>
+                             <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
+                          </div>
                        ) : (
-                         <>
-                           <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
-                              <Upload size={18} className="text-slate-400 group-hover/upload:text-indigo-400" />
-                           </div>
-                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select ID Card</span>
-                         </>
+                          <>
+                            <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
+                               <Upload size={18} className="text-slate-200 group-hover/upload:text-indigo-400" />
+                            </div>
+                            <span className="text-[10px] font-black text-indigo-200/80 uppercase tracking-widest">Select ID Card</span>
+                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocUpload('idCardUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.idCardUrl && (
-                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
+                    <div className="flex items-center justify-center h-20 text-slate-300 text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
                   )}
                 </div>
  
                 <div className="bg-slate-800/30 border border-slate-700/40 p-5 rounded-[28px] relative group transition-all hover:bg-slate-800/50">
                   <div className="flex items-center justify-between mb-4">
                      <div className="flex items-center gap-2">
-                        <FileText size={14} className="text-slate-500" />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Agreement</span>
+                        <FileText size={14} className="text-indigo-300/80" />
+                        <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">Agreement</span>
                      </div>
                      {farmer.agreementUrl && (
                         <button onClick={() => window.open(farmer.agreementUrl, '_blank')} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 underline uppercase tracking-widest">View</button>
@@ -361,25 +361,25 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                   {isAdmin ? (
                     <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700/50 grow rounded-2xl p-4 min-h-[100px] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer group/upload">
                        {isUploadingDoc.agreement ? (
-                         <div className="flex flex-col items-center gap-2">
-                            <div className="relative w-12 h-12 flex items-center justify-center">
-                              <Loader2 size={24} className="animate-spin text-indigo-500" />
-                              <span className="absolute text-[8px] font-black text-white">{uploadProgress?.agreement || 0}%</span>
-                            </div>
-                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
-                         </div>
+                          <div className="flex flex-col items-center gap-2">
+                             <div className="relative w-12 h-12 flex items-center justify-center">
+                               <Loader2 size={24} className="animate-spin text-indigo-500" />
+                               <span className="absolute text-[8px] font-black text-white">{uploadProgress?.agreement || 0}%</span>
+                             </div>
+                             <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uploading...</span>
+                          </div>
                        ) : (
-                         <>
-                           <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
-                              <Upload size={18} className="text-slate-400 group-hover/upload:text-indigo-400" />
-                           </div>
-                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Agreement</span>
-                         </>
+                          <>
+                            <div className="w-10 h-10 bg-slate-700/30 rounded-xl flex items-center justify-center mb-2 group-hover/upload:scale-110 transition-transform">
+                               <Upload size={18} className="text-slate-200 group-hover/upload:text-indigo-400" />
+                            </div>
+                            <span className="text-[10px] font-black text-indigo-200/80 uppercase tracking-widest">Select Agreement</span>
+                          </>
                        )}
                        <input type="file" className="hidden" accept="image/*,application/pdf,.doc,.docx" onChange={(e) => handleDocUpload('agreementUrl', e.target.files[0])} />
                     </label>
                   ) : !farmer.agreementUrl && (
-                    <div className="flex items-center justify-center h-20 text-slate-600 italic text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
+                    <div className="flex items-center justify-center h-20 text-slate-300 text-[10px] bg-slate-900/20 rounded-2xl border border-slate-700/20">Not Available</div>
                   )}
                 </div>
             </div>
@@ -391,7 +391,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           {isAdmin && !isEditing && (
             <div className="mb-10 animate-in slide-in-from-top-4 duration-500">
                <div className="flex items-center justify-start gap-2 mb-6">
-                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Record New Payment</span>
+                  <span className="text-[11px] font-black text-indigo-200/80 uppercase tracking-widest">Record New Payment</span>
                   <CreditCard size={12} className="text-indigo-400" />
                </div>
 
@@ -400,7 +400,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                      {/* Left: Image Upload Zone */}
                      <div className="relative group/upload h-full">
                         <label className="flex flex-col items-center justify-center w-full h-44 bg-slate-900/50 border-2 border-dashed border-slate-700 hover:border-indigo-500/50 cursor-pointer rounded-[32px] p-6 transition-all group-active/upload:scale-95 group/upload">
-                           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-600 group-hover/upload:text-indigo-400 transition-colors mb-4 relative overflow-hidden">
+                           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-indigo-200/80 group-hover/upload:text-indigo-400 transition-colors mb-4 relative overflow-hidden">
                               {uploadProgress?.receipt > 0 ? (
                                 <div className="flex flex-col items-center">
                                   <Loader2 size={24} className="animate-spin text-indigo-500" />
@@ -413,10 +413,10 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                               )}
                            </div>
                            <div className="text-center">
-                              <p className="text-[14px] font-black text-slate-300">
+                              <p className="text-[14px] font-black text-slate-200">
                                 {uploadProgress?.receipt > 0 ? "Uploading Receipt..." : file ? "Receipt Selected" : "Choose Receipt"}
                               </p>
-                              <p className="text-[9px] text-slate-500 mt-2 uppercase tracking-widest italic">PDF, PNG, JPEG SUPPORT</p>
+                              <p className="text-[9px] text-indigo-200/70 mt-2 uppercase tracking-widest">PDF, PNG, JPEG SUPPORT</p>
                            </div>
                            <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files[0])} />
                         </label>
@@ -431,7 +431,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                                 className={`flex-1 py-4 px-2 text-[12px] font-black rounded-2xl border transition-all ${
                                   method === m
                                   ? 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/30' 
-                                  : 'bg-slate-900 border-slate-700 text-slate-500 hover:text-slate-300'
+                                  : 'bg-slate-900 border-slate-700 text-indigo-200/70 hover:text-slate-200'
                                 }`}
                              >
                                {m}
@@ -440,7 +440,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                         </div>
 
                           <div className="relative bg-slate-900/80 border border-slate-700 rounded-[32px] p-2 flex items-center shadow-inner group/input focus-within:border-indigo-500/50 transition-all font-sans">
-                           <div className="w-14 h-14 flex items-center justify-center text-slate-600">
+                           <div className="w-14 h-14 flex items-center justify-center text-indigo-300/80">
                               <CreditCard size={24} />
                            </div>
                            <input 
@@ -449,7 +449,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                               disabled={!isAdmin}
                               onChange={(e) => setAmount(e.target.value)}
                               placeholder="Enter amount..."
-                              className="bg-transparent flex-1 py-5 pl-8 text-left text-2xl font-black text-white italic placeholder:text-slate-700 focus:outline-none disabled:opacity-50"
+                              className="bg-transparent flex-1 py-5 pl-8 text-left text-2xl font-black text-white placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
                            />
                           </div>
                      </div>
@@ -461,17 +461,17 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
           {/* History Section */}
           <div className="animate-in fade-in duration-700 pb-10">
             <div className="flex items-center justify-start gap-2 mb-8">
-               <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Payment Details</span>
+               <span className="text-[11px] font-black text-indigo-200/80 uppercase tracking-widest">Payment Details</span>
             </div>
             
             <div className="overflow-x-auto no-scrollbar">
                <table className="w-full text-left border-collapse">
                  <thead>
                    <tr className="border-b border-slate-700/50">
-                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Date</th>
-                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Amount & Receipt</th>
-                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic">Method</th>
-                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-slate-500 italic text-center">Preview</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Date</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Amount & Receipt</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Method</th>
+                     <th className="pb-4 text-[10px] uppercase tracking-widest font-black text-indigo-200/80 text-center">Preview</th>
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-slate-800/20">
@@ -492,8 +492,8 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                </table>
                {!farmer.history?.length && (
                  <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
-                    <Receipt size={48} className="text-slate-400" />
-                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500">No History Records</p>
+                    <Receipt size={48} className="text-indigo-200/60" />
+                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-indigo-200/70">No History Records</p>
                  </div>
                )}
             </div>
@@ -516,14 +516,14 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                {isAdmin && (
                  <button 
                   onClick={() => setIsEditing(true)}
-                  className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 text-[10px] lg:text-sm uppercase tracking-widest px-2"
+                  className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-200 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 text-[10px] lg:text-sm uppercase tracking-widest px-2"
                  >
                    Edit
                  </button>
                )}
                <button 
                 onClick={onClose}
-                className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center text-[10px] lg:text-sm uppercase tracking-widest px-2"
+                className="flex-1 h-14 lg:h-16 border border-slate-700 hover:bg-slate-800 text-slate-200 font-black rounded-2xl transition-all active:scale-95 flex items-center justify-center text-[10px] lg:text-sm uppercase tracking-widest px-2"
                >
                  Close
                </button>
@@ -539,7 +539,7 @@ const FarmerDetailModal = memo(({ farmer, isOpen, onClose, onRecordPayment, onUp
                </button>
                <button 
                 onClick={() => setIsEditing(false)}
-                className="flex-1 h-16 bg-slate-800 text-slate-400 font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest"
+                className="flex-1 h-16 bg-slate-800 text-slate-300 font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest"
                >
                  Cancel
                </button>
@@ -579,7 +579,7 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
             className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none focus:border-indigo-500 transition-colors disabled:opacity-50"
           />
         ) : (
-          <span className="text-[13px] font-bold text-slate-300">{entry.date}</span>
+          <span className="text-[13px] font-bold text-slate-200">{entry.date}</span>
         )}
       </td>
       <td className="py-4">
@@ -621,7 +621,7 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
             <option value="Bank Payment">Bank Payment</option>
           </select>
         ) : (
-          <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+          <div className="text-[11px] font-black uppercase tracking-widest text-slate-200">
              {entry.method || 'Cash'}
           </div>
         )}
@@ -644,14 +644,14 @@ const HistoryRow = ({ entry, onUpdate, onDelete, globalIsEditing, setPreviewImag
             </button>
           ) : (
             <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-slate-800/50 border border-slate-700/30 flex items-center justify-center">
-               <ImageIcon size={14} className="text-slate-600 opacity-20" />
+               <ImageIcon size={14} className="text-indigo-300 opacity-30" />
             </div>
           )}
           
           {globalIsEditing && (
             <button 
               onClick={(e) => { e.stopPropagation(); onDelete(); }} 
-              className="p-1.5 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all active:scale-95 ml-1"
+              className="p-1.5 text-slate-200 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all active:scale-95 ml-1"
               title="Delete Record"
             >
               <X size={16} />
@@ -669,7 +669,7 @@ const MiniStat = ({ label, value, icon, color }) => (
             {icon}
             <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>
         </div>
-        <p className="text-sm font-black text-white italic truncate">{value}</p>
+        <p className="text-sm font-black text-white truncate">{value}</p>
     </div>
 );
 

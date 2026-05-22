@@ -185,18 +185,18 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-start gap-3 lg:gap-4 w-full lg:w-auto">
           {/* Compact search */}
           <div className="relative w-full max-w-md lg:max-w-[260px]">
-            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 pointer-events-none" />
             <input
               type="text"
               placeholder="Search reports..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all text-center uppercase font-black italic tracking-widest"
+              className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl py-2.5 pl-9 pr-8 text-xs text-white placeholder-slate-450 focus:border-indigo-500 outline-none transition-all text-center uppercase font-black tracking-widest"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-200 hover:text-white transition-colors"
               >
                 <X size={11} />
               </button>
@@ -204,7 +204,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
           </div>
 
           <div className="flex items-center justify-start gap-2 shrink-0">
-            <span className="px-3 lg:px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[9px] lg:text-[10px] font-black text-white italic uppercase tracking-widest">
+            <span className="px-3 lg:px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-[9px] lg:text-[10px] font-black text-white uppercase tracking-widest">
               {filtered.length} Records
             </span>
             <button
@@ -234,13 +234,13 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
             {/* Type */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">Type</label>
+              <label className="block text-[12px] font-black text-indigo-200/80 mb-2 uppercase tracking-widest">Type</label>
               <div className="flex flex-wrap gap-2">
                 {types.map(t => (
                   <button
                     key={t}
                     onClick={() => setTypeFilter(t)}
-                    className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${typeFilter === t ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-indigo-500/30'}`}
+                    className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${typeFilter === t ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-indigo-200/75 hover:bg-slate-700 hover:text-slate-100'}`}
                   >
                     {t}
                   </button>
@@ -250,7 +250,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
             {/* Category */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">Category</label>
+              <label className="block text-[12px] font-black text-indigo-200/80 mb-2 uppercase tracking-widest">Category</label>
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
@@ -262,7 +262,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
             {/* Date From */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">From Date</label>
+              <label className="block text-[12px] font-black text-indigo-200/80 mb-2 uppercase tracking-widest">From Date</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -273,7 +273,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
 
             {/* Date To */}
             <div>
-              <label className="block text-[12px] font-black text-slate-500 mb-2 uppercase tracking-widest">To Date</label>
+              <label className="block text-[12px] font-black text-indigo-200/80 mb-2 uppercase tracking-widest">To Date</label>
               <input
                 type="date"
                 value={dateTo}
@@ -286,7 +286,7 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
           {/* Active filter tags */}
           {hasFilters && (
             <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-slate-700/40">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Active:</span>
+              <span className="text-[10px] text-indigo-200/80 uppercase tracking-widest font-black">Active:</span>
               {typeFilter !== 'All'     && <span className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl text-[9px] font-black uppercase">{typeFilter}</span>}
               {categoryFilter !== 'All' && <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl text-[9px] font-black uppercase">{categoryFilter}</span>}
               {dateFrom  && <span className="px-3 py-1 bg-slate-700 border border-slate-600 text-slate-300 rounded-xl text-[9px] font-black uppercase">From: {dateFrom}</span>}
@@ -311,45 +311,45 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
               <tr className="border-b border-slate-700/50">
                 <th
                   onClick={() => toggleSort('date')}
-                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none italic"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest cursor-pointer hover:text-white transition-colors whitespace-nowrap select-none"
                 >
                   Date {sortField === 'date' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Category</th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest italic">Description</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest">Category</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest">Description</th>
                 <th
                   onClick={() => toggleSort('amount')}
-                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-left cursor-pointer hover:text-white transition-colors select-none italic"
+                  className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-left cursor-pointer hover:text-white transition-colors select-none"
                 >
                   Amount {sortField === 'amount' ? (sortDir === 'desc' ? '↓' : '↑') : ''}
                 </th>
-                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right italic">Actions</th>
+                <th className="p-5 text-[11px] font-black text-white/90 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/40">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-24 text-center">
-                    <div className="flex flex-col items-center gap-4 opacity-30">
-                      <FileText size={48} className="text-slate-500" />
-                      <p className="text-lg font-black uppercase tracking-widest text-slate-500">No Records Found</p>
-                      <p className="text-sm text-slate-600 font-bold">Try adjusting your filters or date range.</p>
+                    <div className="flex flex-col items-center gap-4 opacity-40">
+                      <FileText size={48} className="text-indigo-300" />
+                      <p className="text-lg font-black uppercase tracking-widest text-indigo-200/80">No Records Found</p>
+                      <p className="text-sm text-slate-400 font-bold">Try adjusting your filters or date range.</p>
                     </div>
                   </td>
                 </tr>
               ) : filtered.map(entry => (
                 <tr key={entry.id} className="group hover:bg-slate-700/20 transition-all duration-200">
                   <td className="p-5 whitespace-nowrap">
-                    <p className="text-white font-black italic uppercase tracking-widest text-xs">{entry._date || '—'}</p>
+                    <p className="text-white font-black uppercase tracking-widest text-xs">{entry._date || '—'}</p>
                   </td>
                   <td className="p-5">
                     <span className="text-[11px] font-black text-white uppercase tracking-widest">{entry._category}</span>
                   </td>
                   <td className="p-5 max-w-[200px]">
-                    <p className="text-white font-bold text-[15px] leading-snug truncate italic">{entry._description}</p>
+                    <p className="text-white font-bold text-[15px] leading-snug truncate">{entry._description}</p>
                   </td>
                   <td className="p-5 text-left whitespace-nowrap">
-                    <p className={`text-lg font-black italic ${AMOUNT_COLORS[entry._type]}`}>
+                    <p className={`text-lg font-black ${AMOUNT_COLORS[entry._type]}`}>
                       {['revenue', 'pending'].includes(entry._type) ? '+' : '−'} Rs. {Number(entry.amount).toLocaleString()}
                     </p>
                   </td>
@@ -380,21 +380,21 @@ export default function FinancialReports({ entries = [], selectedYear = new Date
         {/* Footer */}
         {filtered.length > 0 && (
           <div className="border-t border-slate-700/50 px-6 py-4 bg-[#0f172a] flex flex-wrap items-center justify-between gap-4">
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">{filtered.length} records</p>
+            <p className="text-[10px] text-indigo-200/80 uppercase tracking-widest font-black">{filtered.length} records</p>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">In:</span>
-                <span className="text-sm font-black italic text-emerald-400">Rs. {(totals.revenue + totals.pending).toLocaleString()}</span>
+                <span className="text-sm font-black text-emerald-400">Rs. {(totals.revenue + totals.pending).toLocaleString()}</span>
               </div>
               <div className="w-px h-4 bg-slate-700" />
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-rose-400 font-black uppercase tracking-widest">Out:</span>
-                <span className="text-sm font-black italic text-rose-400">Rs. {(totals.expense + totals.shopRepair).toLocaleString()}</span>
+                <span className="text-sm font-black text-rose-400">Rs. {(totals.expense + totals.shopRepair).toLocaleString()}</span>
               </div>
               <div className="w-px h-4 bg-slate-700" />
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Net:</span>
-                <span className={`text-sm font-black italic ${net >= 0 ? 'text-indigo-400' : 'text-rose-400'}`}>
+                <span className="text-[10px] text-indigo-200/80 font-black uppercase tracking-widest">Net:</span>
+                <span className={`text-sm font-black ${net >= 0 ? 'text-indigo-400' : 'text-rose-400'}`}>
                   Rs. {net.toLocaleString()}
                 </span>
               </div>

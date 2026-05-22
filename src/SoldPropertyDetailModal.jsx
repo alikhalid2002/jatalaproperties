@@ -53,17 +53,17 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
         {/* Header - Optimized for mobile */}
         <div className="p-6 lg:p-10 border-b border-slate-700 bg-slate-900/40 relative flex flex-col items-center text-center">
           <div className="absolute top-6 right-6 flex items-center gap-3">
-             <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-2xl transition-all group">
+             <button onClick={onClose} className="p-3 bg-slate-800 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-2xl transition-all group">
                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
              </button>
           </div>
           
           <div className="flex flex-col items-center gap-3 mb-6">
-            <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter italic leading-tight text-center">
+            <h2 className="text-2xl lg:text-4xl font-black text-white uppercase tracking-tighter leading-tight text-center">
               {property.nameEn || property.nameUr}
             </h2>
             <div className="flex items-center gap-3">
-               <span className="text-[10px] lg:text-[11px] font-black text-slate-400 uppercase tracking-widest italic">Buyer: {property.buyerName}</span>
+                <span className="text-[10px] lg:text-[11px] font-black text-indigo-200/80 uppercase tracking-widest">Buyer: {property.buyerName}</span>
                <div className="w-1.5 h-1.5 rounded-full bg-slate-700"></div>
                <div className={`px-3 py-1 rounded-xl border flex items-center gap-1.5 ${
                  isPaid 
@@ -98,14 +98,14 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2">Payment Method</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-indigo-200/80 block mb-2">Payment Method</label>
                     <div className="flex gap-2">
                       {['Cash', 'Bank', 'Cheque'].map((m) => (
                         <button 
                           key={m}
                           onClick={() => setMethod(m)}
                           className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl border transition-all ${
-                            method === m ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300'
+                            method === m ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' : 'bg-slate-800 border-slate-700 text-indigo-200/75 hover:text-slate-100'
                           }`}
                         >
                           {m}
@@ -114,15 +114,15 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
                     </div>
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2">Amount</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-indigo-200/80 block mb-2">Amount</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">Rs.</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-200/80 font-bold text-xs">Rs.</span>
                       <input 
                         type="number" 
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 pl-12 pr-4 text-white font-bold focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-3 pl-12 pr-4 text-white font-bold focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -130,9 +130,9 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2">Date</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-indigo-200/80 block mb-2">Date</label>
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300" size={18} />
                       <input 
                         type="date" 
                         value={date}
@@ -157,15 +157,15 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
 
           {/* History Table */}
           <div className="p-6 lg:p-8">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-6 italic">Installment History</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-200/80 mb-6">Installment History</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-700">
-                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Date</th>
-                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Amount</th>
-                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500">Method</th>
-                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-slate-500 text-left">Balance</th>
+                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Date</th>
+                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Amount</th>
+                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-indigo-200/80">Method</th>
+                    <th className="pb-4 p-2 text-[10px] uppercase tracking-widest font-black text-indigo-200/80 text-left">Balance</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
@@ -178,16 +178,16 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
                         <span className="text-[13px] font-black text-emerald-400">Rs. {Number(inst.amount)?.toLocaleString()}</span>
                       </td>
                       <td className="py-4 p-2">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{inst.method}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">{inst.method}</span>
                       </td>
                       <td className="py-4 p-2 text-left">
-                        <span className="text-[11px] font-black text-slate-400 italic">Rs. {Number(inst.remainingBalanceAfter || 0).toLocaleString()}</span>
+                        <span className="text-[11px] font-black text-slate-200">Rs. {Number(inst.remainingBalanceAfter || 0).toLocaleString()}</span>
                       </td>
                     </tr>
                   ))}
                   {(!property.installments || property.installments.length === 0) && (
                     <tr>
-                      <td colSpan="4" className="py-12 text-center text-xs font-bold text-slate-600 uppercase tracking-[0.2em]">No installments recorded yet</td>
+                      <td colSpan="4" className="py-12 text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">No installments recorded yet</td>
                     </tr>
                   )}
                 </tbody>
@@ -214,8 +214,8 @@ const SoldPropertyDetailModal = ({ property, isOpen, onClose, onRecordInstallmen
 const MiniStat = ({ label, value, color, isHighlight }) => (
     <div className={`p-4 rounded-2xl transition-all duration-500 ${isHighlight ? 'bg-orange-500/10 border border-orange-500/30 font-black shadow-lg shadow-orange-500/5' : `bg-slate-800/40 border border-slate-700/50`}`}>
         <div className="flex flex-col items-center text-center gap-1.5">
-            <h4 className={`text-[13px] font-black uppercase tracking-widest leading-none ${isHighlight ? 'text-orange-400' : 'text-slate-400'}`}>{label}</h4>
-            <p className={`text-base lg:text-lg font-black italic mt-1 ${isHighlight ? 'text-orange-400' : 'text-white'}`}>{value}</p>
+            <h4 className={`text-[13px] font-black uppercase tracking-widest leading-none ${isHighlight ? 'text-orange-400' : 'text-slate-200'}`}>{label}</h4>
+            <p className={`text-base lg:text-lg font-black mt-1 ${isHighlight ? 'text-orange-400' : 'text-white'}`}>{value}</p>
         </div>
     </div>
 );

@@ -33,8 +33,8 @@ class ErrorBoundary extends React.Component {
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-4xl font-black italic tracking-tighter">APPLICATION ERROR</h1>
-              <p className="text-slate-400 text-sm font-medium leading-relaxed">
+              <h1 className="text-4xl font-black tracking-tighter">APPLICATION ERROR</h1>
+              <p className="text-slate-200 text-sm font-medium leading-relaxed">
                 We encountered a technical issue while rendering the dashboard. This happens sometimes due to stale cache or network sync errors.
               </p>
               <div className="p-6 bg-slate-900/50 rounded-2xl border border-slate-700/50 text-left font-mono text-[10px] text-rose-300 overflow-auto max-h-32">
@@ -51,13 +51,13 @@ class ErrorBoundary extends React.Component {
               </button>
               <button 
                 onClick={this.handleRestart}
-                className="w-full py-4 rounded-3xl bg-slate-800 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-rose-600 hover:text-white transition-all active:scale-95"
+                className="w-full py-4 rounded-3xl bg-slate-800 text-slate-200 font-black uppercase tracking-widest text-[10px] hover:bg-rose-600 hover:text-white transition-all active:scale-95"
               >
                 Clear Data & Force Restart
               </button>
             </div>
             
-            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Premium Recovery System v1.1.0</p>
+            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Premium Recovery System v1.1.0</p>
           </div>
         </div>
       );

@@ -197,12 +197,12 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                  <option value="RAJANPUR">Rajanpur</option>
                  <option value="DASUHA">Dasuha</option>
                </select>
-               <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-400">
+               <select value={newFarmer.landUnit} onChange={e => setNewFarmer({...newFarmer, landUnit: e.target.value})} className="bg-slate-900 border border-slate-700 p-4 rounded-xl font-black text-[10px] uppercase text-slate-200">
                  <option value="Acres">Acres</option>
                  <option value="Kanal">Kanal</option>
                </select>
              </div>
-             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black italic uppercase tracking-widest text-xs">Register Member</button>
+             <button className="w-full bg-indigo-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Register Member</button>
            </form>
             <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-slate-800/50">
               {farmers.length > 0 ? (
@@ -210,11 +210,11 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                   <div key={f.id} className="py-2.5 flex justify-between items-center group/item hover:bg-slate-800/10 px-2 -mx-2 rounded-xl transition-colors">
                     <div className="flex flex-col">
                       <div className="font-black text-xs uppercase text-white tracking-wider">{f.nameEn || f.nameUr}</div>
-                      <div className="text-[9px] font-bold text-slate-500 uppercase">{f.landSize} {f.landUnit}</div>
+                      <div className="text-[9px] font-bold text-indigo-200/80 uppercase">{f.landSize} {f.landUnit}</div>
                     </div>
                     <button 
                       onClick={() => deleteFarmer(f.id)}
-                      className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                      className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
                       title="Remove Member"
                     >
                       <Trash2 size={16} />
@@ -222,7 +222,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                   </div>
                 ))
               ) : (
-                <div className="py-20 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+                <div className="py-20 text-center text-indigo-200/80 font-black uppercase text-[10px] tracking-widest">
                   No Members Found
                 </div>
               )}
@@ -261,7 +261,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                  placeholder="Area/Size (e.g. 12x15)" 
                />
              </div>
-             <button className="w-full bg-blue-600 py-4 rounded-xl font-black italic uppercase tracking-widest text-xs">Add Commercial Shop</button>
+             <button className="w-full bg-blue-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs">Add Commercial Shop</button>
            </form>
            <div className="divide-y divide-slate-800/50 max-h-[300px] overflow-y-auto no-scrollbar">
              {shops.length > 0 ? (
@@ -269,18 +269,18 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                  <div key={s.id} className="py-3 flex justify-between items-center font-black uppercase text-xs">
                    <div className="flex flex-col">
                      <span className="text-white tracking-wider font-black text-xs">{s.tenant}</span>
-                     <span className="text-[9px] font-bold text-slate-500 lowercase">{s.name} | Rs. {Number(s.rent || 0).toLocaleString()} | {s.area || 'N/A'}</span>
+                     <span className="text-[9px] font-bold text-indigo-200/80 lowercase">{s.name} | Rs. {Number(s.rent || 0).toLocaleString()} | {s.area || 'N/A'}</span>
                    </div>
                    <button 
                      onClick={() => handleDeleteShop(s.id)}
-                     className="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                     className="p-2.5 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
                    >
                      <Trash2 size={14}/>
                    </button>
                  </div>
                ))
              ) : (
-               <div className="py-12 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+               <div className="py-12 text-center text-indigo-200/80 font-black uppercase text-[10px] tracking-widest">
                  No Shops Found
                </div>
              )}
@@ -311,7 +311,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                  <div key={p.id} className="py-2.5 flex justify-between items-center group/item hover:bg-slate-800/10 px-2 -mx-2 rounded-xl transition-colors">
                    <div className="flex flex-col">
                      <div className="font-black text-xs uppercase text-white tracking-wider">{p.nameEn || p.nameUr}</div>
-                     <div className="text-[9px] font-bold text-slate-500 uppercase">Buyer: {p.buyerName} | Rs. {Number(p.totalPrice || 0).toLocaleString()}</div>
+                     <div className="text-[9px] font-bold text-indigo-200/80 uppercase">Buyer: {p.buyerName} | Rs. {Number(p.totalPrice || 0).toLocaleString()}</div>
                    </div>
                    <div className="flex gap-2">
                     <button 
@@ -321,14 +321,14 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                          setExpandedSection('sold'); // Ensure same section is open
                          window.scrollTo({ top: 0, behavior: 'smooth' });
                        }}
-                       className="p-3 bg-slate-900 hover:bg-indigo-500/20 text-slate-600 hover:text-indigo-400 rounded-xl transition-all active:scale-90"
+                       className="p-3 bg-slate-900 hover:bg-indigo-500/20 text-slate-200 hover:text-indigo-400 rounded-xl transition-all active:scale-90"
                        title="Edit Property"
                      >
                        <Settings size={16} />
                      </button>
                      <button 
                        onClick={() => { if(window.confirm('Delete this sold property?')) deleteProperty(p.id) }}
-                       className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-600 hover:text-rose-500 rounded-xl transition-all active:scale-90"
+                       className="p-3 bg-slate-900 hover:bg-rose-500/20 text-slate-200 hover:text-rose-500 rounded-xl transition-all active:scale-90"
                        title="Remove Property"
                      >
                        <Trash2 size={16} />
@@ -337,7 +337,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                  </div>
                ))
              ) : (
-               <div className="py-20 text-center text-slate-600 font-black uppercase text-[10px] tracking-widest">
+               <div className="py-20 text-center text-indigo-200/80 font-black uppercase text-[10px] tracking-widest">
                  No Sold Properties Found
                </div>
              )}
@@ -372,7 +372,7 @@ const SettingsPage = ({ entries = [], setTransactions, selectedYear, isAdmin }) 
                   window.location.reload();
                 }
               }} 
-              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-slate-400 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
+              className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl lg:rounded-[32px] font-black uppercase text-[10px] lg:text-[11px] text-slate-200 border border-slate-700/50 hover:bg-slate-800 transition-all text-center leading-tight gap-2"
             >
               Wipe Mobile Cache
             </button>
