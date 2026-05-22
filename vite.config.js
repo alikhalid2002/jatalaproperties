@@ -7,7 +7,7 @@ export default defineConfig({
     allowedHosts: true,
     host: true,
     watch: {
-      ignored: ['**/node_modules_corrupted/**']
+      ignored: ['**/node_modules_corrupted/**', '**/.git_corrupted/**']
     }
   },
   build: {
