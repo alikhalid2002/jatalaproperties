@@ -42,6 +42,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
 
   const handleSaveInfo = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     await updateAreaInfo({
       location: locationInput,
       totalAcres: acresInput
@@ -51,6 +52,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
 
   const handleSaveMemo = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     if (!memoTitle.trim() && !memoContent.trim()) return;
 
     if (editingMemoId) {
@@ -76,6 +78,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
   };
 
   const handleEditMemoClick = (memo) => {
+    if (!isAdmin) return;
     setEditingMemoId(memo.id);
     setMemoTitle(memo.title);
     setMemoContent(memo.content);
@@ -84,6 +87,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
   };
 
   const processFiles = async (filesList) => {
+    if (!isAdmin) return;
     const files = Array.from(filesList || []);
     for (const file of files) {
       await uploadFile(file);
@@ -96,18 +100,21 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
   };
 
   const handleDragOver = (e) => {
+    if (!isAdmin) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e) => {
+    if (!isAdmin) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e) => {
+    if (!isAdmin) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -117,6 +124,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
   };
 
   const triggerFilePicker = () => {
+    if (!isAdmin) return;
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -145,14 +153,16 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
       
       {/* Hidden File Input */}
-      <input 
-        ref={fileInputRef}
-        type="file" 
-        multiple 
-        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
-        className="hidden" 
-        onChange={handleFileInputChange}
-      />
+      {isAdmin && (
+        <input 
+          ref={fileInputRef}
+          type="file" 
+          multiple 
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+          className="hidden" 
+          onChange={handleFileInputChange}
+        />
+      )}
 
       <div className="w-full max-w-3xl bg-[#090d16] border border-indigo-500/30 rounded-[28px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
@@ -168,6 +178,11 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                 <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold uppercase tracking-wider">
                   Area Portal
                 </span>
+                {!isAdmin && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-slate-400 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Lock size={10} /> Read Only
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 font-semibold mt-0.5">Media, Documents & Territory Information</p>
             </div>
@@ -209,8 +224,8 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
             </button>
           </div>
 
-          {/* Quick Action Buttons */}
-          {activeTab === 'files' && (
+          {/* Quick Action Buttons (Admin only) */}
+          {isAdmin && activeTab === 'files' && (
             <button
               onClick={triggerFilePicker}
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black tracking-wider uppercase flex items-center gap-2 shadow-lg shadow-indigo-950/40 transition-all active:scale-95 cursor-pointer my-2"
@@ -220,7 +235,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
             </button>
           )}
 
-          {activeTab === 'info' && !showMemoForm && (
+          {isAdmin && activeTab === 'info' && !showMemoForm && (
             <button
               onClick={() => {
                 setEditingMemoId(null);
@@ -257,26 +272,28 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
           {activeTab === 'files' && (
             <div className="space-y-6">
               
-              {/* Drag & Drop Upload Zone */}
-              <div 
-                onClick={triggerFilePicker}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={`group border-2 border-dashed ${
-                  isDragging 
-                    ? 'border-indigo-400 bg-indigo-500/20 scale-[1.01]' 
-                    : 'border-indigo-500/30 hover:border-indigo-400 bg-indigo-500/5 hover:bg-indigo-500/10'
-                } rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2`}
-              >
-                <div className="w-12 h-12 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                  <Upload size={22} />
+              {/* Drag & Drop Upload Zone (Admin only) */}
+              {isAdmin && (
+                <div 
+                  onClick={triggerFilePicker}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`group border-2 border-dashed ${
+                    isDragging 
+                      ? 'border-indigo-400 bg-indigo-500/20 scale-[1.01]' 
+                      : 'border-indigo-500/30 hover:border-indigo-400 bg-indigo-500/5 hover:bg-indigo-500/10'
+                  } rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2`}
+                >
+                  <div className="w-12 h-12 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                    <Upload size={22} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-white uppercase tracking-wider">Click or Drag & Drop Files Here</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Supports PNG, JPG, PDF, DOCX, XLSX, TXT, CSV</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-black text-white uppercase tracking-wider">Click or Drag & Drop Files Here</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Supports PNG, JPG, PDF, DOCX, XLSX, TXT, CSV</p>
-                </div>
-              </div>
+              )}
 
               {/* Images Section */}
               {images.length > 0 && (
@@ -323,13 +340,15 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                             <p className="text-[11px] font-bold text-slate-200 truncate">{img.name}</p>
                             <p className="text-[9px] text-slate-400 mt-0.5">{img.size} • {img.uploadedAt}</p>
                           </div>
-                          <button
-                            onClick={() => setConfirmDelete({ id: img.id, name: img.name, type: 'file' })}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ml-2"
-                            title="Delete Image"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          {isAdmin && (
+                            <button
+                              onClick={() => setConfirmDelete({ id: img.id, name: img.name, type: 'file' })}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ml-2"
+                              title="Delete Image"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -354,12 +373,12 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
                             <File size={20} />
-                            </div>
+                          </div>
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors">{docItem.name}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">{docItem.size} • Uploaded on {docItem.uploadedAt}</p>
-                            </div>
                           </div>
+                        </div>
 
                         <div className="flex items-center gap-2 shrink-0">
                           <a
@@ -371,14 +390,16 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                             <ExternalLink size={13} />
                             <span className="hidden sm:inline">Open</span>
                           </a>
-                          <button
-                            onClick={() => setConfirmDelete({ id: docItem.id, name: docItem.name, type: 'file' })}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
-                            title="Delete Document"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                          </div>
+                          {isAdmin && (
+                            <button
+                              onClick={() => setConfirmDelete({ id: docItem.id, name: docItem.name, type: 'file' })}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
+                              title="Delete Document"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -392,13 +413,15 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                     <Paperclip size={24} />
                   </div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">No images or documents uploaded yet</p>
-                  <button
-                    onClick={triggerFilePicker}
-                    className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider cursor-pointer hover:bg-indigo-500 transition-all inline-flex items-center gap-1.5 shadow-lg"
-                  >
-                    <Plus size={14} />
-                    <span>Select & Attach Files</span>
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={triggerFilePicker}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider cursor-pointer hover:bg-indigo-500 transition-all inline-flex items-center gap-1.5 shadow-lg"
+                    >
+                      <Plus size={14} />
+                      <span>Select & Attach Files</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -415,22 +438,24 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                     <LandPlot size={15} />
                     <span>Territory Overview</span>
                   </h3>
-                  {!isEditingInfo ? (
-                    <button
-                      onClick={() => setIsEditingInfo(true)}
-                      className="text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-                    >
-                      <Edit3 size={13} />
-                      <span>Edit Specs</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSaveInfo}
-                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase transition-all cursor-pointer shadow-md flex items-center gap-1"
-                    >
-                      <Check size={13} />
-                      <span>Save Specs</span>
-                    </button>
+                  {isAdmin && (
+                    !isEditingInfo ? (
+                      <button
+                        onClick={() => setIsEditingInfo(true)}
+                        className="text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                      >
+                        <Edit3 size={13} />
+                        <span>Edit Specs</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSaveInfo}
+                        className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase transition-all cursor-pointer shadow-md flex items-center gap-1"
+                      >
+                        <Check size={13} />
+                        <span>Save Specs</span>
+                      </button>
+                    )
                   )}
                 </div>
 
@@ -441,7 +466,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                       <span>Location</span>
                     </label>
                     <input 
-                      disabled={!isEditingInfo}
+                      disabled={!isEditingInfo || !isAdmin}
                       type="text"
                       placeholder="e.g. Rajanpur District"
                       value={locationInput}
@@ -456,7 +481,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                       <span>Total Land Acreage</span>
                     </label>
                     <input 
-                      disabled={!isEditingInfo}
+                      disabled={!isEditingInfo || !isAdmin}
                       type="text"
                       placeholder="e.g. 150 Acres"
                       value={acresInput}
@@ -467,8 +492,8 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                 </div>
               </div>
 
-              {/* Memo Creation / Edit Modal Form */}
-              {showMemoForm && (
+              {/* Memo Creation / Edit Modal Form (Admin Only) */}
+              {isAdmin && showMemoForm && (
                 <form onSubmit={handleSaveMemo} className="bg-[#0e1422] border border-indigo-500/40 rounded-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
                   <div className="flex items-center justify-between pb-2 border-b border-white/10">
                     <h4 className="text-xs font-black uppercase tracking-widest text-indigo-300 flex items-center gap-2">
@@ -585,27 +610,29 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                                 <Clock size={11} />
                                 <span>{memo.date}</span>
                               </span>
-                              </div>
+                            </div>
                             <h4 className="text-sm font-black text-white uppercase tracking-wider pt-1">{memo.title}</h4>
-                            </div>
-
-                          <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => handleEditMemoClick(memo)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-300 hover:bg-indigo-500/10 transition-all cursor-pointer"
-                              title="Edit Memo"
-                            >
-                              <Edit3 size={15} />
-                            </button>
-                            <button
-                              onClick={() => setConfirmDelete({ id: memo.id, name: memo.title, type: 'memo' })}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
-                              title="Delete Memo"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                            </div>
                           </div>
+
+                          {isAdmin && (
+                            <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => handleEditMemoClick(memo)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-300 hover:bg-indigo-500/10 transition-all cursor-pointer"
+                                title="Edit Memo"
+                              >
+                                <Edit3 size={15} />
+                              </button>
+                              <button
+                                onClick={() => setConfirmDelete({ id: memo.id, name: memo.title, type: 'memo' })}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
+                                title="Delete Memo"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
 
                         {memo.content && (
                           <p className="text-xs text-slate-300 font-normal leading-relaxed whitespace-pre-wrap pt-1 border-t border-white/5">
@@ -624,19 +651,21 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                         {memoSearch ? 'No memos match your search query' : 'No memos created for this area yet'}
                       </p>
-                      <button
-                        onClick={() => {
-                          setEditingMemoId(null);
-                          setMemoTitle('');
-                          setMemoContent('');
-                          setMemoTag('General');
-                          setShowMemoForm(true);
-                        }}
-                        className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider cursor-pointer hover:bg-indigo-500 transition-all inline-flex items-center gap-1.5 shadow-lg"
-                      >
-                        <Plus size={14} />
-                        <span>Create First Area Memo</span>
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => {
+                            setEditingMemoId(null);
+                            setMemoTitle('');
+                            setMemoContent('');
+                            setMemoTag('General');
+                            setShowMemoForm(true);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider cursor-pointer hover:bg-indigo-500 transition-all inline-flex items-center gap-1.5 shadow-lg"
+                        >
+                          <Plus size={14} />
+                          <span>Create First Area Memo</span>
+                        </button>
+                      )}
                     </div>
                   )
                 )}
@@ -663,8 +692,8 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
         </div>
       )}
 
-      {/* ── Confirm Delete Dialog ── */}
-      {confirmDelete && (
+      {/* ── Confirm Delete Dialog (Admin Only) ── */}
+      {isAdmin && confirmDelete && (
         <div className="fixed inset-0 z-70 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="w-full max-w-sm bg-[#0e1422] border border-rose-500/30 rounded-[24px] shadow-2xl p-6 space-y-5">
             <div className="flex flex-col items-center text-center space-y-3">
