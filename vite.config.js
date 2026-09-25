@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const APP_VERSION = `v1.4.${Date.now()}`; // Unique per build - forces SW cache invalidation
+
 export default defineConfig({
   server: {
     allowedHosts: true,
@@ -25,10 +27,18 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        cleanupOutdatedCaches: true
+        cleanupOutdatedCaches: true,
+        cacheId: APP_VERSION, // New cache ID per build = forces full SW update
+        runtimeCaching: [],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/],
+      },
+      devOptions: {
+        enabled: false
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
