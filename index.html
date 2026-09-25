@@ -10,6 +10,21 @@
     <meta name="theme-color" content="#0f172a" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <title>Jatala Properties Dashboard</title>
+    <script>
+      // Clear legacy service worker cache on mobile browsers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) caches.delete(name);
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
