@@ -439,7 +439,14 @@ const App = () => {
                    ))}
                 </div>
               )}
-              {view === 'landMembers' && <LandAssets isAdmin={isAdmin} selectedYear={selectedYear} selectedArea={selectedArea} />}
+              {view === 'landMembers' && (
+                <LandAssets 
+                  isAdmin={isAdmin} 
+                  selectedYear={selectedYear} 
+                  selectedArea={selectedArea || 'RAJANPUR'} 
+                  onOpenAreaModal={() => setSelectedAreaModal(selectedArea || 'RAJANPUR')} 
+                />
+              )}
               {view === 'Shops' && <ShopsPage isAdmin={isAdmin} selectedYear={selectedYear} />}
               {view === 'Sold' && <SoldProperties key={selectedYear} isAdmin={isAdmin} selectedYear={selectedYear} />}
               {view === 'Expenses' && <FinancialReports entries={entries} selectedYear={selectedYear} preFilter="Expense" isAdmin={isAdmin} />}

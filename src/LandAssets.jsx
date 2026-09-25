@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useFarmers } from './useFarmers';
 import { useFinanceData } from './useFinanceData';
 import { seedFarmersData } from './seedFarmers';
-import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map as LandPlot, UserCircle, Store, X, MapPin } from 'lucide-react';
+import { Search, Database, Calculator, Save, Calendar, Plus, Receipt, CheckCircle, AlertCircle, ArrowUpRight, ArrowDownRight, Clock, Map as LandPlot, UserCircle, Store, X, MapPin, Paperclip } from 'lucide-react';
 import { transliterateToEnglish } from './urduTransliterator';
 import FarmerDetailModal from './FarmerDetailModal';
 
-const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmin, selectedArea }) => {
+const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmin, selectedArea, onOpenAreaModal }) => {
   const { 
     farmers, 
     loading: farmersLoading, 
@@ -68,8 +68,8 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
       
 
       {/* Portfolio Area - Horizontal Style as per sample */}
-      <div className={`px-2 ${selectedArea.toUpperCase() === 'DASUHA' ? 'mb-4' : 'mb-16'}`}>
-        <div className="bg-[#111827]/60 border border-[#10B981]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+      <div className={`px-2 ${selectedArea.toUpperCase() === 'DASUHA' ? 'mb-4' : 'mb-8'} flex flex-col items-center gap-3`}>
+        <div className="bg-[#111827]/60 border border-[#10B981]/10 py-6 px-10 rounded-full flex flex-row items-center justify-center gap-6 shadow-[0_0_30px_rgba(16,185,129,0.05)] w-full max-w-2xl">
            <div className="p-3 bg-[#10B981]/10 text-[#10B981] rounded-2xl">
               <LandPlot size={24} />
            </div>
@@ -83,6 +83,17 @@ const LandAssets = ({ selectedYear = new Date().getFullYear().toString(), isAdmi
               </div>
            </div>
         </div>
+
+        {/* Mobile-Friendly Upload & Memos Button */}
+        {onOpenAreaModal && (
+          <button
+            onClick={onOpenAreaModal}
+            className="px-5 py-2.5 rounded-2xl bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 hover:text-white border border-indigo-500/40 text-xs font-black tracking-wider uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer"
+          >
+            <Paperclip size={15} className="text-indigo-400" />
+            <span>Upload {selectedArea} Files & Memos</span>
+          </button>
+        )}
       </div>
 
       {/* Yearly Income - Horizontal Style - ONLY FOR DASUHA */}
