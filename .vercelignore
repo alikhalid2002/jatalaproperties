@@ -1,0 +1,7 @@
+﻿node_modules
+.git
+backups
+scratch
+*.png
+*.jpg
+ip.txt

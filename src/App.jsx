@@ -4,7 +4,7 @@ import {
   ChevronRight, ChevronDown, Bell, User, Lock, Eye, EyeOff,
   Home, TrendingUp, TrendingDown, ArrowLeft, 
   CheckCircle, BarChart3, Settings, X, ArrowUpRight, ArrowDownRight, Calendar,
-  Fingerprint, Building2
+  Fingerprint, Building2, Paperclip, Upload, FolderPlus
 } from 'lucide-react';
 
 // --- FIREBASE & DATA HOOKS ---
@@ -20,16 +20,18 @@ const FinancialReports = lazy(() => import('./FinancialReports'));
 const SoldProperties = lazy(() => import('./SoldProperties'));
 import SettingsPage from './SettingsPage';
 import AddEntryModal from './AddEntryModal';
+import AreaModal from './AreaModal';
 import { seedFarmersData } from './seedFarmers';
 
 const App = () => {
   // --- Auth & Access States ---
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('jatala_auth') !== 'false');
+  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('jatala_is_admin') === 'true');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showQuickAdminModal, setShowQuickAdminModal] = useState(false);
 
   // --- UI States ---
   const [view, setView] = useState(() => localStorage.getItem('jatala_view') || 'dashboard');
@@ -37,13 +39,16 @@ const App = () => {
   const [selectedYear, setSelectedYear] = useState('2026');
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [showEntryModal, setShowEntryModal] = useState(false);
+  const [selectedAreaModal, setSelectedAreaModal] = useState(null);
 
   // --- Sync State to LocalStorage ---
   useEffect(() => { 
     localStorage.setItem('jatala_view', view);
+    localStorage.setItem('jatala_auth', isAuthenticated ? 'true' : 'false');
+    localStorage.setItem('jatala_is_admin', isAdmin ? 'true' : 'false');
     if (selectedArea) localStorage.setItem('jatala_selected_area', selectedArea);
     else localStorage.removeItem('jatala_selected_area');
-  }, [view, selectedArea]);
+  }, [view, selectedArea, isAuthenticated, isAdmin]);
 
   // --- Firebase Guest Initializer & Data Restoration ---
   useEffect(() => {
@@ -77,7 +82,12 @@ const App = () => {
     if (password === 'ali321') {
       setIsAdmin(true);
       setIsAuthenticated(true);
+      localStorage.setItem('jatala_is_admin', 'true');
+      localStorage.setItem('jatala_auth', 'true');
       setLoginError('');
+      setShowAdminLogin(false);
+      setShowQuickAdminModal(false);
+      setPassword('');
     } else {
       setLoginError('Incorrect administrative password');
     }
@@ -86,6 +96,8 @@ const App = () => {
   const handleGuestLogin = () => {
     setIsAdmin(false);
     setIsAuthenticated(true);
+    localStorage.setItem('jatala_is_admin', 'false');
+    localStorage.setItem('jatala_auth', 'true');
   };
 
   // --- 1. DUAL LOGIN GATEWAY ---
@@ -238,8 +250,23 @@ const App = () => {
             </div>
           </div>
 
-          <div className="flex gap-2.5">
-            <button className="w-10 h-10 rounded-full bg-slate-900/80 border border-slate-800/80 flex items-center justify-center text-slate-300 hover:text-white transition-all relative">
+          <div className="flex items-center gap-2.5">
+            {isAdmin ? (
+              <div className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-black tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-indigo-950/40">
+                <Fingerprint className="w-4 h-4 text-[#818cf8]" />
+                <span className="hidden sm:inline">Admin Mode</span>
+              </div>
+            ) : (
+              <button 
+                onClick={() => { setShowQuickAdminModal(true); setPassword(''); setLoginError(''); }}
+                className="px-3 py-1.5 rounded-xl bg-indigo-600/20 border border-indigo-500/40 hover:bg-indigo-600 hover:text-white text-indigo-300 text-xs font-black tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer shadow-lg active:scale-95"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>Admin Login</span>
+              </button>
+            )}
+
+            <button className="w-10 h-10 rounded-full bg-slate-900/80 border border-slate-800/80 flex items-center justify-center text-slate-300 hover:text-white transition-all relative cursor-pointer">
               <Bell className="w-4.5 h-4.5" />
               <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-rose-500 ring-4 ring-slate-950"></span>
             </button>
@@ -247,11 +274,13 @@ const App = () => {
               onClick={() => {
                 setIsAuthenticated(false);
                 setIsAdmin(false);
+                localStorage.setItem('jatala_auth', 'false');
+                localStorage.setItem('jatala_is_admin', 'false');
                 setPassword('');
                 setView('dashboard');
               }}
               className="w-10 h-10 rounded-full bg-slate-900/80 border border-slate-800/80 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              title="Logout"
+              title="Logout / Switch Account"
             >
               <User className="w-4.5 h-4.5" />
             </button>
@@ -369,13 +398,13 @@ const App = () => {
         ) : (
           <Suspense fallback={<DashboardSkeleton />}>
             <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
-              {view === 'landSelection' && (
+               {view === 'landSelection' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                    {[
                      { name: 'RAJANPUR' },
                      { name: 'DASUHA' }
                    ].map((area) => (
-                     <button
+                     <div
                         key={area.name}
                         onClick={() => {
                           setSelectedArea(area.name);
@@ -386,13 +415,27 @@ const App = () => {
                         <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all border border-indigo-500/10">
                            <LandPlot className="w-7 h-7" />
                         </div>
-                        <div className="text-center">
+                        <div className="text-center space-y-1">
                            <h3 className="text-xl font-black tracking-widest text-white uppercase">{area.name}</h3>
+                           <p className="text-slate-400 text-[11px] font-semibold">Click card to view land plot members</p>
                         </div>
-                        <div className="absolute top-6 right-6 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                           <ChevronRight className="w-5 h-5" />
+
+                        {/* Dedicated Upload & Info Action Button */}
+                        <div onClick={(e) => e.stopPropagation()} className="pt-1 z-10">
+                          <button
+                            onClick={() => setSelectedAreaModal(area.name)}
+                            className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/40 hover:border-indigo-500 text-xs font-black tracking-wider uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer"
+                            title={`Upload images, documents & info for ${area.name}`}
+                          >
+                            <Paperclip size={14} className="text-indigo-400 group-hover:text-white" />
+                            <span>Upload Files & Data</span>
+                          </button>
                         </div>
-                     </button>
+
+                        <div className="absolute top-6 right-6 flex items-center gap-1.5 text-slate-500 group-hover:text-white transition-colors">
+                           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                     </div>
                    ))}
                 </div>
               )}
@@ -419,8 +462,68 @@ const App = () => {
  
   
  
+      {/* Quick Admin PIN Overlay Modal */}
+      {showQuickAdminModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-[#090d16] border border-indigo-500/30 rounded-[28px] shadow-2xl p-6 relative overflow-hidden space-y-6">
+            <button 
+              onClick={() => setShowQuickAdminModal(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="text-center space-y-2 pt-2">
+              <div className="w-12 h-12 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-[#818cf8] mx-auto shadow-lg shadow-indigo-950/50">
+                <Lock size={22} />
+              </div>
+              <h3 className="text-lg font-black tracking-widest text-white uppercase">Admin Authentication</h3>
+              <p className="text-slate-400 text-xs font-semibold">Enter PIN to unlock full creation and editing privileges</p>
+            </div>
+
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#818cf8] transition-colors" size={18} />
+                <input 
+                  autoFocus
+                  type={showPassword ? "text" : "password"}
+                  placeholder="ENTER PIN (ali321)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#0c0f16] border border-white/10 p-4 pl-12 rounded-[18px] text-xs font-black text-white outline-none focus:border-[#818cf8] focus:bg-[#11151f] transition-all uppercase tracking-widest placeholder:text-slate-500"
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+
+              {loginError && <p className="text-rose-400 text-[10px] font-bold text-center uppercase tracking-widest">{loginError}</p>}
+
+              <button 
+                type="submit" 
+                className="w-full bg-[#818cf8] hover:bg-[#6366f1] text-white p-4 rounded-[18px] text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+              >
+                Authorize Access
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Real AddEntryModal - Keeps 100% of standard entry functionality */}
       <AddEntryModal isOpen={showEntryModal} onClose={() => setShowEntryModal(false)} onAdd={addEntry} isAdmin={isAdmin} />
+
+      {/* Area Media, Documents & Information Portal Modal */}
+      <AreaModal 
+        isOpen={!!selectedAreaModal} 
+        onClose={() => setSelectedAreaModal(null)} 
+        areaName={selectedAreaModal} 
+        isAdmin={isAdmin} 
+      />
     </div>
   );
 };

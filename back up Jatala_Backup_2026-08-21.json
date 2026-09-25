@@ -1,0 +1,566 @@
+{
+  "farmers": [
+    {
+      "id": "27hj7x3yoVIRQ2EGNxek",
+      "landUnit": "Acres",
+      "theka": 60000,
+      "nameUr": "طیب",
+      "history": [
+        {
+          "date": "2026-04-14",
+          "receiptUrl": null,
+          "method": "Bank",
+          "amount": 150000
+        }
+      ],
+      "nameEn": "TAYYEB",
+      "status": "Paid",
+      "landSize": "2.5",
+      "totalPaid": 150000,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776162024769_tayyab.jpeg?alt=media&token=4df70cc2-d76c-4e85-abb5-88356c19dea9",
+      "totalPayable": 150000,
+      "totalRemaining": 0
+    },
+    {
+      "id": "E7ywwjNOJ7JnAGTirLou",
+      "totalRemaining": 0,
+      "totalPayable": 780000,
+      "landUnit": "Acres",
+      "theka": 60000,
+      "nameUr": "",
+      "history": [
+        {
+          "amount": 406000,
+          "method": "Bank",
+          "date": "2026-04-14",
+          "receiptUrl": null
+        },
+        {
+          "amount": 406020,
+          "method": "Bank",
+          "receiptUrl": null,
+          "date": "2026-04-14"
+        }
+      ],
+      "nameEn": "NAZAR HUSAIN",
+      "status": "Paid",
+      "landSize": 13,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776161734707_nazar.jpeg?alt=media&token=98131091-399c-49ed-9619-88d1a94d7b8b",
+      "totalPaid": 812020
+    },
+    {
+      "id": "QdSqg1l90KCSk6DWpqEt",
+      "landUnit": "Acres",
+      "theka": 60000,
+      "nameUr": "کرم حسین",
+      "history": [
+        {
+          "date": "2026-04-14",
+          "method": "Bank",
+          "receiptUrl": null,
+          "amount": 480000
+        },
+        {
+          "amount": 90000,
+          "date": "2026-04-14",
+          "method": "Bank",
+          "receiptUrl": null
+        }
+      ],
+      "nameEn": "HAFIZ QASIM",
+      "status": "Paid",
+      "totalPaid": 570000,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776162593230_allah%20yar.jpeg?alt=media&token=a017b0da-8ac0-46dc-8bc5-16106f51f5b9",
+      "landSize": "9.5",
+      "totalRemaining": 0,
+      "totalPayable": 570000
+    },
+    {
+      "id": "TywiudM6Crv0MTxZwIzJ",
+      "totalRemaining": 0,
+      "totalPayable": 0,
+      "theka": 60000,
+      "landUnit": "Acres",
+      "nameUr": "بشیر",
+      "history": [
+        {
+          "amount": 420000,
+          "receiptUrl": null,
+          "method": "Bank",
+          "date": "2026-04-14"
+        }
+      ],
+      "nameEn": "BASHIR",
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776161788365_bashir.jpeg?alt=media&token=2a1b26fc-db95-4fc4-81ad-109b6fe695c4",
+      "totalPaid": 420000,
+      "landSize": "7",
+      "status": "Paid"
+    },
+    {
+      "id": "VqhEUh8Kwt3qbtPSU6Fg",
+      "totalPayable": 510000,
+      "totalRemaining": 26750,
+      "landUnit": "Acres",
+      "theka": 60000,
+      "nameUr": "راشد",
+      "nameEn": "HAJI  AHMED",
+      "history": [
+        {
+          "method": "Cash",
+          "receiptUrl": null,
+          "date": "2026-04-21",
+          "amount": 433250
+        },
+        {
+          "date": "2024-03-22",
+          "balance": 25000,
+          "amount": 50000
+        }
+      ],
+      "status": "Pending",
+      "totalPaid": 483250,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776162144705_qari%20ramzan.jpeg?alt=media&token=9c5a79df-f0e6-4438-af9c-3819126c62d2",
+      "landSize": "8.5"
+    },
+    {
+      "id": "YkDWpcIeOaD9loIIFIZr",
+      "totalRemaining": 0,
+      "totalPayable": 525000,
+      "nameUr": "لیاقت علی",
+      "theka": 60000,
+      "landUnit": "Acres",
+      "totalPaid": 525000,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776161983109_liaqat.jpeg?alt=media&token=f3df2202-1ac9-4a8a-a224-9b0617af8e59",
+      "landSize": "8.75",
+      "status": "Paid",
+      "nameEn": "LIAQAT",
+      "history": [
+        {
+          "amount": 45000,
+          "receiptUrl": null,
+          "method": "Cash",
+          "date": "2026-04-21"
+        },
+        {
+          "date": "2026-04-14",
+          "receiptUrl": null,
+          "method": "Bank",
+          "amount": 480000
+        }
+      ]
+    },
+    {
+      "id": "ZTzOihozNAm9lWbHf9pN",
+      "landUnit": "Acres",
+      "theka": 60000,
+      "nameUr": "رمضان",
+      "history": [
+        {
+          "amount": 180000,
+          "date": "2026-04-14",
+          "receiptUrl": null,
+          "method": "Bank"
+        }
+      ],
+      "nameEn": "M RAMZAN",
+      "status": "Paid",
+      "landSize": "3",
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776161880532_m%20ramzan.jpeg?alt=media&token=9615b7bf-ae38-4d4f-abfc-791b4ae0ea7e",
+      "totalPaid": 180000,
+      "totalPayable": 15000,
+      "totalRemaining": 0
+    },
+    {
+      "id": "dxB84yzK9IVzm0cowbVh",
+      "totalRemaining": 0,
+      "totalPayable": 30000,
+      "nameEn": "AKBAR",
+      "history": [
+        {
+          "receiptUrl": null,
+          "method": "Cash",
+          "date": "2026-04-21",
+          "amount": 30000
+        }
+      ],
+      "totalPaid": 30000,
+      "landSize": 0.5,
+      "status": "Paid",
+      "theka": 60000,
+      "landUnit": "Acres",
+      "nameUr": ""
+    },
+    {
+      "id": "xnD9apggUBpY83YFbMqG",
+      "totalPayable": 1155744,
+      "totalRemaining": 30744,
+      "history": [
+        {
+          "date": "2026-04-14",
+          "method": "Bank",
+          "receiptUrl": null,
+          "amount": 60000
+        },
+        {
+          "method": "Bank",
+          "receiptUrl": null,
+          "date": "2026-04-14",
+          "amount": 1065000
+        }
+      ],
+      "nameEn": "Salamat",
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/agreementUrl%2F1776161309383_a%20razaq.jpeg?alt=media&token=c381fa91-fd3e-4710-92f1-6c9e5084c8db",
+      "totalPaid": 1125000,
+      "landSize": "18.75",
+      "status": "Pending",
+      "theka": 61640,
+      "landUnit": "Acres",
+      "nameUr": "سلا مت علی"
+    },
+    {
+      "id": "zpV3K62h53URKaeFBHeD",
+      "theka": 103136,
+      "landUnit": "Acres",
+      "nameUr": "راشد",
+      "history": [
+        {
+          "amount": 900000,
+          "note": "Initial Settlement",
+          "method": "Cash",
+          "date": "2026-01-15"
+        }
+      ],
+      "nameEn": "Rashid",
+      "landSize": "8.75",
+      "totalPaid": 900000,
+      "status": "Pending",
+      "totalPayable": 902444,
+      "totalRemaining": 2444
+    }
+  ],
+  "shops": [
+    {
+      "id": "BOuTPycLjCHys0fpDdzr",
+      "status": "Pending",
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/shops%2FBOuTPycLjCHys0fpDdzr%2FagreementUrl%2F1776196689350_11.jpeg?alt=media&token=dbf5b50e-81e0-4805-882c-56955102a146",
+      "rent": 120000,
+      "name": "",
+      "tenant": "AAMIR MOBILE, FAISALABAD",
+      "area": "120000",
+      "createdAt": "2026-04-14T19:49:01.512Z"
+    },
+    {
+      "id": "Coxj9D635LTe4zARXWme",
+      "name": "12 30",
+      "area": "9500",
+      "createdAt": "2026-04-14T19:17:25.603Z",
+      "tenant": "SERVICE STATION, RAJANPUR",
+      "status": "Pending",
+      "rent": 9500
+    },
+    {
+      "id": "DMmLlxkpWNZNF6lTVjaw",
+      "tenant": "LUNDA SHOP,  RAJANPUR",
+      "createdAt": "2026-04-14T19:59:15.179Z",
+      "area": "9000",
+      "name": "",
+      "rent": 9000,
+      "status": "Pending"
+    },
+    {
+      "id": "Rjl2lMvbWgKETe2fPPdX",
+      "createdAt": "2026-04-14T19:52:52.678Z",
+      "area": "200000",
+      "tenant": "QUETTA CAFE, FAISALABAD",
+      "name": "24 30",
+      "rent": 200000,
+      "agreementUrl": "https://firebasestorage.googleapis.com/v0/b/jatala-properties.firebasestorage.app/o/shops%2FRjl2lMvbWgKETe2fPPdX%2FagreementUrl%2F1776196652460_1.jpeg?alt=media&token=5ab80057-a09f-440c-aa22-20ba6031884b",
+      "status": "Pending"
+    },
+    {
+      "id": "WwLExVRpZxnuZuuoIfOE",
+      "status": "Pending",
+      "rent": 13000,
+      "name": "",
+      "tenant": "DANYAL SHOP, RAJANPUR",
+      "createdAt": "2026-04-14T19:59:31.604Z",
+      "area": "13000"
+    }
+  ],
+  "sold_properties": [
+    {
+      "id": "ND0VqRpnELWFIZEoC3h6",
+      "nameEn": "HOUSE, NIMAT COLONY RAJANPUR",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776195863,
+        "nanoseconds": 818000000
+      },
+      "status": "Fully Paid",
+      "totalPrice": 6500000,
+      "installments": [
+        {
+          "amount": 928571,
+          "date": "2026-04-15",
+          "id": "1776276790227",
+          "method": "Bank",
+          "remainingBalanceAfter": 5571429
+        },
+        {
+          "method": "Bank",
+          "id": "1776276806619",
+          "date": "2026-04-15",
+          "amount": 1857142,
+          "remainingBalanceAfter": 4642858
+        },
+        {
+          "remainingBalanceAfter": 4642858,
+          "date": "2026-04-15",
+          "amount": 1857142,
+          "method": "Bank",
+          "id": "1776276814388"
+        },
+        {
+          "date": "2026-05-01",
+          "method": "Bank",
+          "amount": 372000,
+          "id": "1777615828862",
+          "remainingBalanceAfter": 1485145
+        },
+        {
+          "date": "2026-06-05",
+          "remainingBalanceAfter": 968702,
+          "method": "Bank",
+          "amount": 516443,
+          "id": "1780924687843"
+        },
+        {
+          "remainingBalanceAfter": 0,
+          "date": "2026-06-20",
+          "id": "1781975805144",
+          "amount": 968702,
+          "method": "Bank"
+        }
+      ],
+      "buyerName": "A HAFEEZ"
+    },
+    {
+      "id": "WGBN7U1p1HINxNDrLBk8",
+      "status": "Ongoing Installments",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776196983,
+        "nanoseconds": 43000000
+      },
+      "totalPrice": 42750000,
+      "nameEn": "8.5 ACR",
+      "buyerName": "MOLVI QASIM",
+      "installments": [
+        {
+          "method": "Cash",
+          "remainingBalanceAfter": 42100000,
+          "date": "2025-12-15",
+          "amount": 650000,
+          "id": "1776253850251"
+        },
+        {
+          "amount": 1645714,
+          "remainingBalanceAfter": 40454286,
+          "id": "1776691806794",
+          "method": "Cheque",
+          "date": "2026-04-20"
+        },
+        {
+          "id": "1776691825712",
+          "amount": 1645714,
+          "method": "Cheque",
+          "remainingBalanceAfter": 40454286,
+          "date": "2026-04-20"
+        },
+        {
+          "id": "1776691846490",
+          "method": "Cheque",
+          "remainingBalanceAfter": 41277143,
+          "amount": 822857,
+          "date": "2026-04-20"
+        },
+        {
+          "method": "Cheque",
+          "remainingBalanceAfter": 41441715,
+          "amount": 658285,
+          "date": "2026-04-20",
+          "id": "1776691896187"
+        },
+        {
+          "remainingBalanceAfter": 41770858,
+          "amount": 329142,
+          "date": "2026-04-20",
+          "id": "1776691980237",
+          "method": "Cheque"
+        },
+        {
+          "remainingBalanceAfter": 32398288,
+          "method": "Bank",
+          "amount": 4600000,
+          "id": "1783434119333",
+          "date": "2026-07-07"
+        }
+      ]
+    },
+    {
+      "id": "c0vcXtiuVLHQ1SOW9oha",
+      "totalPrice": 2500000,
+      "nameEn": "0.5 ACR",
+      "installments": [
+        {
+          "method": "Cash",
+          "amount": 600000,
+          "date": "2025-12-15",
+          "remainingBalanceAfter": 1900000,
+          "id": "1776253745336"
+        },
+        {
+          "amount": 900000,
+          "date": "2026-04-11",
+          "id": "1776253777866",
+          "remainingBalanceAfter": 1000000,
+          "method": "Cash"
+        }
+      ],
+      "buyerName": "AKBAR",
+      "status": "Ongoing Installments",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776253660,
+        "nanoseconds": 340000000
+      }
+    },
+    {
+      "id": "e4tC3Svhqk0xU2s2d9GQ",
+      "buyerName": "TAYYEB",
+      "installments": [
+        {
+          "method": "Cash",
+          "id": "1776276697123",
+          "remainingBalanceAfter": 10760001,
+          "date": "2026-04-11",
+          "amount": 489999
+        }
+      ],
+      "totalPrice": 11250000,
+      "nameEn": "2.5 ACR",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776197572,
+        "nanoseconds": 665000000
+      },
+      "status": "Ongoing Installments"
+    },
+    {
+      "id": "fTIoDkf6II7ibDstmi44",
+      "status": "Ongoing Installments",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776197081,
+        "nanoseconds": 609000000
+      },
+      "buyerName": "HAJI AHMED",
+      "nameEn": "8.5 ACR",
+      "totalPrice": 38250000,
+      "installments": [
+        {
+          "id": "1776197213973",
+          "remainingBalanceAfter": 37450000,
+          "date": "2026-04-11",
+          "amount": 800000,
+          "method": "Cash"
+        }
+      ]
+    },
+    {
+      "id": "yUAVxj9mdgzXc3S9xu9c",
+      "installments": [
+        {
+          "method": "Cheque",
+          "remainingBalanceAfter": 28928572,
+          "id": "1776691678668",
+          "date": "2026-04-20",
+          "amount": 2571428
+        },
+        {
+          "method": "Cheque",
+          "id": "1776691733512",
+          "remainingBalanceAfter": 27900001,
+          "date": "2026-04-20",
+          "amount": 1028571
+        },
+        {
+          "id": "1776691745923",
+          "remainingBalanceAfter": 27900001,
+          "date": "2026-04-20",
+          "amount": 1028571,
+          "method": "Cheque"
+        },
+        {
+          "method": "Cheque",
+          "id": "1776691759648",
+          "remainingBalanceAfter": 28414287,
+          "date": "2026-04-20",
+          "amount": 514285
+        },
+        {
+          "id": "1777912520467",
+          "remainingBalanceAfter": 23785717,
+          "amount": 2571428,
+          "date": "2026-05-04",
+          "method": "Bank"
+        },
+        {
+          "method": "Bank",
+          "amount": 1285714,
+          "date": "2026-05-04",
+          "remainingBalanceAfter": 25071431,
+          "id": "1777912560460"
+        }
+      ],
+      "totalPrice": 31500000,
+      "nameEn": "7 ACR",
+      "buyerName": "BASHIR",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1776197849,
+        "nanoseconds": 739000000
+      },
+      "status": "Ongoing Installments"
+    }
+  ],
+  "revenue": [],
+  "expenses": [
+    {
+      "id": "4rrqAxbu8xm1Turx9Ztz",
+      "amount": 80000,
+      "status": "received",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1777399892,
+        "nanoseconds": 703000000
+      },
+      "date": "2026-04-13",
+      "label": "Other",
+      "description": "Advocate fee for shop documentation"
+    },
+    {
+      "id": "jrgcOKMt5U6ybKooyVl0",
+      "amount": 168032,
+      "date": "2026-08-21",
+      "createdAt": {
+        "type": "firestore/timestamp/1.0",
+        "seconds": 1787336552,
+        "nanoseconds": 32000000
+      },
+      "label": "Tax",
+      "description": "21D property tax ",
+      "status": "received"
+    }
+  ]
+}
