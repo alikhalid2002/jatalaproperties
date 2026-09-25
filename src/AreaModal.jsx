@@ -18,6 +18,7 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
   const [activeTab, setActiveTab] = useState('files'); // 'files' | 'info'
   const [previewImage, setPreviewImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null); // { id, name, type: 'file'|'memo' }
   const fileInputRef = useRef(null);
 
   // Form states for Area Info editing
@@ -287,15 +288,15 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {images.map((img) => (
-                      <div 
+                      <div
                         key={img.id}
                         className="group relative bg-slate-900 border border-white/10 rounded-xl overflow-hidden shadow-lg hover:border-indigo-500/50 transition-all"
                       >
                         <div className="aspect-square w-full overflow-hidden bg-slate-950 relative">
-                          <img 
-                            src={img.url} 
-                            alt={img.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                          <img
+                            src={img.url}
+                            alt={img.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                           <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <button
@@ -315,18 +316,20 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                             >
                               <Download size={15} />
                             </a>
-                            <button
-                              onClick={() => deleteFile(img.id)}
-                              className="p-2 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white transition-all cursor-pointer"
-                              title="Delete"
-                            >
-                              <Trash2 size={15} />
-                            </button>
                           </div>
                         </div>
-                        <div className="p-2 bg-slate-900/90 border-t border-white/5">
-                          <p className="text-[11px] font-bold text-slate-200 truncate">{img.name}</p>
-                          <p className="text-[9px] text-slate-400 mt-0.5">{img.size} • {img.uploadedAt}</p>
+                        <div className="p-2 bg-slate-900/90 border-t border-white/5 flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-bold text-slate-200 truncate">{img.name}</p>
+                            <p className="text-[9px] text-slate-400 mt-0.5">{img.size} • {img.uploadedAt}</p>
+                          </div>
+                          <button
+                            onClick={() => setConfirmDelete({ id: img.id, name: img.name, type: 'file' })}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ml-2"
+                            title="Delete Image"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -351,12 +354,12 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
                             <File size={20} />
-                          </div>
+                            </div>
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors">{docItem.name}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">{docItem.size} • Uploaded on {docItem.uploadedAt}</p>
+                            </div>
                           </div>
-                        </div>
 
                         <div className="flex items-center gap-2 shrink-0">
                           <a
@@ -369,13 +372,13 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                             <span className="hidden sm:inline">Open</span>
                           </a>
                           <button
-                            onClick={() => deleteFile(docItem.id)}
+                            onClick={() => setConfirmDelete({ id: docItem.id, name: docItem.name, type: 'file' })}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
                             title="Delete Document"
                           >
                             <Trash2 size={16} />
                           </button>
-                        </div>
+                          </div>
                       </div>
                     ))}
                   </div>
@@ -582,9 +585,9 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                                 <Clock size={11} />
                                 <span>{memo.date}</span>
                               </span>
-                            </div>
+                              </div>
                             <h4 className="text-sm font-black text-white uppercase tracking-wider pt-1">{memo.title}</h4>
-                          </div>
+                            </div>
 
                           <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button
@@ -595,14 +598,14 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
                               <Edit3 size={15} />
                             </button>
                             <button
-                              onClick={() => deleteMemo(memo.id)}
+                              onClick={() => setConfirmDelete({ id: memo.id, name: memo.title, type: 'memo' })}
                               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
                               title="Delete Memo"
                             >
                               <Trash2 size={15} />
                             </button>
+                            </div>
                           </div>
-                        </div>
 
                         {memo.content && (
                           <p className="text-xs text-slate-300 font-normal leading-relaxed whitespace-pre-wrap pt-1 border-t border-white/5">
@@ -657,6 +660,49 @@ export default function AreaModal({ isOpen, onClose, areaName, isAdmin }) {
             alt="Full Preview" 
             className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl" 
           />
+        </div>
+      )}
+
+      {/* ── Confirm Delete Dialog ── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-70 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-sm bg-[#0e1422] border border-rose-500/30 rounded-[24px] shadow-2xl p-6 space-y-5">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                <Trash2 size={26} />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-white uppercase tracking-widest">Delete {confirmDelete.type === 'memo' ? 'Memo' : 'File'}?</h3>
+                <p className="text-xs text-slate-400 mt-1 font-semibold leading-relaxed">
+                  Are you sure you want to delete<br />
+                  <span className="text-white font-bold">"{confirmDelete.name}"</span>?<br />
+                  <span className="text-rose-400">This cannot be undone.</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (confirmDelete.type === 'file') {
+                    await deleteFile(confirmDelete.id);
+                  } else {
+                    await deleteMemo(confirmDelete.id);
+                  }
+                  setConfirmDelete(null);
+                }}
+                className="py-3 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer active:scale-95 shadow-lg shadow-rose-950/40"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
