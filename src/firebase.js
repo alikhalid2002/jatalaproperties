@@ -43,5 +43,5 @@ export const auth = getAuth(app);
 // Enable security rules compliance by signing in anonymously
 signInAnonymously(auth).catch(err => console.error("Firebase Auth Error:", err));
 
-export const APP_VERSION = '1.3.0'; 
+export const APP_VERSION = '1.4.0'; 
 export const getDataPath = (collectionName) => collectionName;
